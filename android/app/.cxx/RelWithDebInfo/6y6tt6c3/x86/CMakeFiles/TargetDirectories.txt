@@ -1,0 +1,2 @@
+/Users/y.shikita/Downloads/FlutterProjects/three_tasks/android/app/.cxx/RelWithDebInfo/6y6tt6c3/x86/CMakeFiles/edit_cache.dir
+/Users/y.shikita/Downloads/FlutterProjects/three_tasks/android/app/.cxx/RelWithDebInfo/6y6tt6c3/x86/CMakeFiles/rebuild_cache.dir
