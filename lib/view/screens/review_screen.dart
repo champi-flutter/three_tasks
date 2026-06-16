@@ -4,10 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:three_tasks/db/database.dart';
+import 'package:three_tasks/entities/view_type/task_type.dart';
 import 'package:three_tasks/main.dart';
-import 'package:three_tasks/screens/history_screen.dart';
-
-import '../ad_helper.dart';
+import 'history_screen.dart';
 import 'home_screen.dart';
 
 enum ReviewStatus { date, week, month, year }
@@ -19,17 +18,15 @@ bool _isEditedReview = false;
 get isEditedReview => _isEditedReview;
 
 class ReviewScreen extends StatefulWidget {
-  final ReviewStatus reviewStatus;
+  final TaskType taskType;
 
   final TimeStatus timeStatus;
 
-  final int toastCount;
-
-  const ReviewScreen(
-      {super.key,
-      required this.reviewStatus,
+  const ReviewScreen({
+    super.key,
+      required this.taskType,
       required this.timeStatus,
-      required this.toastCount});
+  });
 
   @override
   State<ReviewScreen> createState() => _ReviewScreenState();
@@ -79,17 +76,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
   // List<FocusNode> _focusNode = [];
   late FocusNode _focusNode;
 
-  // バナー広告の内容
-  BannerAd? _ad;
-
-  // バナー広告がロードされたかどうか
-  bool _isAdLoaded = false;
-
-  // インタースティシャル広告の内容
-  InterstitialAd? _interstitialAd;
-
-  int _toastCount = 0;
-
   // タスクが存在するかどうか
   bool _isNotExist= false;
 
@@ -98,43 +84,11 @@ class _ReviewScreenState extends State<ReviewScreen> {
   void initState() {
     // _focusNode = [FocusNode(), FocusNode(), FocusNode()];
     _focusNode = FocusNode();
-    _toastCount = widget.toastCount;
     _reviewStatus = widget.reviewStatus;
-    // todo バナー広告のロード
-    _loadBannerAd();
 
     // todo タスク取得
     _setItems();
     super.initState();
-  }
-
-  // todo バナー広告をロードするメソッド in initState
-  _loadBannerAd() {
-
-    // await _initGoogleMobileAds();
-    BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdHelper.bannerAdUnitId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          // Loadが完了したらリビルド
-          setState(() {
-            _ad = ad as BannerAd;
-            _isAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          // 失敗時の処理
-          ad.dispose();
-          print(
-            "Ad load failed (code = ${error.code} message = ${error.message})",
-          );
-        },
-      ),
-      request: AdRequest(),
-    ).load();
-
-    print("ーーー _adの初期化完了 ーーー");
   }
 
   // todo バナー広告Widget in build
@@ -150,12 +104,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       //   );
       // }
       // todo Loadされた広告を表示
-      return Container(
-        width: _isAdLoaded ? _ad!.size.width.toDouble() : double.infinity,
-        height: 100.0,
-        alignment: Alignment.center,
-        child: _isAdLoaded ? AdWidget(ad: _ad!) : null,
-      );
+      return Container();
     });
   }
 
@@ -167,41 +116,37 @@ class _ReviewScreenState extends State<ReviewScreen> {
           _reviewTask = await database.allTasksForToday;
         } else {
           _reviewTask = await database.allTasksForYesterday;
-          if (_reviewTask.length == 0) {
-            if (_toastCount == 0) {
-              _toastCount++;
-              Fluttertoast.showToast(
-                msg: '''タスクが見つかりませんでした
-              (´・ω・｀)''',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              // todo インタースティシャル広告
-              if (interstitialStack % 4 == 0 && _interstitialAd == null) {
-                _loadInterstitialAd();
-              }
-            } else if (_toastCount == 1) {
-              Fluttertoast.showToast(
-                msg: "だからないって(　˙-˙　)",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              _toastCount++;
-            } else if (_toastCount == 2) {
-              Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,);
-              _toastCount = 0;
-            }
-            _isNotExist = true;
-            _reviewTask = ["", "", ""];
-          }
+          // if (_reviewTask.length == 0) {
+          //   if (_toastCount == 0) {
+          //     _toastCount++;
+          //     Fluttertoast.showToast(
+          //       msg: '''タスクが見つかりませんでした
+          //     (´・ω・｀)''',
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //   } else if (_toastCount == 1) {
+          //     Fluttertoast.showToast(
+          //       msg: "だからないって(　˙-˙　)",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //     _toastCount++;
+          //   } else if (_toastCount == 2) {
+          //     Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,);
+          //     _toastCount = 0;
+          //   }
+          //   _isNotExist = true;
+          //   _reviewTask = ["", "", ""];
+          // }
         }
 
       case ReviewStatus.week:
@@ -211,126 +156,126 @@ class _ReviewScreenState extends State<ReviewScreen> {
           _reviewTask = await database.allTasksForLastWeek;
           print("_reviewTask!!!!!!!!!");
           print("_reviewTask!!!!!!!!!: ${_reviewTask.length}");
-          if (_reviewTask.length == 0) {
-            if (_toastCount == 0) {
-              _toastCount++;
-              Fluttertoast.showToast(
-                msg: '''タスクが見つかりませんでした
-              (´・ω・｀)''',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-            } else if (_toastCount == 1) {
-              Fluttertoast.showToast(
-                msg: "だからないって(　˙-˙　)",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              _toastCount++;
-            } else if (_toastCount == 2) {
-              Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,);
-              _toastCount = 0;
-            }
-            _isNotExist = true;
-            _reviewTask = ["", "", ""];
-          }
+          // if (_reviewTask.length == 0) {
+          //   if (_toastCount == 0) {
+          //     _toastCount++;
+          //     Fluttertoast.showToast(
+          //       msg: '''タスクが見つかりませんでした
+          //     (´・ω・｀)''',
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //   } else if (_toastCount == 1) {
+          //     Fluttertoast.showToast(
+          //       msg: "だからないって(　˙-˙　)",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //     _toastCount++;
+          //   } else if (_toastCount == 2) {
+          //     Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,);
+          //     _toastCount = 0;
+          //   }
+          //   _isNotExist = true;
+          //   _reviewTask = ["", "", ""];
+          // }
         }
       case ReviewStatus.month:
         if (widget.timeStatus == TimeStatus.now) {
           _reviewTask = await database.allTasksForThisMonth;
         } else {
           _reviewTask = await database.allTasksForLastMonth;
-          if (_reviewTask.length == 0) {
-            // todo ToastMessage「タスクが見つかりませんでした(´・ω・｀)」
-            if (_toastCount == 0) {
-              _toastCount++;
-              Fluttertoast.showToast(
-                msg: '''タスクが見つかりませんでした
-              (´・ω・｀)''',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              // todo インタースティシャル広告
-              if (interstitialStack % 4 == 0 && _interstitialAd == null) {
-                _loadInterstitialAd();
-              }
-            } else if (_toastCount == 1) {
-              Fluttertoast.showToast(
-                msg: "だからないって(　˙-˙　)",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              _toastCount++;
-            } else if (_toastCount == 2) {
-              Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,);
-              _toastCount = 0;
-            }
-            _isNotExist = true;
-            _reviewTask = ["", "", ""];
-          }
+          // if (_reviewTask.length == 0) {
+          //   // todo ToastMessage「タスクが見つかりませんでした(´・ω・｀)」
+          //   if (_toastCount == 0) {
+          //     _toastCount++;
+          //     Fluttertoast.showToast(
+          //       msg: '''タスクが見つかりませんでした
+          //     (´・ω・｀)''',
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //     // todo インタースティシャル広告
+          //     if (interstitialStack % 4 == 0 && _interstitialAd == null) {
+          //       _loadInterstitialAd();
+          //     }
+          //   } else if (_toastCount == 1) {
+          //     Fluttertoast.showToast(
+          //       msg: "だからないって(　˙-˙　)",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //     _toastCount++;
+          //   } else if (_toastCount == 2) {
+          //     Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,);
+          //     _toastCount = 0;
+          //   }
+          //   _isNotExist = true;
+          //   _reviewTask = ["", "", ""];
+          // }
         }
       case ReviewStatus.year:
         if (widget.timeStatus == TimeStatus.now) {
           _reviewTask = await database.allTasksForThisYear;
         } else {
           _reviewTask = await database.allTasksForLastYear;
-          if (_reviewTask.length == 0) {
-            if (_toastCount == 0) {
-              _toastCount++;
-              Fluttertoast.showToast(
-                msg: '''タスクが見つかりませんでした
-              (´・ω・｀)''',
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              // todo インタースティシャル広告
-              if (interstitialStack % 4 == 0 && _interstitialAd == null) {
-                _loadInterstitialAd();
-              }
-            } else if (_toastCount == 1) {
-              Fluttertoast.showToast(
-                msg: "だからないって(　˙-˙　)",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,
-              );
-              _toastCount++;
-            } else if (_toastCount == 2) {
-              Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
-                toastLength: Toast.LENGTH_LONG,
-                gravity: ToastGravity.TOP,
-                textColor: Theme.of(context).colorScheme.secondary,
-                backgroundColor: Theme.of(context).colorScheme.onSecondary,);
-              _toastCount = 0;
-            }
-            _isNotExist = true;
-            _reviewTask = ["", "", ""];
-          }
+          // if (_reviewTask.length == 0) {
+          //   if (_toastCount == 0) {
+          //     _toastCount++;
+          //     Fluttertoast.showToast(
+          //       msg: '''タスクが見つかりませんでした
+          //     (´・ω・｀)''',
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //     // todo インタースティシャル広告
+          //     if (interstitialStack % 4 == 0 && _interstitialAd == null) {
+          //       _loadInterstitialAd();
+          //     }
+          //   } else if (_toastCount == 1) {
+          //     Fluttertoast.showToast(
+          //       msg: "だからないって(　˙-˙　)",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,
+          //     );
+          //     _toastCount++;
+          //   } else if (_toastCount == 2) {
+          //     Fluttertoast.showToast(msg: "( ´・ω) (´・ω・) (・ω・｀) (ω・｀ ) ",
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.TOP,
+          //       textColor: Theme.of(context).colorScheme.secondary,
+          //       backgroundColor: Theme.of(context).colorScheme.onSecondary,);
+          //     _toastCount = 0;
+          //   }
+          //   _isNotExist = true;
+          //   _reviewTask = ["", "", ""];
+          // }
         }
     }
     _isTaskLoaded = true;
-    if (!_isNotExist){
-      _toastCount = 0;
-    }
+    // if (!_isNotExist){
+    //   _toastCount = 0;
+    // }
 
     setState(() {
       for (int i = 0; i < 3; i++) {
@@ -354,9 +299,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
     //   ..[1].dispose()
     //   ..[2].dispose();
     _focusNode.dispose();
-    _ad?.dispose();
-    _isAdLoaded = false;
-    _interstitialAd?.dispose();
     // for (int j = 0; j < 4; j++) {
     //   for (int k = 0; k < 2; k++) {
     //     _controller[j][k].dispose();
@@ -380,19 +322,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ) {
           if (didPop) return;
           if (_isNotExist){
-            Navigator.of(context).pop(_toastCount);
-            print("　　　　_toastCount = $_toastCount");
+            Navigator.of(context).pop();
           }
           else if (_isEdited) {
             _onPopped();
           } else {
-            Navigator.pop(context, _toastCount);
-            // todo インタースティシャル広告
-            if (interstitialStack % 4 == 0 &&
-                _interstitialAd == null &&
-                _toastCount == 0) {
-              _loadInterstitialAd();
-            }
+            Navigator.pop(context);
           }
         },
         child: Scaffold(
@@ -463,43 +398,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(super.context, 0);
-                // todo インタースティシャル広告
-                if (interstitialStack % 4 == 0 &&
-                    _interstitialAd == null &&
-                    _toastCount == 0) {
-                  _loadInterstitialAd();
-                }
               },
               child: Text("破棄"),
             ),
           ],
         );
       },
-    );
-  }
-
-  // todo インタースティシャル広告をロードするメソッド
-  _loadInterstitialAd() {
-    print("${interstitialStack}");
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback;
-          ad.show();
-          // Loadが完了したらリビルド
-          setState(() {
-            _interstitialAd = ad;
-          });
-        },
-        onAdFailedToLoad: (error) {
-          // 失敗時の処理
-          print(
-            "インタースティシャル広告読み込み失敗 (code = ${error.code} message = ${error.message})",
-          );
-        },
-      ),
-      request: AdRequest(),
     );
   }
 

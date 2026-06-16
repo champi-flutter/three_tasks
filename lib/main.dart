@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:three_tasks/screens/home_screen.dart';
-import 'package:three_tasks/screens/week_tasks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:three_tasks/view/screens/home_screen.dart';
 
 import 'db/database.dart';
 
@@ -42,10 +40,12 @@ void main() {
   // WidgetsFlutterBinding.ensureInitialized();
   // MobileAds.instance.initialize();
 
-  runApp(MyApp(
-      // isFirstLaunch: _isFirstLaunch,
-
-      ));
+  runApp(ProviderScope(
+    child: MyApp(
+        // isFirstLaunch: _isFirstLaunch,
+    
+        ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenUtilInit(
       // designSize: Size(411, 913),
-      designSize: Size(411, 914),
+      designSize: Size(412, 915),
       minTextAdapt: false,
       splitScreenMode: true,
       builder: (_, child) => MaterialApp(

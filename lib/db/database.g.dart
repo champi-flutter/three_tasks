@@ -15,9 +15,9 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _dateMeta = const VerificationMeta('date');
   @override
-  late final GeneratedColumn<String> date = GeneratedColumn<String>(
+  late final GeneratedColumn<int> date = GeneratedColumn<int>(
       'date', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -102,7 +102,7 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
       task: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}task'])!,
       date: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}date'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}date'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       isChecked: attachedDatabase.typeMapping
@@ -122,7 +122,7 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
 
 class DayTask extends DataClass implements Insertable<DayTask> {
   final String task;
-  final String date;
+  final int date;
   final int id;
   final bool isChecked;
   final String? result;
@@ -138,7 +138,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['task'] = Variable<String>(task);
-    map['date'] = Variable<String>(date);
+    map['date'] = Variable<int>(date);
     map['id'] = Variable<int>(id);
     map['is_checked'] = Variable<bool>(isChecked);
     if (!nullToAbsent || result != null) {
@@ -169,7 +169,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DayTask(
       task: serializer.fromJson<String>(json['task']),
-      date: serializer.fromJson<String>(json['date']),
+      date: serializer.fromJson<int>(json['date']),
       id: serializer.fromJson<int>(json['id']),
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       result: serializer.fromJson<String?>(json['result']),
@@ -181,7 +181,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'task': serializer.toJson<String>(task),
-      'date': serializer.toJson<String>(date),
+      'date': serializer.toJson<int>(date),
       'id': serializer.toJson<int>(id),
       'isChecked': serializer.toJson<bool>(isChecked),
       'result': serializer.toJson<String?>(result),
@@ -191,7 +191,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
 
   DayTask copyWith(
           {String? task,
-          String? date,
+          int? date,
           int? id,
           bool? isChecked,
           Value<String?> result = const Value.absent(),
@@ -246,7 +246,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
 
 class DayTasksCompanion extends UpdateCompanion<DayTask> {
   final Value<String> task;
-  final Value<String> date;
+  final Value<int> date;
   final Value<int> id;
   final Value<bool> isChecked;
   final Value<String?> result;
@@ -261,7 +261,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
   });
   DayTasksCompanion.insert({
     required String task,
-    required String date,
+    required int date,
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
@@ -270,7 +270,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
         date = Value(date);
   static Insertable<DayTask> custom({
     Expression<String>? task,
-    Expression<String>? date,
+    Expression<int>? date,
     Expression<int>? id,
     Expression<bool>? isChecked,
     Expression<String>? result,
@@ -288,7 +288,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
 
   DayTasksCompanion copyWith(
       {Value<String>? task,
-      Value<String>? date,
+      Value<int>? date,
       Value<int>? id,
       Value<bool>? isChecked,
       Value<String?>? result,
@@ -310,7 +310,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
       map['task'] = Variable<String>(task.value);
     }
     if (date.present) {
-      map['date'] = Variable<String>(date.value);
+      map['date'] = Variable<int>(date.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -352,23 +352,11 @@ class $WeeklyTasksTable extends WeeklyTasks
   late final GeneratedColumn<String> task = GeneratedColumn<String>(
       'task', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _weekMeta = const VerificationMeta('week');
+  static const VerificationMeta _firstDateMeta =
+      const VerificationMeta('firstDate');
   @override
-  late final GeneratedColumn<String> week = GeneratedColumn<String>(
-      'week', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _monthMeta = const VerificationMeta('month');
-  @override
-  late final GeneratedColumn<int> month = GeneratedColumn<int>(
-      'month', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: Constant(now.month));
-  static const VerificationMeta _firstDayMeta =
-      const VerificationMeta('firstDay');
-  @override
-  late final GeneratedColumn<int> firstDay = GeneratedColumn<int>(
-      'first_day', aliasedName, false,
+  late final GeneratedColumn<int> firstDate = GeneratedColumn<int>(
+      'first_date', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
@@ -402,7 +390,7 @@ class $WeeklyTasksTable extends WeeklyTasks
       type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [task, week, month, firstDay, id, isChecked, result, improvement];
+      [task, firstDate, id, isChecked, result, improvement];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -419,21 +407,11 @@ class $WeeklyTasksTable extends WeeklyTasks
     } else if (isInserting) {
       context.missing(_taskMeta);
     }
-    if (data.containsKey('week')) {
-      context.handle(
-          _weekMeta, week.isAcceptableOrUnknown(data['week']!, _weekMeta));
+    if (data.containsKey('first_date')) {
+      context.handle(_firstDateMeta,
+          firstDate.isAcceptableOrUnknown(data['first_date']!, _firstDateMeta));
     } else if (isInserting) {
-      context.missing(_weekMeta);
-    }
-    if (data.containsKey('month')) {
-      context.handle(
-          _monthMeta, month.isAcceptableOrUnknown(data['month']!, _monthMeta));
-    }
-    if (data.containsKey('first_day')) {
-      context.handle(_firstDayMeta,
-          firstDay.isAcceptableOrUnknown(data['first_day']!, _firstDayMeta));
-    } else if (isInserting) {
-      context.missing(_firstDayMeta);
+      context.missing(_firstDateMeta);
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
@@ -463,12 +441,8 @@ class $WeeklyTasksTable extends WeeklyTasks
     return WeeklyTask(
       task: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}task'])!,
-      week: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}week'])!,
-      month: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}month'])!,
-      firstDay: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}first_day'])!,
+      firstDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}first_date'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       isChecked: attachedDatabase.typeMapping
@@ -488,18 +462,14 @@ class $WeeklyTasksTable extends WeeklyTasks
 
 class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   final String task;
-  final String week;
-  final int month;
-  final int firstDay;
+  final int firstDate;
   final int id;
   final bool isChecked;
   final String? result;
   final String? improvement;
   const WeeklyTask(
       {required this.task,
-      required this.week,
-      required this.month,
-      required this.firstDay,
+      required this.firstDate,
       required this.id,
       required this.isChecked,
       this.result,
@@ -508,9 +478,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['task'] = Variable<String>(task);
-    map['week'] = Variable<String>(week);
-    map['month'] = Variable<int>(month);
-    map['first_day'] = Variable<int>(firstDay);
+    map['first_date'] = Variable<int>(firstDate);
     map['id'] = Variable<int>(id);
     map['is_checked'] = Variable<bool>(isChecked);
     if (!nullToAbsent || result != null) {
@@ -525,9 +493,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   WeeklyTasksCompanion toCompanion(bool nullToAbsent) {
     return WeeklyTasksCompanion(
       task: Value(task),
-      week: Value(week),
-      month: Value(month),
-      firstDay: Value(firstDay),
+      firstDate: Value(firstDate),
       id: Value(id),
       isChecked: Value(isChecked),
       result:
@@ -543,9 +509,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return WeeklyTask(
       task: serializer.fromJson<String>(json['task']),
-      week: serializer.fromJson<String>(json['week']),
-      month: serializer.fromJson<int>(json['month']),
-      firstDay: serializer.fromJson<int>(json['firstDay']),
+      firstDate: serializer.fromJson<int>(json['firstDate']),
       id: serializer.fromJson<int>(json['id']),
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       result: serializer.fromJson<String?>(json['result']),
@@ -557,9 +521,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'task': serializer.toJson<String>(task),
-      'week': serializer.toJson<String>(week),
-      'month': serializer.toJson<int>(month),
-      'firstDay': serializer.toJson<int>(firstDay),
+      'firstDate': serializer.toJson<int>(firstDate),
       'id': serializer.toJson<int>(id),
       'isChecked': serializer.toJson<bool>(isChecked),
       'result': serializer.toJson<String?>(result),
@@ -569,18 +531,14 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
 
   WeeklyTask copyWith(
           {String? task,
-          String? week,
-          int? month,
-          int? firstDay,
+          int? firstDate,
           int? id,
           bool? isChecked,
           Value<String?> result = const Value.absent(),
           Value<String?> improvement = const Value.absent()}) =>
       WeeklyTask(
         task: task ?? this.task,
-        week: week ?? this.week,
-        month: month ?? this.month,
-        firstDay: firstDay ?? this.firstDay,
+        firstDate: firstDate ?? this.firstDate,
         id: id ?? this.id,
         isChecked: isChecked ?? this.isChecked,
         result: result.present ? result.value : this.result,
@@ -589,9 +547,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   WeeklyTask copyWithCompanion(WeeklyTasksCompanion data) {
     return WeeklyTask(
       task: data.task.present ? data.task.value : this.task,
-      week: data.week.present ? data.week.value : this.week,
-      month: data.month.present ? data.month.value : this.month,
-      firstDay: data.firstDay.present ? data.firstDay.value : this.firstDay,
+      firstDate: data.firstDate.present ? data.firstDate.value : this.firstDate,
       id: data.id.present ? data.id.value : this.id,
       isChecked: data.isChecked.present ? data.isChecked.value : this.isChecked,
       result: data.result.present ? data.result.value : this.result,
@@ -604,9 +560,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   String toString() {
     return (StringBuffer('WeeklyTask(')
           ..write('task: $task, ')
-          ..write('week: $week, ')
-          ..write('month: $month, ')
-          ..write('firstDay: $firstDay, ')
+          ..write('firstDate: $firstDate, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
@@ -616,16 +570,14 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      task, week, month, firstDay, id, isChecked, result, improvement);
+  int get hashCode =>
+      Object.hash(task, firstDate, id, isChecked, result, improvement);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WeeklyTask &&
           other.task == this.task &&
-          other.week == this.week &&
-          other.month == this.month &&
-          other.firstDay == this.firstDay &&
+          other.firstDate == this.firstDate &&
           other.id == this.id &&
           other.isChecked == this.isChecked &&
           other.result == this.result &&
@@ -634,18 +586,14 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
 
 class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
   final Value<String> task;
-  final Value<String> week;
-  final Value<int> month;
-  final Value<int> firstDay;
+  final Value<int> firstDate;
   final Value<int> id;
   final Value<bool> isChecked;
   final Value<String?> result;
   final Value<String?> improvement;
   const WeeklyTasksCompanion({
     this.task = const Value.absent(),
-    this.week = const Value.absent(),
-    this.month = const Value.absent(),
-    this.firstDay = const Value.absent(),
+    this.firstDate = const Value.absent(),
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
@@ -653,21 +601,16 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
   });
   WeeklyTasksCompanion.insert({
     required String task,
-    required String week,
-    this.month = const Value.absent(),
-    required int firstDay,
+    required int firstDate,
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
   })  : task = Value(task),
-        week = Value(week),
-        firstDay = Value(firstDay);
+        firstDate = Value(firstDate);
   static Insertable<WeeklyTask> custom({
     Expression<String>? task,
-    Expression<String>? week,
-    Expression<int>? month,
-    Expression<int>? firstDay,
+    Expression<int>? firstDate,
     Expression<int>? id,
     Expression<bool>? isChecked,
     Expression<String>? result,
@@ -675,9 +618,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
   }) {
     return RawValuesInsertable({
       if (task != null) 'task': task,
-      if (week != null) 'week': week,
-      if (month != null) 'month': month,
-      if (firstDay != null) 'first_day': firstDay,
+      if (firstDate != null) 'first_date': firstDate,
       if (id != null) 'id': id,
       if (isChecked != null) 'is_checked': isChecked,
       if (result != null) 'result': result,
@@ -687,18 +628,14 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
 
   WeeklyTasksCompanion copyWith(
       {Value<String>? task,
-      Value<String>? week,
-      Value<int>? month,
-      Value<int>? firstDay,
+      Value<int>? firstDate,
       Value<int>? id,
       Value<bool>? isChecked,
       Value<String?>? result,
       Value<String?>? improvement}) {
     return WeeklyTasksCompanion(
       task: task ?? this.task,
-      week: week ?? this.week,
-      month: month ?? this.month,
-      firstDay: firstDay ?? this.firstDay,
+      firstDate: firstDate ?? this.firstDate,
       id: id ?? this.id,
       isChecked: isChecked ?? this.isChecked,
       result: result ?? this.result,
@@ -712,14 +649,8 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
     if (task.present) {
       map['task'] = Variable<String>(task.value);
     }
-    if (week.present) {
-      map['week'] = Variable<String>(week.value);
-    }
-    if (month.present) {
-      map['month'] = Variable<int>(month.value);
-    }
-    if (firstDay.present) {
-      map['first_day'] = Variable<int>(firstDay.value);
+    if (firstDate.present) {
+      map['first_date'] = Variable<int>(firstDate.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -740,9 +671,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
   String toString() {
     return (StringBuffer('WeeklyTasksCompanion(')
           ..write('task: $task, ')
-          ..write('week: $week, ')
-          ..write('month: $month, ')
-          ..write('firstDay: $firstDay, ')
+          ..write('firstDate: $firstDate, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
@@ -1430,6 +1359,366 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
   }
 }
 
+class $LabeledTasksTable extends LabeledTasks
+    with TableInfo<$LabeledTasksTable, LabeledTask> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LabeledTasksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _labeledIdMeta =
+      const VerificationMeta('labeledId');
+  @override
+  late final GeneratedColumn<int> labeledId = GeneratedColumn<int>(
+      'labeled_id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _labelMeta = const VerificationMeta('label');
+  @override
+  late final GeneratedColumn<String> label = GeneratedColumn<String>(
+      'label', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _dailyIdListMeta =
+      const VerificationMeta('dailyIdList');
+  @override
+  late final GeneratedColumn<Uint8List> dailyIdList =
+      GeneratedColumn<Uint8List>('daily_id_list', aliasedName, false,
+          type: DriftSqlType.blob,
+          requiredDuringInsert: false,
+          defaultValue: Constant(Uint8List.fromList([])));
+  static const VerificationMeta _weeklyIdListMeta =
+      const VerificationMeta('weeklyIdList');
+  @override
+  late final GeneratedColumn<Uint8List> weeklyIdList =
+      GeneratedColumn<Uint8List>('weekly_id_list', aliasedName, false,
+          type: DriftSqlType.blob,
+          requiredDuringInsert: false,
+          defaultValue: Constant(Uint8List.fromList([])));
+  static const VerificationMeta _monthlyIdListMeta =
+      const VerificationMeta('monthlyIdList');
+  @override
+  late final GeneratedColumn<Uint8List> monthlyIdList =
+      GeneratedColumn<Uint8List>('monthly_id_list', aliasedName, false,
+          type: DriftSqlType.blob,
+          requiredDuringInsert: false,
+          defaultValue: Constant(Uint8List.fromList([])));
+  static const VerificationMeta _yearlyIdListMeta =
+      const VerificationMeta('yearlyIdList');
+  @override
+  late final GeneratedColumn<Uint8List> yearlyIdList =
+      GeneratedColumn<Uint8List>('yearly_id_list', aliasedName, false,
+          type: DriftSqlType.blob,
+          requiredDuringInsert: false,
+          defaultValue: Constant(Uint8List.fromList([])));
+  @override
+  List<GeneratedColumn> get $columns => [
+        labeledId,
+        label,
+        dailyIdList,
+        weeklyIdList,
+        monthlyIdList,
+        yearlyIdList
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'labeled_tasks';
+  @override
+  VerificationContext validateIntegrity(Insertable<LabeledTask> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('labeled_id')) {
+      context.handle(_labeledIdMeta,
+          labeledId.isAcceptableOrUnknown(data['labeled_id']!, _labeledIdMeta));
+    }
+    if (data.containsKey('label')) {
+      context.handle(
+          _labelMeta, label.isAcceptableOrUnknown(data['label']!, _labelMeta));
+    } else if (isInserting) {
+      context.missing(_labelMeta);
+    }
+    if (data.containsKey('daily_id_list')) {
+      context.handle(
+          _dailyIdListMeta,
+          dailyIdList.isAcceptableOrUnknown(
+              data['daily_id_list']!, _dailyIdListMeta));
+    }
+    if (data.containsKey('weekly_id_list')) {
+      context.handle(
+          _weeklyIdListMeta,
+          weeklyIdList.isAcceptableOrUnknown(
+              data['weekly_id_list']!, _weeklyIdListMeta));
+    }
+    if (data.containsKey('monthly_id_list')) {
+      context.handle(
+          _monthlyIdListMeta,
+          monthlyIdList.isAcceptableOrUnknown(
+              data['monthly_id_list']!, _monthlyIdListMeta));
+    }
+    if (data.containsKey('yearly_id_list')) {
+      context.handle(
+          _yearlyIdListMeta,
+          yearlyIdList.isAcceptableOrUnknown(
+              data['yearly_id_list']!, _yearlyIdListMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {labeledId};
+  @override
+  LabeledTask map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LabeledTask(
+      labeledId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}labeled_id'])!,
+      label: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}label'])!,
+      dailyIdList: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}daily_id_list'])!,
+      weeklyIdList: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}weekly_id_list'])!,
+      monthlyIdList: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}monthly_id_list'])!,
+      yearlyIdList: attachedDatabase.typeMapping
+          .read(DriftSqlType.blob, data['${effectivePrefix}yearly_id_list'])!,
+    );
+  }
+
+  @override
+  $LabeledTasksTable createAlias(String alias) {
+    return $LabeledTasksTable(attachedDatabase, alias);
+  }
+}
+
+class LabeledTask extends DataClass implements Insertable<LabeledTask> {
+  final int labeledId;
+  final String label;
+  final Uint8List dailyIdList;
+  final Uint8List weeklyIdList;
+  final Uint8List monthlyIdList;
+  final Uint8List yearlyIdList;
+  const LabeledTask(
+      {required this.labeledId,
+      required this.label,
+      required this.dailyIdList,
+      required this.weeklyIdList,
+      required this.monthlyIdList,
+      required this.yearlyIdList});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['labeled_id'] = Variable<int>(labeledId);
+    map['label'] = Variable<String>(label);
+    map['daily_id_list'] = Variable<Uint8List>(dailyIdList);
+    map['weekly_id_list'] = Variable<Uint8List>(weeklyIdList);
+    map['monthly_id_list'] = Variable<Uint8List>(monthlyIdList);
+    map['yearly_id_list'] = Variable<Uint8List>(yearlyIdList);
+    return map;
+  }
+
+  LabeledTasksCompanion toCompanion(bool nullToAbsent) {
+    return LabeledTasksCompanion(
+      labeledId: Value(labeledId),
+      label: Value(label),
+      dailyIdList: Value(dailyIdList),
+      weeklyIdList: Value(weeklyIdList),
+      monthlyIdList: Value(monthlyIdList),
+      yearlyIdList: Value(yearlyIdList),
+    );
+  }
+
+  factory LabeledTask.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LabeledTask(
+      labeledId: serializer.fromJson<int>(json['labeledId']),
+      label: serializer.fromJson<String>(json['label']),
+      dailyIdList: serializer.fromJson<Uint8List>(json['dailyIdList']),
+      weeklyIdList: serializer.fromJson<Uint8List>(json['weeklyIdList']),
+      monthlyIdList: serializer.fromJson<Uint8List>(json['monthlyIdList']),
+      yearlyIdList: serializer.fromJson<Uint8List>(json['yearlyIdList']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'labeledId': serializer.toJson<int>(labeledId),
+      'label': serializer.toJson<String>(label),
+      'dailyIdList': serializer.toJson<Uint8List>(dailyIdList),
+      'weeklyIdList': serializer.toJson<Uint8List>(weeklyIdList),
+      'monthlyIdList': serializer.toJson<Uint8List>(monthlyIdList),
+      'yearlyIdList': serializer.toJson<Uint8List>(yearlyIdList),
+    };
+  }
+
+  LabeledTask copyWith(
+          {int? labeledId,
+          String? label,
+          Uint8List? dailyIdList,
+          Uint8List? weeklyIdList,
+          Uint8List? monthlyIdList,
+          Uint8List? yearlyIdList}) =>
+      LabeledTask(
+        labeledId: labeledId ?? this.labeledId,
+        label: label ?? this.label,
+        dailyIdList: dailyIdList ?? this.dailyIdList,
+        weeklyIdList: weeklyIdList ?? this.weeklyIdList,
+        monthlyIdList: monthlyIdList ?? this.monthlyIdList,
+        yearlyIdList: yearlyIdList ?? this.yearlyIdList,
+      );
+  LabeledTask copyWithCompanion(LabeledTasksCompanion data) {
+    return LabeledTask(
+      labeledId: data.labeledId.present ? data.labeledId.value : this.labeledId,
+      label: data.label.present ? data.label.value : this.label,
+      dailyIdList:
+          data.dailyIdList.present ? data.dailyIdList.value : this.dailyIdList,
+      weeklyIdList: data.weeklyIdList.present
+          ? data.weeklyIdList.value
+          : this.weeklyIdList,
+      monthlyIdList: data.monthlyIdList.present
+          ? data.monthlyIdList.value
+          : this.monthlyIdList,
+      yearlyIdList: data.yearlyIdList.present
+          ? data.yearlyIdList.value
+          : this.yearlyIdList,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LabeledTask(')
+          ..write('labeledId: $labeledId, ')
+          ..write('label: $label, ')
+          ..write('dailyIdList: $dailyIdList, ')
+          ..write('weeklyIdList: $weeklyIdList, ')
+          ..write('monthlyIdList: $monthlyIdList, ')
+          ..write('yearlyIdList: $yearlyIdList')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      labeledId,
+      label,
+      $driftBlobEquality.hash(dailyIdList),
+      $driftBlobEquality.hash(weeklyIdList),
+      $driftBlobEquality.hash(monthlyIdList),
+      $driftBlobEquality.hash(yearlyIdList));
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LabeledTask &&
+          other.labeledId == this.labeledId &&
+          other.label == this.label &&
+          $driftBlobEquality.equals(other.dailyIdList, this.dailyIdList) &&
+          $driftBlobEquality.equals(other.weeklyIdList, this.weeklyIdList) &&
+          $driftBlobEquality.equals(other.monthlyIdList, this.monthlyIdList) &&
+          $driftBlobEquality.equals(other.yearlyIdList, this.yearlyIdList));
+}
+
+class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
+  final Value<int> labeledId;
+  final Value<String> label;
+  final Value<Uint8List> dailyIdList;
+  final Value<Uint8List> weeklyIdList;
+  final Value<Uint8List> monthlyIdList;
+  final Value<Uint8List> yearlyIdList;
+  const LabeledTasksCompanion({
+    this.labeledId = const Value.absent(),
+    this.label = const Value.absent(),
+    this.dailyIdList = const Value.absent(),
+    this.weeklyIdList = const Value.absent(),
+    this.monthlyIdList = const Value.absent(),
+    this.yearlyIdList = const Value.absent(),
+  });
+  LabeledTasksCompanion.insert({
+    this.labeledId = const Value.absent(),
+    required String label,
+    this.dailyIdList = const Value.absent(),
+    this.weeklyIdList = const Value.absent(),
+    this.monthlyIdList = const Value.absent(),
+    this.yearlyIdList = const Value.absent(),
+  }) : label = Value(label);
+  static Insertable<LabeledTask> custom({
+    Expression<int>? labeledId,
+    Expression<String>? label,
+    Expression<Uint8List>? dailyIdList,
+    Expression<Uint8List>? weeklyIdList,
+    Expression<Uint8List>? monthlyIdList,
+    Expression<Uint8List>? yearlyIdList,
+  }) {
+    return RawValuesInsertable({
+      if (labeledId != null) 'labeled_id': labeledId,
+      if (label != null) 'label': label,
+      if (dailyIdList != null) 'daily_id_list': dailyIdList,
+      if (weeklyIdList != null) 'weekly_id_list': weeklyIdList,
+      if (monthlyIdList != null) 'monthly_id_list': monthlyIdList,
+      if (yearlyIdList != null) 'yearly_id_list': yearlyIdList,
+    });
+  }
+
+  LabeledTasksCompanion copyWith(
+      {Value<int>? labeledId,
+      Value<String>? label,
+      Value<Uint8List>? dailyIdList,
+      Value<Uint8List>? weeklyIdList,
+      Value<Uint8List>? monthlyIdList,
+      Value<Uint8List>? yearlyIdList}) {
+    return LabeledTasksCompanion(
+      labeledId: labeledId ?? this.labeledId,
+      label: label ?? this.label,
+      dailyIdList: dailyIdList ?? this.dailyIdList,
+      weeklyIdList: weeklyIdList ?? this.weeklyIdList,
+      monthlyIdList: monthlyIdList ?? this.monthlyIdList,
+      yearlyIdList: yearlyIdList ?? this.yearlyIdList,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (labeledId.present) {
+      map['labeled_id'] = Variable<int>(labeledId.value);
+    }
+    if (label.present) {
+      map['label'] = Variable<String>(label.value);
+    }
+    if (dailyIdList.present) {
+      map['daily_id_list'] = Variable<Uint8List>(dailyIdList.value);
+    }
+    if (weeklyIdList.present) {
+      map['weekly_id_list'] = Variable<Uint8List>(weeklyIdList.value);
+    }
+    if (monthlyIdList.present) {
+      map['monthly_id_list'] = Variable<Uint8List>(monthlyIdList.value);
+    }
+    if (yearlyIdList.present) {
+      map['yearly_id_list'] = Variable<Uint8List>(yearlyIdList.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LabeledTasksCompanion(')
+          ..write('labeledId: $labeledId, ')
+          ..write('label: $label, ')
+          ..write('dailyIdList: $dailyIdList, ')
+          ..write('weeklyIdList: $weeklyIdList, ')
+          ..write('monthlyIdList: $monthlyIdList, ')
+          ..write('yearlyIdList: $yearlyIdList')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MyDatabase extends GeneratedDatabase {
   _$MyDatabase(QueryExecutor e) : super(e);
   $MyDatabaseManager get managers => $MyDatabaseManager(this);
@@ -1437,17 +1726,18 @@ abstract class _$MyDatabase extends GeneratedDatabase {
   late final $WeeklyTasksTable weeklyTasks = $WeeklyTasksTable(this);
   late final $MonthlyTasksTable monthlyTasks = $MonthlyTasksTable(this);
   late final $YearlyTasksTable yearlyTasks = $YearlyTasksTable(this);
+  late final $LabeledTasksTable labeledTasks = $LabeledTasksTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [dayTasks, weeklyTasks, monthlyTasks, yearlyTasks];
+      [dayTasks, weeklyTasks, monthlyTasks, yearlyTasks, labeledTasks];
 }
 
 typedef $$DayTasksTableCreateCompanionBuilder = DayTasksCompanion Function({
   required String task,
-  required String date,
+  required int date,
   Value<int> id,
   Value<bool> isChecked,
   Value<String?> result,
@@ -1455,7 +1745,7 @@ typedef $$DayTasksTableCreateCompanionBuilder = DayTasksCompanion Function({
 });
 typedef $$DayTasksTableUpdateCompanionBuilder = DayTasksCompanion Function({
   Value<String> task,
-  Value<String> date,
+  Value<int> date,
   Value<int> id,
   Value<bool> isChecked,
   Value<String?> result,
@@ -1474,7 +1764,7 @@ class $$DayTasksTableFilterComposer
   ColumnFilters<String> get task => $composableBuilder(
       column: $table.task, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get date => $composableBuilder(
+  ColumnFilters<int> get date => $composableBuilder(
       column: $table.date, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
@@ -1502,7 +1792,7 @@ class $$DayTasksTableOrderingComposer
   ColumnOrderings<String> get task => $composableBuilder(
       column: $table.task, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get date => $composableBuilder(
+  ColumnOrderings<int> get date => $composableBuilder(
       column: $table.date, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
@@ -1530,7 +1820,7 @@ class $$DayTasksTableAnnotationComposer
   GeneratedColumn<String> get task =>
       $composableBuilder(column: $table.task, builder: (column) => column);
 
-  GeneratedColumn<String> get date =>
+  GeneratedColumn<int> get date =>
       $composableBuilder(column: $table.date, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
@@ -1570,7 +1860,7 @@ class $$DayTasksTableTableManager extends RootTableManager<
               $$DayTasksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> task = const Value.absent(),
-            Value<String> date = const Value.absent(),
+            Value<int> date = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
@@ -1586,7 +1876,7 @@ class $$DayTasksTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required String task,
-            required String date,
+            required int date,
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
@@ -1622,9 +1912,7 @@ typedef $$DayTasksTableProcessedTableManager = ProcessedTableManager<
 typedef $$WeeklyTasksTableCreateCompanionBuilder = WeeklyTasksCompanion
     Function({
   required String task,
-  required String week,
-  Value<int> month,
-  required int firstDay,
+  required int firstDate,
   Value<int> id,
   Value<bool> isChecked,
   Value<String?> result,
@@ -1633,9 +1921,7 @@ typedef $$WeeklyTasksTableCreateCompanionBuilder = WeeklyTasksCompanion
 typedef $$WeeklyTasksTableUpdateCompanionBuilder = WeeklyTasksCompanion
     Function({
   Value<String> task,
-  Value<String> week,
-  Value<int> month,
-  Value<int> firstDay,
+  Value<int> firstDate,
   Value<int> id,
   Value<bool> isChecked,
   Value<String?> result,
@@ -1654,14 +1940,8 @@ class $$WeeklyTasksTableFilterComposer
   ColumnFilters<String> get task => $composableBuilder(
       column: $table.task, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get week => $composableBuilder(
-      column: $table.week, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get month => $composableBuilder(
-      column: $table.month, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get firstDay => $composableBuilder(
-      column: $table.firstDay, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get firstDate => $composableBuilder(
+      column: $table.firstDate, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
@@ -1688,14 +1968,8 @@ class $$WeeklyTasksTableOrderingComposer
   ColumnOrderings<String> get task => $composableBuilder(
       column: $table.task, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get week => $composableBuilder(
-      column: $table.week, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get month => $composableBuilder(
-      column: $table.month, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get firstDay => $composableBuilder(
-      column: $table.firstDay, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get firstDate => $composableBuilder(
+      column: $table.firstDate, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
@@ -1722,14 +1996,8 @@ class $$WeeklyTasksTableAnnotationComposer
   GeneratedColumn<String> get task =>
       $composableBuilder(column: $table.task, builder: (column) => column);
 
-  GeneratedColumn<String> get week =>
-      $composableBuilder(column: $table.week, builder: (column) => column);
-
-  GeneratedColumn<int> get month =>
-      $composableBuilder(column: $table.month, builder: (column) => column);
-
-  GeneratedColumn<int> get firstDay =>
-      $composableBuilder(column: $table.firstDay, builder: (column) => column);
+  GeneratedColumn<int> get firstDate =>
+      $composableBuilder(column: $table.firstDate, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
@@ -1768,9 +2036,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
               $$WeeklyTasksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> task = const Value.absent(),
-            Value<String> week = const Value.absent(),
-            Value<int> month = const Value.absent(),
-            Value<int> firstDay = const Value.absent(),
+            Value<int> firstDate = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
@@ -1778,9 +2044,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
           }) =>
               WeeklyTasksCompanion(
             task: task,
-            week: week,
-            month: month,
-            firstDay: firstDay,
+            firstDate: firstDate,
             id: id,
             isChecked: isChecked,
             result: result,
@@ -1788,9 +2052,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required String task,
-            required String week,
-            Value<int> month = const Value.absent(),
-            required int firstDay,
+            required int firstDate,
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
@@ -1798,9 +2060,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
           }) =>
               WeeklyTasksCompanion.insert(
             task: task,
-            week: week,
-            month: month,
-            firstDay: firstDay,
+            firstDate: firstDate,
             id: id,
             isChecked: isChecked,
             result: result,
@@ -2183,6 +2443,191 @@ typedef $$YearlyTasksTableProcessedTableManager = ProcessedTableManager<
     (YearlyTask, BaseReferences<_$MyDatabase, $YearlyTasksTable, YearlyTask>),
     YearlyTask,
     PrefetchHooks Function()>;
+typedef $$LabeledTasksTableCreateCompanionBuilder = LabeledTasksCompanion
+    Function({
+  Value<int> labeledId,
+  required String label,
+  Value<Uint8List> dailyIdList,
+  Value<Uint8List> weeklyIdList,
+  Value<Uint8List> monthlyIdList,
+  Value<Uint8List> yearlyIdList,
+});
+typedef $$LabeledTasksTableUpdateCompanionBuilder = LabeledTasksCompanion
+    Function({
+  Value<int> labeledId,
+  Value<String> label,
+  Value<Uint8List> dailyIdList,
+  Value<Uint8List> weeklyIdList,
+  Value<Uint8List> monthlyIdList,
+  Value<Uint8List> yearlyIdList,
+});
+
+class $$LabeledTasksTableFilterComposer
+    extends Composer<_$MyDatabase, $LabeledTasksTable> {
+  $$LabeledTasksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get labeledId => $composableBuilder(
+      column: $table.labeledId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get label => $composableBuilder(
+      column: $table.label, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get dailyIdList => $composableBuilder(
+      column: $table.dailyIdList, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get weeklyIdList => $composableBuilder(
+      column: $table.weeklyIdList, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get monthlyIdList => $composableBuilder(
+      column: $table.monthlyIdList, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<Uint8List> get yearlyIdList => $composableBuilder(
+      column: $table.yearlyIdList, builder: (column) => ColumnFilters(column));
+}
+
+class $$LabeledTasksTableOrderingComposer
+    extends Composer<_$MyDatabase, $LabeledTasksTable> {
+  $$LabeledTasksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get labeledId => $composableBuilder(
+      column: $table.labeledId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get label => $composableBuilder(
+      column: $table.label, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get dailyIdList => $composableBuilder(
+      column: $table.dailyIdList, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get weeklyIdList => $composableBuilder(
+      column: $table.weeklyIdList,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get monthlyIdList => $composableBuilder(
+      column: $table.monthlyIdList,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<Uint8List> get yearlyIdList => $composableBuilder(
+      column: $table.yearlyIdList,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$LabeledTasksTableAnnotationComposer
+    extends Composer<_$MyDatabase, $LabeledTasksTable> {
+  $$LabeledTasksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get labeledId =>
+      $composableBuilder(column: $table.labeledId, builder: (column) => column);
+
+  GeneratedColumn<String> get label =>
+      $composableBuilder(column: $table.label, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get dailyIdList => $composableBuilder(
+      column: $table.dailyIdList, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get weeklyIdList => $composableBuilder(
+      column: $table.weeklyIdList, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get monthlyIdList => $composableBuilder(
+      column: $table.monthlyIdList, builder: (column) => column);
+
+  GeneratedColumn<Uint8List> get yearlyIdList => $composableBuilder(
+      column: $table.yearlyIdList, builder: (column) => column);
+}
+
+class $$LabeledTasksTableTableManager extends RootTableManager<
+    _$MyDatabase,
+    $LabeledTasksTable,
+    LabeledTask,
+    $$LabeledTasksTableFilterComposer,
+    $$LabeledTasksTableOrderingComposer,
+    $$LabeledTasksTableAnnotationComposer,
+    $$LabeledTasksTableCreateCompanionBuilder,
+    $$LabeledTasksTableUpdateCompanionBuilder,
+    (
+      LabeledTask,
+      BaseReferences<_$MyDatabase, $LabeledTasksTable, LabeledTask>
+    ),
+    LabeledTask,
+    PrefetchHooks Function()> {
+  $$LabeledTasksTableTableManager(_$MyDatabase db, $LabeledTasksTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LabeledTasksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LabeledTasksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LabeledTasksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> labeledId = const Value.absent(),
+            Value<String> label = const Value.absent(),
+            Value<Uint8List> dailyIdList = const Value.absent(),
+            Value<Uint8List> weeklyIdList = const Value.absent(),
+            Value<Uint8List> monthlyIdList = const Value.absent(),
+            Value<Uint8List> yearlyIdList = const Value.absent(),
+          }) =>
+              LabeledTasksCompanion(
+            labeledId: labeledId,
+            label: label,
+            dailyIdList: dailyIdList,
+            weeklyIdList: weeklyIdList,
+            monthlyIdList: monthlyIdList,
+            yearlyIdList: yearlyIdList,
+          ),
+          createCompanionCallback: ({
+            Value<int> labeledId = const Value.absent(),
+            required String label,
+            Value<Uint8List> dailyIdList = const Value.absent(),
+            Value<Uint8List> weeklyIdList = const Value.absent(),
+            Value<Uint8List> monthlyIdList = const Value.absent(),
+            Value<Uint8List> yearlyIdList = const Value.absent(),
+          }) =>
+              LabeledTasksCompanion.insert(
+            labeledId: labeledId,
+            label: label,
+            dailyIdList: dailyIdList,
+            weeklyIdList: weeklyIdList,
+            monthlyIdList: monthlyIdList,
+            yearlyIdList: yearlyIdList,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$LabeledTasksTableProcessedTableManager = ProcessedTableManager<
+    _$MyDatabase,
+    $LabeledTasksTable,
+    LabeledTask,
+    $$LabeledTasksTableFilterComposer,
+    $$LabeledTasksTableOrderingComposer,
+    $$LabeledTasksTableAnnotationComposer,
+    $$LabeledTasksTableCreateCompanionBuilder,
+    $$LabeledTasksTableUpdateCompanionBuilder,
+    (
+      LabeledTask,
+      BaseReferences<_$MyDatabase, $LabeledTasksTable, LabeledTask>
+    ),
+    LabeledTask,
+    PrefetchHooks Function()>;
 
 class $MyDatabaseManager {
   final _$MyDatabase _db;
@@ -2195,4 +2640,6 @@ class $MyDatabaseManager {
       $$MonthlyTasksTableTableManager(_db, _db.monthlyTasks);
   $$YearlyTasksTableTableManager get yearlyTasks =>
       $$YearlyTasksTableTableManager(_db, _db.yearlyTasks);
+  $$LabeledTasksTableTableManager get labeledTasks =>
+      $$LabeledTasksTableTableManager(_db, _db.labeledTasks);
 }

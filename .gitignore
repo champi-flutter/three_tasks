@@ -12,6 +12,10 @@
 .swiftpm/
 migrate_working_dir/
 
+# プライベートな情報
+private_config_debug.json
+private_config_release.json
+
 # IntelliJ related
 *.iml
 *.ipr

@@ -5,29 +5,22 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:three_tasks/db/database.dart';
 import 'package:three_tasks/main.dart';
-import 'package:three_tasks/screens/history_screen.dart';
-import 'package:three_tasks/screens/review_screen.dart';
-
-import '../ad_helper.dart';
+import 'package:three_tasks/view/screens/review_screen.dart';
+import 'history_screen.dart';
 import 'home_screen.dart';
 
-class TasksForMonth extends StatefulWidget {
-  @override
-  State<TasksForMonth> createState() => _TasksForMonthState();
-}
-
-class _TasksForMonthState extends State<TasksForMonth> {
-  // ドロップダウンのmenu
-  var _menuItem = ["今月のタスクをレビュー", "先月のタスクをレビュー"];
+class YearlyTasksScreen extends StatelessWidget {
+  // Popupのmenu
+  var _menuItem = ["今年のタスクをレビュー", "去年のタスクをレビュー"];
   var _selectedValue = "";
 
-  List<MonthlyTask> _taskForThisMonth = [];
+  List<YearlyTask> _taskForThisYear = [];
 
   // TextEditingControllerのtextにリスト番号に合ったタスクを入れるためにStringのリストを作成
-  List<String> _strMonthTask = [];
+  List<String> _strYearTask = [];
 
   // 達成しなかったタスク一覧に表示させるタスクのリスト
-  List<MonthlyTask> _taskListForDialog = [];
+  List<YearlyTask> _taskListForDialog = [];
 
   // チェックマークの有無
   List<bool> _isSelected = [false, false, false];
@@ -53,36 +46,8 @@ class _TasksForMonthState extends State<TasksForMonth> {
     super.initState();
     // _focusNode = [FocusNode(), FocusNode(), FocusNode()];
     _focusNode = FocusNode();
-    // todo バナー広告のロード
-    _loadBannerAd();
     // todo タスク取得
     _setItems();
-  }
-
-  // todo バナー広告をロードするメソッド in initState
-  _loadBannerAd() {
-    // await _initGoogleMobileAds();
-    BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdHelper.bannerAdUnitId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          // Loadが完了したらリビルド
-          setState(() {
-            _ad = ad as BannerAd;
-            _isAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          // 失敗時の処理
-          ad.dispose();
-          print(
-            "Ad load failed (code = ${error.code} message = ${error.message})",
-          );
-        },
-      ),
-      request: AdRequest(),
-    ).load();
   }
 
   // todo バナー広告Widget in build
@@ -109,37 +74,37 @@ class _TasksForMonthState extends State<TasksForMonth> {
 
   // todo 「今月のタスク」をデータベースから取得するメソッド
   void _setItems() async {
-    _taskForThisMonth = await database.allTasksForThisMonth;
+    _taskForThisYear = await database.allTasksForThisYear;
     // 一度開けば""で保存されるので、lengthは0か3。
-    if (_taskForThisMonth.length == 0) {
-      var _firstMonthlyTasks = [
-        MonthlyTasksCompanion.insert(
+    if (_taskForThisYear.length == 0) {
+      var _firstYearlyTasks = [
+        YearlyTasksCompanion.insert(
           task: "",
-          month: thisMonth,
+          year: thisYear,
         ),
-        MonthlyTasksCompanion.insert(
+        YearlyTasksCompanion.insert(
           task: "",
-          month: thisMonth,
+          year: thisYear,
         ),
-        MonthlyTasksCompanion.insert(
+        YearlyTasksCompanion.insert(
           task: "",
-          month: thisMonth,
+          year: thisYear,
         ),
       ];
-      await database.addBatchMonthlyTaskCompanions(_firstMonthlyTasks);
+      await database.addBatchYearlyTaskCompanions(_firstYearlyTasks);
 
-      _taskForThisMonth = await database.allTasksForThisMonth;
+      _taskForThisYear = await database.allTasksForThisYear;
     }
 
-    _strMonthTask = [
-      _taskForThisMonth[0].task,
-      _taskForThisMonth[1].task,
-      _taskForThisMonth[2].task,
+    _strYearTask = [
+      _taskForThisYear[0].task,
+      _taskForThisYear[1].task,
+      _taskForThisYear[2].task,
     ];
     _isSelected = [
-      _taskForThisMonth[0].isChecked,
-      _taskForThisMonth[1].isChecked,
-      _taskForThisMonth[2].isChecked,
+      _taskForThisYear[0].isChecked,
+      _taskForThisYear[1].isChecked,
+      _taskForThisYear[2].isChecked,
     ];
     setState(() {});
   }
@@ -173,10 +138,6 @@ class _TasksForMonthState extends State<TasksForMonth> {
             _onPopped();
           } else {
             Navigator.pop(context);
-            // todo インタースティシャル広告
-            if (interstitialStack % 4 == 0 && _interstitialAd == null) {
-              _loadInterstitialAd();
-            }
           }
         },
         child: Scaffold(
@@ -184,7 +145,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
           appBar: AppBar(
             toolbarHeight: 56.h,
             centerTitle: true,
-            title: const Text("今月のタスク"),
+            title: const Text("今年のタスク"),
             actions: [
               _reviewButton(),
             ],
@@ -207,8 +168,8 @@ class _TasksForMonthState extends State<TasksForMonth> {
                           // todo 余白
                           SizedBox(height: 30.0.h.h),
 
-                          // todo 今週のタスク
-                          _tasksForThisMonth(),
+                          // todo 今年のタスク
+                          _tasksForThisYear(),
 
                           // todo 余白
                           SizedBox(height: 30.0.h.h),
@@ -262,41 +223,12 @@ class _TasksForMonthState extends State<TasksForMonth> {
               onPressed: () {
                 Navigator.pop(context);
                 Navigator.pop(super.context);
-                // todo インタースティシャル広告
-                if (interstitialStack % 4 == 0 && _interstitialAd == null) {
-                  _loadInterstitialAd();
-                }
               },
               child: const Text("破棄"),
             ),
           ],
         );
       },
-    );
-  }
-
-  // todo インタースティシャル広告をロードするメソッド
-  _loadInterstitialAd() {
-    print("${interstitialStack}");
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback;
-          ad.show();
-          // Loadが完了したらリビルド
-          setState(() {
-            _interstitialAd = ad;
-          });
-        },
-        onAdFailedToLoad: (error) {
-          // 失敗時の処理
-          print(
-            "Ad load failed (code = ${error.code} message = ${error.message})",
-          );
-        },
-      ),
-      request: AdRequest(),
     );
   }
 
@@ -331,11 +263,10 @@ class _TasksForMonthState extends State<TasksForMonth> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ReviewScreen(
-                    reviewStatus: ReviewStatus.month,
-                    timeStatus: s == "今月のタスクをレビュー"
+                    reviewStatus: ReviewStatus.year,
+                    timeStatus: s == "今年のタスクをレビュー"
                         ? TimeStatus.now
                         : TimeStatus.previous,
-                    toastCount: _toastCount,
                   ),
                 ),
               );
@@ -347,22 +278,22 @@ class _TasksForMonthState extends State<TasksForMonth> {
   }
 
   // todo 「今週のタスク」Widget
-  Widget _tasksForThisMonth() {
+  Widget _tasksForThisYear() {
     return Column(
       children: [
         ListView.builder(
           physics: ScrollPhysics(),
           shrinkWrap: true,
-          itemCount: _taskForThisMonth.length,
+          itemCount: _taskForThisYear.length,
           itemBuilder: (context, int position) =>
-              _tasksForThisMonthList(position),
+              _tasksForThisYearList(position),
         ),
       ],
     );
   }
 
   // todo リストタイル
-  _tasksForThisMonthList(position) {
+  _tasksForThisYearList(position) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10.0.h.h),
       key: Key("$position"),
@@ -379,7 +310,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
           // controllerどうする？　＞＞　TextEditingControllerのtextにStringのリストを入れる
           controller: TextEditingController(
             // text: _strTaskForTomorrow(position: position),
-            text: _strMonthTask[position],
+            text: _strYearTask[position],
             // text: "$position"
           ),
           style: TextStyle(fontSize: 17.0.sp),
@@ -387,7 +318,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
           // focusNode: _focusNode,
           decoration: InputDecoration(labelText: "タスク${position + 1}"),
           onChanged: (text) {
-            _editTaskForThisMonth(text, position: position);
+            _editTaskForThisYear(text, position: position);
             _isEdited = true;
           },
           textInputAction: TextInputAction.done,
@@ -397,8 +328,8 @@ class _TasksForMonthState extends State<TasksForMonth> {
   }
 
   // todo 「今週のタスク」変更処理
-  _editTaskForThisMonth(text, {required position}) {
-    _strMonthTask[position] = text;
+  _editTaskForThisYear(text, {required position}) {
+    _strYearTask[position] = text;
     // setState(() {});
   }
 
@@ -432,34 +363,34 @@ class _TasksForMonthState extends State<TasksForMonth> {
   // todo 下書き保存メソッド
   _saveTasks() async {
     // この段階で表示されているリストの内容をデータベースに上書き保存
-    var _firstTaskForThisMonth = MonthlyTask(
-      task: _strMonthTask[0],
-      month: thisMonth,
-      id: _taskForThisMonth[0].id,
+    var _firstTaskForThisYear = YearlyTask(
+      task: _strYearTask[0],
+      year: thisYear,
+      id: _taskForThisYear[0].id,
       isChecked: _isSelected[0],
-      result: _taskForThisMonth[0].result,
-      improvement: _taskForThisMonth[0].improvement,
+      result: _taskForThisYear[0].result,
+      improvement: _taskForThisYear[0].improvement,
     );
-    var _secondTaskForThisMonth = MonthlyTask(
-      task: _strMonthTask[1],
-      month: thisMonth,
-      id: _taskForThisMonth[1].id,
+    var _secondTaskForThisYear = YearlyTask(
+      task: _strYearTask[1],
+      year: thisYear,
+      id: _taskForThisYear[1].id,
       isChecked: _isSelected[1],
-      result: _taskForThisMonth[1].result,
-      improvement: _taskForThisMonth[1].improvement,
+      result: _taskForThisYear[1].result,
+      improvement: _taskForThisYear[1].improvement,
     );
-    var _thirdTaskForThisMonth = MonthlyTask(
-      task: _strMonthTask[2],
-      month: thisMonth,
-      id: _taskForThisMonth[2].id,
+    var _thirdTaskForThisYear = YearlyTask(
+      task: _strYearTask[2],
+      year: thisYear,
+      id: _taskForThisYear[2].id,
       isChecked: _isSelected[2],
-      result: _taskForThisMonth[2].result,
-      improvement: _taskForThisMonth[2].improvement,
+      result: _taskForThisYear[2].result,
+      improvement: _taskForThisYear[2].improvement,
     );
 
-    await database.updateMonthlyTask(_firstTaskForThisMonth);
-    await database.updateMonthlyTask(_secondTaskForThisMonth);
-    await database.updateMonthlyTask(_thirdTaskForThisMonth);
+    await database.updateYearlyTask(_firstTaskForThisYear);
+    await database.updateYearlyTask(_secondTaskForThisYear);
+    await database.updateYearlyTask(_thirdTaskForThisYear);
 
     Fluttertoast.showToast(
       msg: "タスクを保存しました。",
@@ -489,7 +420,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
           //   ..[1].unfocus()
           //   ..[2].unfocus();
           _focusNode.unfocus();
-          _taskListForDialog = await database.allMonthlyTasksNotAchieved;
+          _taskListForDialog = await database.allYearlyTasksNotAchieved;
           // 空を排除
           _taskListForDialog.removeWhere((value) => value.task == "");
           showDialog(
@@ -509,7 +440,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
     );
   }
 
-  Widget _taskListDialog(List<MonthlyTask> taskList) {
+  Widget _taskListDialog(List<YearlyTask> taskList) {
     return SimpleDialog(
       title: const Text("達成されなかったタスク"),
       children: [
@@ -524,7 +455,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
               itemCount: taskList.length,
               itemBuilder: (context, int position) => _taskNotAchievement(
                 taskList[position].task,
-                taskList[position].month,
+                taskList[position].year,
               ),
               separatorBuilder: (context, index) => Divider(
                 indent: 8,
@@ -551,10 +482,10 @@ class _TasksForMonthState extends State<TasksForMonth> {
     );
   }
 
-  Widget _taskNotAchievement(task, month) {
+  Widget _taskNotAchievement(task, year) {
     return ListTile(
       dense: true,
-      subtitle: Text(month),
+      subtitle: Text(year),
       title: Text(
         "$task",
         style: TextStyle(fontSize: 12.0.sp),
@@ -592,7 +523,7 @@ class _TasksForMonthState extends State<TasksForMonth> {
             context,
             MaterialPageRoute(
               builder: (context) => HistoryScreen(
-                formatAtNavigation: TaskFormat.month,
+                formatAtNavigation: TaskFormat.year,
               ),
             ),
           );
