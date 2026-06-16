@@ -11,8 +11,6 @@ import 'package:three_tasks/db/database.dart';
 import 'package:three_tasks/main.dart';
 import 'package:io/io.dart';
 
-import '../ad_helper.dart';
-
 enum TaskFormat { date, week, month, year }
 
 int _interstitialStackForHistoryScreen = 0;
@@ -103,65 +101,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _interstitialStackForHistoryScreen++;
     print("${interstitialStackForHistoryScreen}");
     _taskFormat = widget.formatAtNavigation;
-    // todo バナー広告のロード
-    _loadBannerAd();
-    // todo タスク取得
+    // タスク取得
     _callTasks();
     _canChangeCheck = false;
     _navigationFormat = _taskFormat;
     // print("${_theDayTask[0]}");
   }
 
-  // todo バナー広告をロードするメソッド in initState
-  _loadBannerAd() {
-    // await _initGoogleMobileAds();
-    BannerAd(
-      size: AdSize.banner,
-      adUnitId: AdHelper.bannerAdUnitId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          // Loadが完了したらリビルド
-          setState(() {
-            _ad = ad as BannerAd;
-            _isAdLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          // 失敗時の処理
-          ad.dispose();
-          print(
-            "Ad load failed (code = ${error.code} message = ${error.message})",
-          );
-        },
-      ),
-      request: AdRequest(),
-    ).load();
-  }
-
-  // todo バナー広告Widget in build
-  Widget _bannerAd() {
-    return Builder(builder: (context) {
-      // if (!_isAdLoaded) {
-      //   return Center(
-      //     child: Text(
-      //       "Ads Not loaded.",
-      //       textAlign: TextAlign.center,
-      //       textScaler: TextScaler.linear(1.3),
-      //     ),
-      //   );
-      // }
-      // todo Loadされた広告を表示
-      return Container(
-        width: _isAdLoaded ? _ad!.size.width.toDouble() : double.infinity,
-        height: 100.0,
-        alignment: Alignment.center,
-        child: _isAdLoaded ? AdWidget(ad: _ad!) : null,
-      );
-    });
-  }
-
-  // todo 各種タスクを取得（initState）
-  _callTasks() async {
+  /// 各種タスクを取得（initState）
+  Future<void> _callTasks()  async {
     switch (_taskFormat) {
       case TaskFormat.date:
         await _callFirstDayTasks();
@@ -176,8 +124,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     setState(() {});
   }
 
-  // todo 1日のタスクを取得（initState）
-  _callFirstDayTasks() async {
+  /// 1日のタスクを取得（initState）
+  Future<void> _callFirstDayTasks()  async {
     _theDayTask = await database.allTasksForTheDay;
 
     // nullでもリストを保てるように空を用意
@@ -215,8 +163,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // });
   }
 
-  // todo 1週間のタスク取得
-  _callFirstWeeklyTasks() async {
+  /// 1週間のタスク取得
+  Future<void> _callFirstWeeklyTasks() async {
     _theWeekTask = await database.allTasksForTheWeek;
 
     if (_theWeekTask.length == 0) {
@@ -262,8 +210,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         "(3)_isTaskLoadedは、${_isTaskLoaded}, theDay.month: ${theDay.month}, _theWeekTask[0].month: ${_theWeekTask[0].month}");
   }
 
-  // todo 1ヶ月のタスク取得
-  _callFirstMonthlyTasks() async {
+  /// 1ヶ月のタスク取得
+  Future<void> _callFirstMonthlyTasks() async {
     _theMonthTask = await database.allTasksForTheMonth;
 
     print("${_theMonthTask.length}個あります。");
@@ -302,8 +250,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     // });
   }
 
-  // todo 1年間のタスク取得
-  _callFirstYearlyTasks() async {
+  /// 1年間のタスク取得
+  Future<void> _callFirstYearlyTasks() async {
     _theYearTask = await database.allTasksForTheYear;
 
     print("${_theYearTask.length}個あります。");
@@ -366,11 +314,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
             TaskFormat.month => _monthlyResult,
             TaskFormat.year => _yearlyResult,
           };
-          // todo インタースティシャル広告
-          if (interstitialStackForHistoryScreen % 4 == 0 &&
-              _interstitialAd == null) {
-            _loadInterstitialAd();
-          }
           Navigator.pop(
             context,
             finallyResult,
@@ -440,37 +383,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
               ),
-              // todo バナー広告
-              _bannerAd(),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  // todo インタースティシャル広告をロードするメソッド
-  _loadInterstitialAd() {
-    print("${interstitialStackForHistoryScreen}");
-    InterstitialAd.load(
-      adUnitId: AdHelper.interstitialAdUnitId,
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          ad.fullScreenContentCallback;
-          ad.show();
-          // Loadが完了したらリビルド
-          setState(() {
-            _interstitialAd = ad;
-          });
-        },
-        onAdFailedToLoad: (error) {
-          // 失敗時の処理
-          print(
-            "Ad load failed (code = ${error.code} message = ${error.message})",
-          );
-        },
-      ),
-      request: AdRequest(),
     );
   }
 
