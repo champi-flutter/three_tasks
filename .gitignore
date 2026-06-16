@@ -16,6 +16,8 @@ migrate_working_dir/
 private_config_debug.json
 private_config_release.json
 
+analysis_options.yaml
+
 # IntelliJ related
 *.iml
 *.ipr
