@@ -8,6 +8,8 @@ import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/view/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
+import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
+import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 
 import '../../view_models/todays_view_model.dart';
 
@@ -15,8 +17,10 @@ class HomeScreen extends ConsumerWidget {
   // todo build
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 初回起動状態を解除
-    // _launchApp();
+    // VMを監視
+    final List<VDayTask> dayTaskList = ref.watch(
+        todaysViewModelProvider);
+
     return SingleChildScrollView(
       child: Center(
         // todo （2026/05/27）＞＞
@@ -28,7 +32,40 @@ class HomeScreen extends ConsumerWidget {
                   SizedBox(height: 30.0.h.h),
 
                   // 「今日のタスク」欄
-                  _TodaysTasksView(),
+                  TasksView.checkbox(
+                    taskList: dayTaskList,
+                    // 保存処理
+                    onSaveTask: (int position, String newValue) async {
+                      // VM をイベントハンドラとして参照
+                      final readTodaysVM = ref.read(
+                          todaysViewModelProvider.notifier);
+                      // 入力値の保存を依頼
+                      await readTodaysVM.saveTask(
+                        targetTask: dayTaskList[position],
+                        newTitle: newValue,
+                      );
+                    },
+                    onCheckChanged: (int position, bool newValue) async {
+                      // VM をイベントハンドラとして参照
+                      final readTodaysVM = ref.read(
+                          todaysViewModelProvider.notifier);
+                      // チェックの保存を依頼
+                      await readTodaysVM.saveCheck(
+                        targetTask: dayTaskList[position],
+                        newValue: newValue,
+                      );
+                    },
+                    // ラベル化処理
+                    onLabeled: (int position, bool value) async {
+                      // ラベル化タスク VM をイベントハンドラとして参照
+                      final readLabeledTasksVM = ref.read(
+                          labeledTasksViewModelProvider.notifier);
+                      // ラベル化の登録を依頼
+                      await readLabeledTasksVM.labeling(vTask: dayTaskList[position]);
+
+                    },
+                    onJustEdited: ,
+                  ),
 
                   // 余白
                   SizedBox(height: 30.0.h.h),

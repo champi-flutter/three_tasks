@@ -5,48 +5,45 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
+import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
+import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 
 /// [TasksView] の表示形式
 ///  - [TasksViewStyle.checkbox] : チェックボックス付き
 ///  - [TasksViewStyle.icon] : チェエクボックスなし（アイコン付き）
-enum TasksViewStyle {
-  checkbox,
-  icon
-}
+enum TasksViewStyle { checkbox, icon }
 
 /// チェックボックス付きタスク入力欄
-class TasksView extends StatelessWidget {
+class TasksView extends ConsumerWidget {
   const TasksView.checkbox({
     required this.taskList,
     required this.onSaveTask,
-    required this.onCheckChanged,
+    required this.saveCheckAuto,
     required this.onLabeled,
-    required this.onJustEdited,
-  })
-      : assert(
-  onCheckChanged != null,
+  }) : assert(
+  saveCheckAuto != null,
   "チェックボックス更新時の処理が設定されていません。",
   ),
         tasksViewStyle = TasksViewStyle.checkbox,
-        assert(
-        onSaveTask != null || onJustEdited != null,
-        "自動保存における編集フラグのコールバックが設定されていません。",
-        ),
+  // assert(
+  // onSaveTask != null || onJustEdited != null,
+  // "自動保存における編集フラグのコールバックが設定されていません。",
+  // ),
         _isAutoSave = onSaveTask != null;
 
   const TasksView.icon({
     required this.taskList,
     required this.onSaveTask,
     required this.onLabeled,
-    required this.onJustEdited,
-  })
-      : tasksViewStyle = TasksViewStyle.icon,
-        onCheckChanged = null,
-        assert(
-        onSaveTask != null || onJustEdited != null,
-        "自動保存における編集フラグのコールバックが設定されていません。",
-        ),
+  }) : tasksViewStyle = TasksViewStyle.icon,
+        saveCheckAuto = null,
+  // assert(
+  // onSaveTask != null || onJustEdited != null,
+  // "自動保存における編集フラグのコールバックが設定されていません。",
+  // ),
         _isAutoSave = onSaveTask != null;
 
   final TasksViewStyle tasksViewStyle;
@@ -57,8 +54,8 @@ class TasksView extends StatelessWidget {
   /// 入力欄に値を入力した状態でフォーカスを外したときの自動保存ロジック
   final Future<void> Function(int position, String value)? onSaveTask;
 
-  /// 自動保存でない場合に、編集を加えたときの処理
-  final VoidCallback? onJustEdited;
+  // /// 自動保存でない場合に、編集を加えたときの処理
+  // final VoidCallback? onJustEdited;
 
   /// 自動保存かどうか
   final bool _isAutoSave;
@@ -67,52 +64,107 @@ class TasksView extends StatelessWidget {
   final Future<void> Function(int position, bool value) onLabeled;
 
   /// チェックボックスの値が更新される時の処理
-  final Future<void> Function(int position, bool value)? onCheckChanged;
+  final Future<void> Function(int position, bool value)? saveCheckAuto;
 
   @override
-  Widget build(BuildContext context) {
-    switch (tasksViewStyle) {
-      case TasksViewStyle.checkbox:
-        return ListView.builder(
-          itemCount: 3,
-          itemBuilder: (context, position) =>
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0.h),
-                child: _CheckableTaskField(
-                  position: position,
-                  taskTitle: taskList[position].task,
-                  isTaskChecked: taskList[position].isChecked,
-                  isTaskLabeled: taskList[position].isLabeled(
-                    // todo ラベル化タスクリスト（2026/06/16）＞＞
-                    labeledTaskList:,
+  Widget build(BuildContext context, WidgetRef ref) {
+    // ラベル化タスクのリスト
+    final List<VLabeledTask> labeledTaskList =
+    ref.watch(labeledTasksViewModelProvider);
+    return ListView.builder(
+      itemCount: 3,
+      itemBuilder: (context, position) {
+        // 各タスクタイトルのコントローラ
+        final TextEditingController titleController = ref.watch(
+          taskTitleEditingControllerProvider(
+            title1: taskList[0].task,
+            title2: taskList[1].task,
+            title3: taskList[2].task,
+          ).select(
+                (state) =>
+            switch (position) {
+              0 => state.titleController1,
+              1 => state.titleController2,
+              2 => state.titleController3,
+            // itemCount の制限上ありえないが、網羅性のため記述
+              _ => TextEditingController(),
+            },
+          ),
+        );
+        switch (tasksViewStyle) {
+          case TasksViewStyle.checkbox:
+          // チェックボックスの値をこのスコープで管理
+            final isChecked = ref.watch(
+              taskCheckEditingControllerProvider(
+                taskList[0].isChecked,
+                taskList[1].isChecked,
+                taskList[2].isChecked,
+              ).select((state) =>
+              // position に応じて、監視するプロパティを切り替える
+              switch (position) {
+                0 => state.check1,
+                1 => state.check2,
+                2 => state.check3,
+              // itemCount の制限上ありえないが、網羅性のため記述
+                _ => false,
+              }),
+            );
+
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.0.h),
+              // position ごとの入力欄
+              child: _CheckableTaskField(
+                position: position,
+                taskTitle: taskList[position].task,
+                isTaskLabeled: taskList[position].isLabeled(
+                  labeledTaskList: labeledTaskList,
+                ),
+                onSaveTask: _isAutoSave
+                    ? (String value) => onSaveTask!(position, value)
+                    : null,
+                onLabeled: (bool value) => onLabeled(position, value),
+                saveCheckAuto: _isAutoSave
+                    ? (bool value) => saveCheckAuto!(position, value)
+                    : null,
+                isChecked: isChecked,
+                notifyCheck: (bool value) {
+                  ref.read(
+                      taskCheckEditingControllerProvider(
+                        taskList[0].isChecked,
+                        taskList[1].isChecked,
+                        taskList[2].isChecked,
+                      ).notifier).check(position, value);
+                },
+                titleController: titleController,
+              ),
+            );
+
+          case TasksViewStyle.icon:
+            return ListView.builder(
+              itemCount: 3,
+              itemBuilder: (context, position) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10.0.h),
+                  // position ごとの入力欄
+                  child: _IconTaskField(
+                    position: position,
+                    taskTitle: taskList[position].task,
+                    isTaskLabeled: taskList[position].isLabeled(
+                      labeledTaskList: labeledTaskList,
+                    ),
+                    onSaveTask: _isAutoSave
+                        ? (String value) => onSaveTask!(position, value)
+                        : null,
+                    onLabeled: (bool value) => onLabeled(position, value),
+                    titleController: titleController,
                   ),
-                  onSaveTask: _isAutoSave ? (String value) =>
-                      onSaveTask!(position, value) : null,
-                  onLabeled: (bool value) => onLabeled(position, value),
-                  onCheckChanged: _isAutoSave? (bool value) =>
-                      onCheckChanged!(position, value) : null,
-                ),
-              ),
-        );
-      case TasksViewStyle.icon:
-        return ListView.builder(
-          itemCount: 3,
-          itemBuilder: (context, position) =>
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.0.h),
-                child: _IconTaskField(
-                  position: position,
-                  taskTitle: taskList[position].task,
-                  isTaskLabeled: taskList[position].isLabeled(
-                    // todo ラベル化タスクリスト（2026/06/16）＞＞
-                    labeledTaskList:,),
-                  onSaveTask: _isAutoSave ? (String value) =>
-                      onSaveTask!(position, value) : null,
-                  onLabeled: (bool value) => onLabeled(position, value),
-                ),
-              ),
-        );
-    }
+                );
+              },
+            );
+        }
+      },
+    );
+
   }
 }
 
@@ -121,7 +173,7 @@ class _TaskField extends HookConsumerWidget {
   const _TaskField({
     required this.position,
     required this.taskTitle,
-    required this.onSaveTask,
+    required this.onSaveTask, required this.titleController,
   });
 
   /// タスクのリスト番号
@@ -133,17 +185,15 @@ class _TaskField extends HookConsumerWidget {
   /// タスクを保存する処理
   final Future<void> Function(String)? onSaveTask;
 
-  // フォーカスが外れたことをフラグに、その段階での入力値を保存する処理を起動するハンドラ
-  Future<void> _handleSave(String value) async {
-  }
+  /// タスク入力値のコントローラ
+  final TextEditingController titleController;
+
+  // // フォーカスが外れたことをフラグに、その段階での入力値を保存する処理を起動するハンドラ
+  // Future<void> _handleSave(String value) async {
+  // }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    // タスクのコントローラ
-    // この text の変更はリビルドのフラグにしない（フラグはフォーカスが外れたこと）
-    final TextEditingController taskController =
-    useNonReactiveTextController(text: taskTitle);
 
     // この TextField のフォーカス
     final focusNode = useFocusNode();
@@ -155,16 +205,16 @@ class _TaskField extends HookConsumerWidget {
         if (!focusNode.hasFocus) {
           _print(
             "フォーカスが解除された際に、そのときの入力値を保存",
-            "保存される入力値: ${taskController.text}",
+            "保存される入力値: ${titleController.text}",
           );
           // 最後に保存した値から変化しているかどうか
-          final bool isChanged = taskController.text != taskTitle;
+          final bool isChanged = titleController.text != taskTitle;
           // 自動保存オンのときの保存処理
           if (isChanged && onSaveTask != null) {
             // 編集未保存フラグをおろす
             ref.read(editSavingControllerProvider.notifier).onSaved();
             // 自動保存
-            await onSaveTask!(taskController.text);
+            await onSaveTask!(titleController.text);
           }
         }
       }
@@ -178,11 +228,11 @@ class _TaskField extends HookConsumerWidget {
     // TextField への入力以外で入力欄に入れる値（taskTitle）が変化した場合（遅延初期化、
     // データ元の変更、など）に対応
     useEffect(() {
-      if (taskController.text != taskTitle) {
+      if (titleController.text != taskTitle) {
         _print(
             "TextField への入力以外で入力欄に入れる値（taskTitle）が変化した場合");
         // 入力欄の値を更新
-        taskController.text = taskTitle;
+        titleController.text = taskTitle;
       }
       return null;
     }, [taskTitle]);
@@ -199,7 +249,7 @@ class _TaskField extends HookConsumerWidget {
           labelText: "タスク${position + 1}",
           // contentPadding: EdgeInsets.all(0),
         ),
-        controller: taskController,
+        controller: titleController,
         style: TextStyle(fontSize: 17.0.sp),
         textInputAction: TextInputAction.done,
         // エンターキー等で、入力完了によってフォーカスが外れるようにする
@@ -207,7 +257,7 @@ class _TaskField extends HookConsumerWidget {
           focusNode.unfocus();
         },
         // 入力欄に文字を入力したときに、編集未保存フラグを立てる。
-        onChanged: (String value){
+        onChanged: (String value) {
           ref.read(editSavingControllerProvider.notifier).onEdited();
         },
       ),
@@ -220,11 +270,12 @@ class _CheckableTaskField extends HookConsumerWidget {
   const _CheckableTaskField({
     required this.position,
     required this.taskTitle,
-    required this.isTaskChecked,
     required this.isTaskLabeled,
     required this.onSaveTask,
     required this.onLabeled,
-    required this.onCheckChanged,
+    required this.saveCheckAuto, required this.isChecked,
+    required this.notifyCheck,
+    required this.titleController,
   });
 
   /// タスクのリスト番号
@@ -232,9 +283,6 @@ class _CheckableTaskField extends HookConsumerWidget {
 
   /// タスクタイトル
   final String taskTitle;
-
-  /// チェックボックスの値
-  final bool isTaskChecked;
 
   /// ラベル化されているかどうか
   final bool isTaskLabeled;
@@ -246,13 +294,20 @@ class _CheckableTaskField extends HookConsumerWidget {
   final Future<void> Function(bool value) onLabeled;
 
   /// チェックボックスの値が更新される時の処理
-  final Future<void> Function(bool)? onCheckChanged;
+  final Future<void> Function(bool)? saveCheckAuto;
+
+  /// チェックボックスの値
+  final bool isChecked;
+
+  /// チェックボックスの値が変わったときのコントローラの操作
+  final void Function(bool) notifyCheck;
+
+  /// タスク入力値のコントローラ
+  final TextEditingController titleController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // チェックボックスの値
-    final isChecked = useState<bool>(isTaskChecked);
-
+    // todo （2026/06/26）＞＞
     // ラベル化されているかどうか
     final isLabeled = useState<bool>(isTaskLabeled);
 
@@ -261,22 +316,24 @@ class _CheckableTaskField extends HookConsumerWidget {
         position: position,
         taskTitle: taskTitle,
         onSaveTask: onSaveTask,
+        titleController: titleController,
       ),
-      value: isChecked.value,
+      value: isChecked,
       // チェックボックスが leading （左）側
       controlAffinity: ListTileControlAffinity.leading,
-      // チェエクボックス変更時
+      // チェックボックス変更時
       onChanged: (bool? value) async {
-        if (isChecked.value != value!) {
-          isChecked.value = value;
+        if (isChecked != value!) {
+          // チェックボックスの値が切り替わったことをコントローラクラスに通知
+          notifyCheck(value);
 
           // 自動保存オンの場合
-          if(onCheckChanged != null) {
+          if (saveCheckAuto != null) {
             // 自動保存
-            await onCheckChanged!(value);
+            await saveCheckAuto!(value);
           }
           // 自動保存オフの場合
-          else{
+          else {
             // 編集未保存フラグを立てる
             ref.read(editSavingControllerProvider.notifier).onEdited();
           }
@@ -285,8 +342,11 @@ class _CheckableTaskField extends HookConsumerWidget {
       // trailing （右）側の Widget
       secondary: IconButton(
         // ラベル化済みなら塗りつぶし
-        icon: isLabeled.value ? Icon(Icons.bookmark)
-            : Icon(Icons.bookmark_add_outlined,),
+        icon: isLabeled.value
+            ? Icon(Icons.bookmark)
+            : Icon(
+          Icons.bookmark_add_outlined,
+        ),
         onPressed: () {
           // todo 確認ダイアログ（2026/06/16）＞＞
           // bool 値を変換
@@ -305,7 +365,7 @@ class _IconTaskField extends HookWidget {
     required this.taskTitle,
     required this.isTaskLabeled,
     required this.onSaveTask,
-    required this.onLabeled,
+    required this.onLabeled, required this.titleController,
   });
 
   /// タスクのリスト番号
@@ -323,6 +383,9 @@ class _IconTaskField extends HookWidget {
   /// ラベル化処理
   final Future<void> Function(bool value) onLabeled;
 
+  /// タスク入力値のコントローラ
+  final TextEditingController titleController;
+
   @override
   Widget build(BuildContext context) {
     // ラベル化されているかどうか
@@ -333,12 +396,15 @@ class _IconTaskField extends HookWidget {
       title: _TaskField(
         position: position,
         taskTitle: taskTitle,
-        onSaveTask: onSaveTask,
+        onSaveTask: onSaveTask, titleController: titleController,
       ),
       trailing: IconButton(
         // ラベル化済みなら塗りつぶし
-        icon: isLabeled.value ? Icon(Icons.bookmark)
-            : Icon(Icons.bookmark_add_outlined,),
+        icon: isLabeled.value
+            ? Icon(Icons.bookmark)
+            : Icon(
+          Icons.bookmark_add_outlined,
+        ),
         onPressed: () {
           // todo 確認ダイアログ（2026/06/16）＞＞
           // bool 値を変換
@@ -350,7 +416,6 @@ class _IconTaskField extends HookWidget {
     );
   }
 }
-
 
 /// printメソッド [tasks_view.dart]
 void _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {

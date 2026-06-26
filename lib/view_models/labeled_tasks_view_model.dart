@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/use_case/services/labeled_tasks_service.dart';
 
 part 'labeled_tasks_view_model.g.dart';
@@ -55,6 +56,11 @@ class LabeledTasksViewModel extends _$LabeledTasksViewModel{
   /// 購読を破棄
   void _disposeSubscription() {
     _labeledTasksSubscription?.cancel();
+  }
+
+  // todo 書き換え
+  Future<void> labeling({required VTask vTask}) async {
+    await _readLabeledTasksService.labeling(vTask: vTask);
   }
 
   // todo dispose

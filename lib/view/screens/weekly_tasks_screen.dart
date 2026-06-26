@@ -7,6 +7,7 @@ import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
+import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 import 'package:three_tasks/view_models/weekly_tasks_view_model.dart';
 import 'history_screen.dart';
 
@@ -58,8 +59,12 @@ class WeeklyTasksScreen extends HookConsumerWidget {
                 );
               },
               // todo ラベル化処理（2026/06/11）＞＞
-              onLabeled: (int position, bool value) {
-
+              onLabeled: (int position, bool value) async {
+                // ラベル化タスク VM をイベントハンドラとして参照
+                final readLabeledTasksVM = ref.read(
+                    labeledTasksViewModelProvider.notifier);
+                // ラベル化の登録を依頼
+                await readLabeledTasksVM.labeling(vTask: weeklyTaskList[position]);
               },
               onJustEdited: ,
             ),

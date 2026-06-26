@@ -213,11 +213,11 @@ class DataRepositoryImpl implements DataRepository {
         // ストリームにデータを流す（週タスクは空を許容）
         _streamWeeklyTasks(resultValue);
 
-    // エラーハンドリング
+      // エラーハンドリング
       case Failure(
-      exception: final Exception error,
-      methodName: final String? methodName
-      ):
+          exception: final Exception error,
+          methodName: final String? methodName
+        ):
         _notifyQueryError(error: error, methodName: methodName);
     }
     return result;
@@ -278,5 +278,40 @@ class DataRepositoryImpl implements DataRepository {
       // todo エラーハンドリング（2026/05/23）＞＞
     }
     return result;
+  }
+
+  /// タスクラベル化メソッド
+  @override
+  Future<void> labeling({required DTask dTask}) async {
+    final Result<void, Exception> result = switch (dTask) {
+      // DTask.task は書き換えメソッドの整合性チェックのため、nullable だが、
+      // 書き換え以外では null はない
+      DDayTask(
+        task: final String? task,
+        id: final int id,
+      ) =>
+        await _dataSource.labelDailyTask(label: task!, newId: id),
+      DWeeklyTask(
+        task: final String? task,
+        id: final int id,
+      ) =>
+        await _dataSource.labelWeeklyTask(label: task!, newId: id),
+      DMonthlyTask(
+        task: final String? task,
+        id: final int id,
+      ) =>
+        await _dataSource.labelMonthlyTask(label: task!, newId: id),
+      DYearlyTask(
+        task: final String? task,
+        id: final int id,
+      ) =>
+        await _dataSource.labelYearlyTask(label: task!, newId: id),
+    };
+    switch (result) {
+      case Success():
+        break;
+      case Failure(exception: Exception error, methodName: String? methodName):
+      // todo エラーハンドリング（2026/06/22）＞＞
+    }
   }
 }
