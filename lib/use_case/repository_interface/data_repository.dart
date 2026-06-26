@@ -35,4 +35,7 @@ abstract class DataRepository {
 
   /// タスクのチェック変更保存メソッド
   Future<Result<void, Exception>> saveCheck({required DTask newTask});
+
+  /// タスクラベル化メソッド
+  Future<void> labeling({required DTask dTask});
 }

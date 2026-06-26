@@ -303,10 +303,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "29345034cd58624c1c8af85a8349a09ed6537dd7"
+      resolved-ref: "4c7db244e197a5ec8bbe7871ba5963b0cc2f8fb1"
       url: "https://github.com/champi-flutter/custom_widgets.git"
     source: git
-    version: "1.0.0+1"
+    version: "1.0.1+2"
   dart_style:
     dependency: transitive
     description:
@@ -859,10 +859,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "5e962aca4700c656a7cfd4e8acb4aab7d4006b11"
+      resolved-ref: "1941a03c2309581c4378f425e878039c3341f1c6"
       url: "https://github.com/champi-flutter/riverpod_wrapper.git"
     source: git
-    version: "1.0.0+1"
+    version: "1.0.2+3"
   rxdart:
     dependency: "direct main"
     description:

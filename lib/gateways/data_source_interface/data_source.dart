@@ -49,6 +49,24 @@ abstract class DataSource {
     required int newId,
   });
 
+  /// 週単位タスクをラベリング
+  Future<Result<void, Exception>> labelWeeklyTask({
+    required String label,
+    required int newId,
+  });
+
+  /// 月単位タスクをラベリング
+  Future<Result<void, Exception>> labelMonthlyTask({
+    required String label,
+    required int newId,
+  });
+
+  /// 年単位タスクをラベリング
+  Future<Result<void, Exception>> labelYearlyTask({
+    required String label,
+    required int newId,
+  });
+
   /// 既存のラベルを採用した枠を作るメソッド
   ///
   /// [newIdList] は呼び出し元で管理されているキャッシュを代入すること。

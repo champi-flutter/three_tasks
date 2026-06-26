@@ -11,11 +11,15 @@ import 'package:three_tasks/view/screens/review_screen.dart';
 import 'package:three_tasks/view/screens/enumeration/screen_type.dart';
 
 class ScreensWrapper extends HookConsumerWidget {
+
   ScreensWrapper({super.key});
 
   // todo build
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // ローディング状態を監視
+    final LoadingState loadingState = ref.watch(loadingViewModelProvider);
+
     // 現在選択されている画面のインデックス
     final selectedIndex = useState<int>(0);
 
@@ -26,8 +30,27 @@ class ScreensWrapper extends HookConsumerWidget {
     final pageViewController =
         usePageController(initialPage: selectedIndex.value);
 
+    // 現在表示している画面に、未保存の編集があるかどうか（ScrollPhysics 制御用）
+    final isEdited = ref.watch(editSavingControllerProvider);
+
     // ChoiceChipがタップされた時のスクロールアニメーション処理
-    void onChipSelected(int index) {
+    Future<void> onChipSelected(int index) async {
+      // 現在の画面の Chip をタップしても何も起きない
+      if(selectedIndex.value == index){
+        return;
+      }
+      // 編集未保存の場合
+      if(isEdited){
+        final bool willDiscard = await confirmToDiscard(context);
+        // 「破棄」を選択した場合、以降の処理に進む
+        if(willDiscard){
+          ref.read(editSavingControllerProvider.notifier).onDiscarded();
+        }
+        // 「編集を続ける」を選択した場合、何もせず早期リターン
+        else {
+          return;
+        }
+      }
       selectedIndex.value = index;
 
       // PageViewを指定したインデックスまで横スクロールでアニメーション遷移させる
@@ -39,9 +62,6 @@ class ScreensWrapper extends HookConsumerWidget {
         curve: Curves.easeInOut,
       );
     }
-
-    // 現在表示している画面に、未保存の編集があるかどうか（ScrollPhysics 制御用）
-    final isEdited = ref.watch(editSavingControllerProvider);
 
     // スワイプで遷移する画面の列挙型
     final List<ScreenType> screenList = ScreenType.values;
@@ -82,6 +102,10 @@ class ScreensWrapper extends HookConsumerWidget {
         resizeToAvoidBottomInset: false,
         // 自動保存でない場合に、未保存の編集を確認するラッパー
         body: EditSavedPopScope(
+          // 「破棄」を選択した場合の処理
+          actionOnDiscarded: ()async{
+
+          },
           child: Column(
             children: [
               // 画面遷移用の Chip
@@ -106,13 +130,24 @@ class ScreensWrapper extends HookConsumerWidget {
                       ? const NeverScrollableScrollPhysics()
                       // スワイプ可能
                       : const ClampingScrollPhysics(),
-                  onPageChanged: (int index) {
-                    // ユーザーが手動でスワイプしてページを切り替えた際、ChoiceChipの選択状態も同期する
+                  onPageChanged: (int index) async {
+                    // 画面の値のコントローラを破棄（完了までローディング）
+                    await ref.read(loadingViewModelProvider.notifier).loadAsync(()async{
+                      await ref.invalidate();
+                    });
+                    // ユーザが手動でスワイプしてページを切り替えた際、ChoiceChipの選択状態も同期する
                     selectedIndex.value = index;
                   },
                   // インデックスで画面を選択
                   itemBuilder: (context, index) {
-                    return screenList[index].constructor;
+                    // ローディング終了後にビルドを開始するようにする
+                    // （古いコントローラの参照等を防ぐため）
+                    if(loadingState.isLoading){
+                      return Container(color: Colors.black12,);
+                    }
+                    else {
+                      return screenList[index].constructor;
+                    }
                   },
                 ),
               ),

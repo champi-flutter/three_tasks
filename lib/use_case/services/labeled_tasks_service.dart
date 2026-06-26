@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:custom_core_types/custom_core_types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/data_type/d_labeled_task.dart';
+import 'package:three_tasks/entities/data_type/d_task.dart';
 import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 「ラベル化したタスク」サービスクラス
 class LabeledTasksService {
   // todo コンストラクタ
-  LabeledTasksService(this._ref){
+  LabeledTasksService(this._ref) {
     _initService();
   }
 
@@ -24,7 +27,7 @@ class LabeledTasksService {
 
   // todo 初期化
   /// このクラスの初期化
-  void _initService(){
+  void _initService() {
     // 古い購読を破棄
     _disposeSubscription();
     // 購読を開始
@@ -37,7 +40,7 @@ class LabeledTasksService {
 
   /// データのストリームを管理するコントローラ
   final StreamController<List<VLabeledTask>> _labeledTasksController =
-      BehaviorSubject<List<VLabeledTask>>();
+  BehaviorSubject<List<VLabeledTask>>();
 
   /// 「ラベル化したタスク」のキャッシュが更新された際に、その情報を流すストリーム
   Stream<List<VLabeledTask>> get labeledTasksStream =>
@@ -50,7 +53,7 @@ class LabeledTasksService {
   }
 
   /// 購読を破棄
-  void _disposeSubscription(){
+  void _disposeSubscription() {
     _labeledTasksSubscription?.cancel();
   }
 
@@ -59,7 +62,7 @@ class LabeledTasksService {
     try {
       // 受信データを表示用のデータ型に変換
       final List<VLabeledTask> convertedData =
-          [...newDataList].map((DLabeledTask newData) {
+      [...newDataList].map((DLabeledTask newData) {
         return VLabeledTask(
           label: newData.label,
           taskId: newData.taskId,
@@ -76,9 +79,24 @@ class LabeledTasksService {
     }
   }
 
+  // todo 書き換え
+  Future<void> labeling({required VTask vTask}) async {
+    final DTask dTask = switch(vTask){
+      VDayTask(task: final String task, date: final Date date, id: final int id, isChecked: final bool isChecked) =>
+          DDayTask(task: task, date: date, id: id, isChecked: isChecked,),
+      VWeeklyTask(task: final String task, week: final UniqueWeek week , id: final int id, isChecked: final bool isChecked) =>
+          DWeeklyTask(task: task, week: week, id: id, isChecked: isChecked),
+      VMonthlyTask(task: final String task, month: final Month month, id: final int id, isChecked: final bool isChecked) =>
+          DMonthlyTask(task: task, month: month, id: id, isChecked: isChecked),
+      VYearlyTask(task: final String task, year: final int year, id: final int id, isChecked: final bool isChecked) =>
+          DYearlyTask(task: task, year: year, id: id, isChecked: isChecked),
+    };
+    await _readRepository.labeling(dTask: dTask);
+  }
+
   // todo dispose
   /// このクラスのオブジェクトが破棄される際に呼び出す明示的な破棄
-  void disposeService(){
+  void disposeService() {
     _disposeSubscription();
   }
 }

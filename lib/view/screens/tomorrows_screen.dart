@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
+import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 import 'package:three_tasks/view_models/tomorrows_view_model.dart';
 
 import 'history_screen.dart';
@@ -25,7 +27,7 @@ class TomorrowsScreen extends HookConsumerWidget {
         child: Column(
           children: [
             // 余白
-            SizedBox(height: 30.0.h.h),
+            SizedBox(height: 30.0.h),
 
             // 明日のタスク
             // 未来のタスクなので、チェックボックスはなし
@@ -33,14 +35,19 @@ class TomorrowsScreen extends HookConsumerWidget {
               taskList: tomorrowsTaskList,
               // 保存は「下書き保存」ボタンで
               onSaveTask: null,
-              // todo ラベル化処理（2026/06/11）＞＞
-              onLabeled: (int position, bool value) async{},
-              // 自動保存でない場合に編集が加わったフラグがたつ
-              onJustEdited: ref.read(editSavingControllerProvider.notifier).onEdited,
+              // ラベル化処理
+              onLabeled: (int position, bool value) async {
+                // ラベル化タスク VM をイベントハンドラとして参照
+                final readLabeledTasksVM = ref.read(
+                    labeledTasksViewModelProvider.notifier);
+                // ラベル化の登録を依頼
+                await readLabeledTasksVM.labeling(
+                    vTask: tomorrowsTaskList[position]);
+              },
             ),
 
             // 余白
-            SizedBox(height: 30.0.h.h),
+            SizedBox(height: 30.0.h),
 
             // ボタンは揃えて配置
             Padding(
@@ -65,7 +72,15 @@ class TomorrowsScreen extends HookConsumerWidget {
                   ),
 
                   // 「ラベル化されたタスク一覧」ボタン
-                  const LabeledTaskListButton(),
+                  LabeledTaskListButton(
+                    // タスクタイトルのリストに変換
+                    taskTitleList: tomorrowsTaskList.map<String>((VDayTask task)=>task.task).toList(),
+                    // 空欄の場所にラベル化タスクを当てはめる処理
+                    onApplyLabeledTask: (int position, VLabeledTask labeledTask)async{
+
+                    },
+                    onReplaceLabeledTask: ,
+                  ),
 
                   //「履歴を参照」ボタン
                   BottomButton.sync(

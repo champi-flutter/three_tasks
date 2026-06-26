@@ -877,6 +877,62 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     }
   }
 
+  /// 日単位タスクをラベリング
+  @override
+  Future<Result<void, Exception>> labelWeeklyTask({
+    required String label,
+    required int newId,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      await managers.labeledTasks.create((record) =>
+          record(
+              label: label, weeklyIdList: Value(Uint8List.fromList([newId]))));
+      return Success(null);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "labelingWeeklylyTask");
+    }
+  }
+
+  /// 日単位タスクをラベリング
+  @override
+  Future<Result<void, Exception>> labelMonthlyTask({
+    required String label,
+    required int newId,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      await managers.labeledTasks.create((record) =>
+          record(
+              label: label, monthlyIdList: Value(Uint8List.fromList([newId])),
+          )
+      );
+      return Success(null);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "labelingMonthlyTask");
+    }
+  }
+
+  /// 日単位タスクをラベリング
+  @override
+  Future<Result<void, Exception>> labelYearlyTask({
+    required String label,
+    required int newId,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      await managers.labeledTasks.create((record) =>
+          record(
+              label: label, yearlyIdList: Value(Uint8List.fromList([newId]))));
+      return Success(null);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "labelingYearlyTask");
+    }
+  }
+
   // todo 週単位、月単位、年単位のラベリング（2026/06/01）＞＞
 
   /// 既存のラベルを採用した枠を作るメソッド
