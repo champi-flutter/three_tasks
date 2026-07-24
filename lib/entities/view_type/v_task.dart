@@ -16,6 +16,8 @@ sealed class VTask {
 
   bool get isChecked;
 
+  int? get labelId;
+
   /// このタスクがラベル化されているかどうか
   bool isLabeled({required List<VLabeledTask> labeledTaskList});
 }
@@ -30,11 +32,12 @@ abstract class VDayTask with _$VDayTask implements VTask {
     required Date date,
     required int id,
     required bool isChecked,
+    required int? labelId,
   }) = _VDayTask;
 
   /// 日単位タスクの仮データを生成するファクトリ
   factory VDayTask.placeholder({required Date date}) =>
-      VDayTask(task: "", date: date, id: -1, isChecked: false);
+      VDayTask(task: "", date: date, id: -1, isChecked: false, labelId: null,);
 
   /// このタスクがラベル化されているかどうか
   @override
@@ -48,6 +51,8 @@ abstract class VDayTask with _$VDayTask implements VTask {
     // 最後までなかったら、false を返す
     return false;
   }
+
+
 }
 
 /// 週単位のタスククラス
@@ -57,10 +62,10 @@ abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
 
   const factory VWeeklyTask({
     required String task,
-    // todo 週のクラス（2026/06/04）＞＞
     required UniqueWeek week,
     required int id,
     required bool isChecked,
+    required int? labelId,
   }) = _VWeeklyTask;
 
   /// このタスクがラベル化されているかどうか
@@ -82,6 +87,7 @@ abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
       week: UniqueWeek.fromDate(currentDate: today, firstDate: today),
       id: -1,
       isChecked: false,
+    labelId: null,
   );
 }
 
@@ -95,6 +101,7 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
     required Month month,
     required int id,
     required bool isChecked,
+    required int? labelId,
   }) = _VMonthlyTask;
 
   /// このタスクがラベル化されているかどうか
@@ -112,7 +119,7 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
 
   /// 週単位タスクの仮データを生成するファクトリ
   factory VMonthlyTask.placeholder() =>
-      VMonthlyTask(task: "", month: thisMonth, id: -1, isChecked: false);
+      VMonthlyTask(task: "", month: thisMonth, id: -1, isChecked: false, labelId: null,);
 }
 
 /// 年単位のタスククラス
@@ -125,6 +132,7 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
     required int year,
     required int id,
     required bool isChecked,
+    required int? labelId,
   }) = _VYearlyTask;
 
   /// このタスクがラベル化されているかどうか
@@ -142,7 +150,7 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
 
   /// 週単位タスクの仮データを生成するファクトリ
   factory VYearlyTask.placeholder() =>
-      VYearlyTask(task: "", year: thisYear, id: -1, isChecked: false);
+      VYearlyTask(task: "", year: thisYear, id: -1, isChecked: false, labelId: null,);
 }
 
 // @freezed

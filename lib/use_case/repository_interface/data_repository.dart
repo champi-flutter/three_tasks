@@ -25,7 +25,8 @@ abstract class DataRepository {
   /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド
   ///
   /// 複数の日付を指定可能。
-  Future<Result<void, Exception>> fetchWeeklyTaskList({required List<Date> firstDateList});
+  Future<Result<void, Exception>> fetchWeeklyTaskList(
+      {required List<Date> firstDateList});
 
   // todo 書き換え
   /// タスクタイトル保存メソッド
@@ -37,5 +38,28 @@ abstract class DataRepository {
   Future<Result<void, Exception>> saveCheck({required DTask newTask});
 
   /// タスクラベル化メソッド
-  Future<void> labeling({required DTask dTask});
+  ///
+  /// 新規ラベルの ID を返す。
+  ///
+  /// 例外が発生した場合は、`null` を返す。
+  Future<int?> labeling({required DTask dTask});
+
+  /// タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[dTask.id]）を追加する。
+  ///
+  /// 指定タスクのラベル情報（[dTask.labelId]）に、指定ラベルを加える。
+  Future<void> addToLabel({
+    required DTask dTask,
+    required int labelId,
+  });
+
+  /// 指定タスクのラベル化を解除するメソッド
+  ///
+  /// 指定タスク（[dTask]）がこの段階で属しているラベルから、このタスクのIDを除外する。
+  ///
+  /// 指定タスクの [DTask.labelId] を `null` にする。
+  Future<void> unlabeling({
+    required DTask dTask,
+  });
 }

@@ -7,7 +7,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
+import 'package:three_tasks/view_controller/task_label_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
 import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 
@@ -20,31 +22,59 @@ enum TasksViewStyle { checkbox, icon }
 class TasksView extends ConsumerWidget {
   const TasksView.checkbox({
     required this.taskList,
-    required this.onSaveTask,
+    required this.saveTaskAuto,
     required this.saveCheckAuto,
-    required this.onLabeled,
-  }) : assert(
-  saveCheckAuto != null,
-  "チェックボックス更新時の処理が設定されていません。",
-  ),
+    required this.saveNewLabelAuto,
+    required this.saveAdditionToLabelAuto,
+    required this.saveUnlabelAuto,
+  })  : assert(
+          saveCheckAuto != null,
+          "チェックボックス更新時の処理が設定されていません。",
+        ),
         tasksViewStyle = TasksViewStyle.checkbox,
-  // assert(
-  // onSaveTask != null || onJustEdited != null,
-  // "自動保存における編集フラグのコールバックが設定されていません。",
-  // ),
-        _isAutoSave = onSaveTask != null;
+        // assert(
+        // saveTaskAuto != null || onJustEdited != null,
+        // "自動保存における編集フラグのコールバックが設定されていません。",
+        // ),
+        assert(
+          (saveTaskAuto == null &&
+                  saveCheckAuto == null &&
+              saveNewLabelAuto == null &&
+              saveAdditionToLabelAuto == null &&
+              saveUnlabelAuto == null) ||
+              (saveTaskAuto != null &&
+                  saveCheckAuto != null &&
+                  saveNewLabelAuto != null &&
+                  saveAdditionToLabelAuto != null &&
+                  saveUnlabelAuto != null),
+          "コールバックが正しく設定されていません（TasksView.checkbox）",
+        ),
+        _isAutoSave = saveTaskAuto != null;
 
   const TasksView.icon({
     required this.taskList,
-    required this.onSaveTask,
-    required this.onLabeled,
-  }) : tasksViewStyle = TasksViewStyle.icon,
+    required this.saveTaskAuto,
+    required this.saveNewLabelAuto,
+    required this.saveAdditionToLabelAuto,
+    required this.saveUnlabelAuto,
+  })  : tasksViewStyle = TasksViewStyle.icon,
         saveCheckAuto = null,
-  // assert(
-  // onSaveTask != null || onJustEdited != null,
-  // "自動保存における編集フラグのコールバックが設定されていません。",
-  // ),
-        _isAutoSave = onSaveTask != null;
+        // assert(
+        // saveTaskAuto != null || onJustEdited != null,
+        // "自動保存における編集フラグのコールバックが設定されていません。",
+        // ),
+        assert(
+        (saveTaskAuto == null &&
+            saveNewLabelAuto == null &&
+            saveAdditionToLabelAuto == null &&
+            saveUnlabelAuto == null) ||
+            (saveTaskAuto != null &&
+                saveNewLabelAuto != null &&
+                saveAdditionToLabelAuto != null &&
+                saveUnlabelAuto != null),
+          "コールバックが正しく設定されていません（TasksView.icon）",
+        ),
+        _isAutoSave = saveTaskAuto != null;
 
   final TasksViewStyle tasksViewStyle;
 
@@ -52,7 +82,7 @@ class TasksView extends ConsumerWidget {
   final List<VTask> taskList;
 
   /// 入力欄に値を入力した状態でフォーカスを外したときの自動保存ロジック
-  final Future<void> Function(int position, String value)? onSaveTask;
+  final Future<void> Function(int position, String value)? saveTaskAuto;
 
   // /// 自動保存でない場合に、編集を加えたときの処理
   // final VoidCallback? onJustEdited;
@@ -61,16 +91,26 @@ class TasksView extends ConsumerWidget {
   final bool _isAutoSave;
 
   /// ラベル化処理
-  final Future<void> Function(int position, bool value) onLabeled;
+  final Future<int> Function(
+    int position,
+  )? saveNewLabelAuto;
+
+  /// 既存のラベルに追加する処理
+  final Future<void> Function(int position, int)? saveAdditionToLabelAuto;
+
+  /// ラベル化解除処理
+  final Future<void> Function(
+    int position,
+  )? saveUnlabelAuto;
 
   /// チェックボックスの値が更新される時の処理
   final Future<void> Function(int position, bool value)? saveCheckAuto;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ラベル化タスクのリスト
-    final List<VLabeledTask> labeledTaskList =
-    ref.watch(labeledTasksViewModelProvider);
+    // // ラベル化タスクのリスト
+    // final List<VLabeledTask> labeledTaskList =
+    //     ref.watch(labeledTasksViewModelProvider);
     return ListView.builder(
       itemCount: 3,
       itemBuilder: (context, position) {
@@ -81,33 +121,47 @@ class TasksView extends ConsumerWidget {
             title2: taskList[1].task,
             title3: taskList[2].task,
           ).select(
-                (state) =>
-            switch (position) {
+            (state) => switch (position) {
               0 => state.titleController1,
               1 => state.titleController2,
               2 => state.titleController3,
-            // itemCount の制限上ありえないが、網羅性のため記述
+              // itemCount の制限上ありえないが、網羅性のため記述
               _ => TextEditingController(),
             },
           ),
         );
+        final isLabeled = ref.watch(
+          taskLabelEditingControllerProvider(
+            taskList[0].labelId,
+            taskList[1].labelId,
+            taskList[2].labelId,
+          ).select((state) =>
+              // position に応じて、監視するプロパティを切り替える
+              switch (position) {
+                0 => state.isLabeled1,
+                1 => state.isLabeled2,
+                2 => state.isLabeled3,
+                // itemCount の制限上ありえないが、網羅性のため記述
+                _ => false,
+              }),
+        );
         switch (tasksViewStyle) {
           case TasksViewStyle.checkbox:
-          // チェックボックスの値をこのスコープで管理
+            // チェックボックスの値をこのスコープで管理
             final isChecked = ref.watch(
               taskCheckEditingControllerProvider(
                 taskList[0].isChecked,
                 taskList[1].isChecked,
                 taskList[2].isChecked,
               ).select((state) =>
-              // position に応じて、監視するプロパティを切り替える
-              switch (position) {
-                0 => state.check1,
-                1 => state.check2,
-                2 => state.check3,
-              // itemCount の制限上ありえないが、網羅性のため記述
-                _ => false,
-              }),
+                  // position に応じて、監視するプロパティを切り替える
+                  switch (position) {
+                    0 => state.check1,
+                    1 => state.check2,
+                    2 => state.check3,
+                    // itemCount の制限上ありえないが、網羅性のため記述
+                    _ => false,
+                  }),
             );
 
             return Padding(
@@ -116,24 +170,38 @@ class TasksView extends ConsumerWidget {
               child: _CheckableTaskField(
                 position: position,
                 taskTitle: taskList[position].task,
-                isTaskLabeled: taskList[position].isLabeled(
-                  labeledTaskList: labeledTaskList,
-                ),
-                onSaveTask: _isAutoSave
-                    ? (String value) => onSaveTask!(position, value)
+                isLabeled: isLabeled,
+                saveTaskAuto: _isAutoSave
+                    ? (String value) => saveTaskAuto!(position, value)
                     : null,
-                onLabeled: (bool value) => onLabeled(position, value),
+                saveNewLabelAuto:
+                    _isAutoSave ? () => saveNewLabelAuto!(position) : null,
+                saveAdditionToLabelAuto: _isAutoSave
+                    ? (int value) => saveAdditionToLabelAuto!(position, value)
+                    : null,
+                saveUnlabelAuto:
+                    _isAutoSave ? () => saveUnlabelAuto!(position) : null,
                 saveCheckAuto: _isAutoSave
                     ? (bool value) => saveCheckAuto!(position, value)
                     : null,
                 isChecked: isChecked,
                 notifyCheck: (bool value) {
-                  ref.read(
-                      taskCheckEditingControllerProvider(
+                  ref
+                      .read(taskCheckEditingControllerProvider(
                         taskList[0].isChecked,
                         taskList[1].isChecked,
                         taskList[2].isChecked,
-                      ).notifier).check(position, value);
+                      ).notifier)
+                      .check(position, value);
+                },
+                notifyLabel: (int? value) {
+                  ref
+                      .read(taskLabelEditingControllerProvider(
+                    taskList[0].labelId,
+                    taskList[1].labelId,
+                    taskList[2].labelId,
+                      ).notifier)
+                      .label(position, value);
                 },
                 titleController: titleController,
               ),
@@ -149,13 +217,26 @@ class TasksView extends ConsumerWidget {
                   child: _IconTaskField(
                     position: position,
                     taskTitle: taskList[position].task,
-                    isTaskLabeled: taskList[position].isLabeled(
-                      labeledTaskList: labeledTaskList,
-                    ),
-                    onSaveTask: _isAutoSave
-                        ? (String value) => onSaveTask!(position, value)
+                    isLabeled: isLabeled,
+                    saveTaskAuto: _isAutoSave
+                        ? (String value) => saveTaskAuto!(position, value)
                         : null,
-                    onLabeled: (bool value) => onLabeled(position, value),
+                    saveNewLabelAuto:
+                    _isAutoSave ? () => saveNewLabelAuto!(position) : null,
+                    saveAdditionToLabelAuto: _isAutoSave
+                        ? (int value) => saveAdditionToLabelAuto!(position, value)
+                        : null,
+                    saveUnlabelAuto:
+                    _isAutoSave ? () => saveUnlabelAuto!(position) : null,
+                    notifyLabel: (int? value) {
+                      ref
+                          .read(taskLabelEditingControllerProvider(
+                            taskList[0].labelId,
+                            taskList[1].labelId,
+                            taskList[2].labelId,
+                          ).notifier)
+                          .label(position, value);
+                    },
                     titleController: titleController,
                   ),
                 );
@@ -164,7 +245,6 @@ class TasksView extends ConsumerWidget {
         }
       },
     );
-
   }
 }
 
@@ -173,7 +253,8 @@ class _TaskField extends HookConsumerWidget {
   const _TaskField({
     required this.position,
     required this.taskTitle,
-    required this.onSaveTask, required this.titleController,
+    required this.titleController,
+    required this.saveTaskAuto,
   });
 
   /// タスクのリスト番号
@@ -183,7 +264,7 @@ class _TaskField extends HookConsumerWidget {
   final String taskTitle;
 
   /// タスクを保存する処理
-  final Future<void> Function(String)? onSaveTask;
+  final Future<void> Function(String)? saveTaskAuto;
 
   /// タスク入力値のコントローラ
   final TextEditingController titleController;
@@ -194,7 +275,6 @@ class _TaskField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     // この TextField のフォーカス
     final focusNode = useFocusNode();
 
@@ -210,11 +290,11 @@ class _TaskField extends HookConsumerWidget {
           // 最後に保存した値から変化しているかどうか
           final bool isChanged = titleController.text != taskTitle;
           // 自動保存オンのときの保存処理
-          if (isChanged && onSaveTask != null) {
+          if (isChanged && saveTaskAuto != null) {
             // 編集未保存フラグをおろす
             ref.read(editSavingControllerProvider.notifier).onSaved();
             // 自動保存
-            await onSaveTask!(titleController.text);
+            await saveTaskAuto!(titleController.text);
           }
         }
       }
@@ -229,8 +309,7 @@ class _TaskField extends HookConsumerWidget {
     // データ元の変更、など）に対応
     useEffect(() {
       if (titleController.text != taskTitle) {
-        _print(
-            "TextField への入力以外で入力欄に入れる値（taskTitle）が変化した場合");
+        _print("TextField への入力以外で入力欄に入れる値（taskTitle）が変化した場合");
         // 入力欄の値を更新
         titleController.text = taskTitle;
       }
@@ -270,12 +349,16 @@ class _CheckableTaskField extends HookConsumerWidget {
   const _CheckableTaskField({
     required this.position,
     required this.taskTitle,
-    required this.isTaskLabeled,
-    required this.onSaveTask,
-    required this.onLabeled,
-    required this.saveCheckAuto, required this.isChecked,
+    required this.saveCheckAuto,
+    required this.isChecked,
     required this.notifyCheck,
     required this.titleController,
+    required this.isLabeled,
+    required this.notifyLabel,
+    required this.saveTaskAuto,
+    required this.saveNewLabelAuto,
+    required this.saveAdditionToLabelAuto,
+    required this.saveUnlabelAuto,
   });
 
   /// タスクのリスト番号
@@ -285,15 +368,24 @@ class _CheckableTaskField extends HookConsumerWidget {
   final String taskTitle;
 
   /// ラベル化されているかどうか
-  final bool isTaskLabeled;
+  final bool isLabeled;
 
-  /// タスクを保存する処理
-  final Future<void> Function(String)? onSaveTask;
+  /// ラベル化マークの値が変わったときのコントローラの操作
+  final void Function(int?) notifyLabel;
+
+  /// タスクを自動保存する処理
+  final Future<void> Function(String)? saveTaskAuto;
 
   /// ラベル化処理
-  final Future<void> Function(bool value) onLabeled;
+  final Future<int> Function()? saveNewLabelAuto;
 
-  /// チェックボックスの値が更新される時の処理
+  /// 既存のラベルに追加する処理
+  final Future<void> Function(int)? saveAdditionToLabelAuto;
+
+  /// ラベル化解除処理
+  final Future<void> Function()? saveUnlabelAuto;
+
+  /// チェックボックスの値が更新される時の自動保存処理
   final Future<void> Function(bool)? saveCheckAuto;
 
   /// チェックボックスの値
@@ -307,15 +399,11 @@ class _CheckableTaskField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // todo （2026/06/26）＞＞
-    // ラベル化されているかどうか
-    final isLabeled = useState<bool>(isTaskLabeled);
-
     return CheckboxListTile(
       title: _TaskField(
         position: position,
         taskTitle: taskTitle,
-        onSaveTask: onSaveTask,
+        saveTaskAuto: saveTaskAuto,
         titleController: titleController,
       ),
       value: isChecked,
@@ -342,30 +430,99 @@ class _CheckableTaskField extends HookConsumerWidget {
       // trailing （右）側の Widget
       secondary: IconButton(
         // ラベル化済みなら塗りつぶし
-        icon: isLabeled.value
+        icon: isLabeled
             ? Icon(Icons.bookmark)
             : Icon(
-          Icons.bookmark_add_outlined,
-        ),
-        onPressed: () {
-          // todo 確認ダイアログ（2026/06/16）＞＞
-          // bool 値を変換
-          isLabeled.value = !isLabeled.value;
-          // 変換後の bool 値でラベル化処理
-          onLabeled(isLabeled.value);
+                Icons.bookmark_add_outlined,
+              ),
+        onPressed: () async {
+          final bool newMark = !isLabeled;
+          // マークがついた場合
+          if (newMark) {
+            // ラベルVM の state を read で参照
+            final List<VLabeledTask> labelList =
+                ref.read(labeledTasksViewModelProvider);
+            // このタイルのタスクのタイトルと合致するラベルがあるかどうか
+            final int? existingLabelId = labelList.idWithSameTitleAs(taskTitle);
+            // 同じ名前のラベルがすでに存在する場合
+            if (existingLabelId != null) {
+              // 対象のラベルに登録するかを確認するダイアログを表示
+              final bool willLabel = await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) {
+                  return _ConfirmingExistingLabelDialog(labelTitle: taskTitle);
+                },
+              );
+              // 「いいえ」を選択した場合は、早期リターン
+              if (!willLabel) {
+                return;
+              }
+              // ラベルの値を変換
+              notifyLabel(existingLabelId);
+
+              // 自動保存オンの場合
+              if (saveAdditionToLabelAuto != null) {
+                // 自動保存
+                await saveAdditionToLabelAuto!(existingLabelId);
+              }
+              // 自動保存オフの場合
+              else {
+                // 編集未保存フラグを立てる
+                ref.read(editSavingControllerProvider.notifier).onEdited();
+              }
+            }
+            // （マークがついて且つ、）同じ名前のラベルがない場合
+            else {
+              // 自動保存オンの場合
+              if (saveNewLabelAuto != null) {
+                // 自動保存
+                final int newId = await saveNewLabelAuto!();
+                // ラベルの値を新規ラベルの ID に変換
+                notifyLabel(newId);
+              }
+              // 自動保存オフの場合
+              else {
+                // ラベルの値を新規ラベルの -1 に変換
+                notifyLabel(-1);
+                // 編集未保存フラグを立てる
+                ref.read(editSavingControllerProvider.notifier).onEdited();
+              }
+            }
+          }
+          // マークが解除された場合
+          else {
+            // ラベルの値を null に変換
+            notifyLabel(null);
+
+            // 自動保存オンの場合
+            if (saveUnlabelAuto != null) {
+              // 自動保存
+              await saveUnlabelAuto!();
+            }
+            // 自動保存オフの場合
+            else {
+              // 編集未保存フラグを立てる
+              ref.read(editSavingControllerProvider.notifier).onEdited();
+            }
+          }
         },
       ),
     );
   }
 }
 
-class _IconTaskField extends HookWidget {
+class _IconTaskField extends ConsumerWidget {
   const _IconTaskField({
     required this.position,
     required this.taskTitle,
-    required this.isTaskLabeled,
-    required this.onSaveTask,
-    required this.onLabeled, required this.titleController,
+    required this.titleController,
+    required this.isLabeled,
+    required this.notifyLabel,
+    required this.saveTaskAuto,
+    required this.saveNewLabelAuto,
+    required this.saveAdditionToLabelAuto,
+    required this.saveUnlabelAuto,
   });
 
   /// タスクのリスト番号
@@ -375,44 +532,154 @@ class _IconTaskField extends HookWidget {
   final String taskTitle;
 
   /// ラベル化されているかどうか
-  final bool isTaskLabeled;
+  final bool isLabeled;
 
-  /// タスクを保存する処理
-  final Future<void> Function(String value)? onSaveTask;
+  /// ラベル化マークの値が変わったときのコントローラの操作
+  final void Function(int?) notifyLabel;
+
+  /// タスクを自動保存する処理
+  final Future<void> Function(String)? saveTaskAuto;
 
   /// ラベル化処理
-  final Future<void> Function(bool value) onLabeled;
+  final Future<int> Function()? saveNewLabelAuto;
+
+  /// 既存のラベルに追加する処理
+  final Future<void> Function(int)? saveAdditionToLabelAuto;
+
+  /// ラベル化解除処理
+  final Future<void> Function()? saveUnlabelAuto;
 
   /// タスク入力値のコントローラ
   final TextEditingController titleController;
 
   @override
-  Widget build(BuildContext context) {
-    // ラベル化されているかどうか
-    final isLabeled = useState<bool>(isTaskLabeled);
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       leading: const Icon(Icons.task),
       title: _TaskField(
         position: position,
         taskTitle: taskTitle,
-        onSaveTask: onSaveTask, titleController: titleController,
+        saveTaskAuto: saveTaskAuto,
+        titleController: titleController,
       ),
       trailing: IconButton(
         // ラベル化済みなら塗りつぶし
-        icon: isLabeled.value
+        icon: isLabeled
             ? Icon(Icons.bookmark)
             : Icon(
-          Icons.bookmark_add_outlined,
-        ),
-        onPressed: () {
-          // todo 確認ダイアログ（2026/06/16）＞＞
-          // bool 値を変換
-          isLabeled.value = !isLabeled.value;
-          // 変換後の bool 値でラベル化処理
-          onLabeled(isLabeled.value);
+                Icons.bookmark_add_outlined,
+              ),
+        onPressed: () async {
+          final bool newMark = !isLabeled;
+          // マークがついた場合
+          if (newMark) {
+            // ラベルVM の state を read で参照
+            final List<VLabeledTask> labelList =
+                ref.read(labeledTasksViewModelProvider);
+            // このタイルのタスクのタイトルと合致するラベルがあるかどうか
+            final int? existingLabelId = labelList.idWithSameTitleAs(taskTitle);
+            // 同じ名前のラベルがすでに存在する場合
+            if (existingLabelId != null) {
+              // 対象のラベルに登録するかを確認するダイアログを表示
+              final bool willLabel = await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) {
+                  return _ConfirmingExistingLabelDialog(labelTitle: taskTitle);
+                },
+              );
+              // 「いいえ」を選択した場合は、早期リターン
+              if (!willLabel) {
+                return;
+              }
+              // ラベルの値を変換
+              notifyLabel(existingLabelId);
+
+              // 自動保存オンの場合
+              if (saveAdditionToLabelAuto != null) {
+                // 自動保存
+                await saveAdditionToLabelAuto!(existingLabelId);
+              }
+              // 自動保存オフの場合
+              else {
+                // 編集未保存フラグを立てる
+                ref.read(editSavingControllerProvider.notifier).onEdited();
+              }
+            }
+            // （マークがついて且つ、）同じ名前のラベルがない場合
+            else {
+              // 自動保存オンの場合
+              if (saveNewLabelAuto != null) {
+                // 自動保存
+                final int newId = await saveNewLabelAuto!();
+                // ラベルの値を新規ラベルの ID に変換
+                notifyLabel(newId);
+              }
+              // 自動保存オフの場合
+              else {
+                // ラベルの値を新規ラベルの -1 に変換
+                notifyLabel(-1);
+                // 編集未保存フラグを立てる
+                ref.read(editSavingControllerProvider.notifier).onEdited();
+              }
+            }
+          }
+          // マークが解除された場合
+          else {
+            // ラベルの値を null に変換
+            notifyLabel(null);
+
+            // 自動保存オンの場合
+            if (saveUnlabelAuto != null) {
+              // 自動保存
+              await saveUnlabelAuto!();
+            }
+            // 自動保存オフの場合
+            else {
+              // 編集未保存フラグを立てる
+              ref.read(editSavingControllerProvider.notifier).onEdited();
+            }
+          }
         },
       ),
+    );
+  }
+}
+
+/// ラベル化時に同じ名前のラベルがすでにあった場合に、そこに登録するかを確認するダイアログ
+///  - 「はい」: `pop` して `true` を返す
+///  - 「いいえ」: `pop` して `false` を返す
+class _ConfirmingExistingLabelDialog extends StatelessWidget {
+  const _ConfirmingExistingLabelDialog({super.key, required this.labelTitle});
+
+  final String labelTitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedSimpleDialog.confirm(
+      title: UtilizedText(
+        "確認",
+        fontSize: 21,
+      ),
+      contentsList: [
+        UtilizedText(
+          "「$labelTitle」 はすでに存在します。",
+          fontSize: 18,
+        ),
+        UtilizedText(
+          "「$labelTitle」 に登録しますか？",
+          fontSize: 18,
+        ),
+        // todo 「以降表示しない」のチェックボックス（2026/07/01）＞＞
+      ],
+      onDecided: () {
+        // pop 時に true を返す
+        Navigator.of(context).pop(true);
+      },
+      onReturn: () {
+        // pop 時に false を返す
+        Navigator.of(context).pop(false);
+      },
     );
   }
 }

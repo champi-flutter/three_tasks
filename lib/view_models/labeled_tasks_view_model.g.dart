@@ -45,7 +45,7 @@ final class LabeledTasksViewModelProvider
 }
 
 String _$labeledTasksViewModelHash() =>
-    r'b3276fbe0c3475998f37bf4f2268021d444828de';
+    r'469c7938e3ce563a70cac9ec561a3724ee03e8de';
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 

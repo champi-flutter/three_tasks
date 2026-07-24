@@ -9,6 +9,7 @@ class BottomButton extends StatelessWidget {
   const BottomButton.sync({
     super.key,
     required this.text,
+    this.isValid = true,
     required this.onPressedSync,
     this.backgroundColor,
   }) : onPressedAsync = null, _processType = ProcessType.sync;
@@ -16,6 +17,7 @@ class BottomButton extends StatelessWidget {
   const BottomButton.async({
     super.key,
     required this.text,
+    this.isValid = true,
     required this.onPressedAsync,
     this.backgroundColor,
   }) : onPressedSync = null, _processType = ProcessType.async;
@@ -38,6 +40,8 @@ class BottomButton extends StatelessWidget {
   /// ボタンタップ時の処理を同じスレッドで行うか、非同期で行うか
   final ProcessType _processType;
 
+  final bool isValid;
+
   @override
   Widget build(BuildContext context) {
     switch(_processType){
@@ -49,7 +53,7 @@ class BottomButton extends StatelessWidget {
           height: 90.h,
           width: double.infinity,
           backgroundColor: backgroundColor,
-          isValid: true,
+          isValid: isValid,
         );
       case ProcessType.async:
         return FlatRaisedButton.async(
@@ -59,7 +63,7 @@ class BottomButton extends StatelessWidget {
           height: 90.h,
           width: double.infinity,
           backgroundColor: backgroundColor,
-          isValid: true,
+          isValid: isValid,
         );
     }
   }

@@ -29,4 +29,6 @@ enum ScreenType {
         ScreenType.month => MonthlyTasksScreen(),
         ScreenType.year => YearlyTasksScreen(),
       };
+
+  // todo provider を指定できるようにしたいが、型を指定できないので意味がなくなる（2026/06/29）＞＞
 }

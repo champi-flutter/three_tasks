@@ -23,6 +23,15 @@ class TaskTitleEditingController extends _$TaskTitleEditingController {
     });
     return controllerList;
   }
+
+  /// `state.titleController1.text` に変更があったかどうか
+  bool get isChanged1 => state.titleController1.text != title1;
+
+  /// `state.titleController2.text` に変更があったかどうか
+  bool get isChanged2 => state.titleController2.text != title2;
+
+  /// `state.titleController3.text` に変更があったかどうか
+  bool get isChanged3 => state.titleController3.text != title3;
 }
 
 @riverpod

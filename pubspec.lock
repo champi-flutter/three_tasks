@@ -262,10 +262,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "45e9492bf1269425260adcf1d9c7449a1b11e466"
+      resolved-ref: be86a6d889eac487f5a25577ac547505f3c1bf35
       url: "https://github.com/champi-flutter/custom_core_types.git"
     source: git
-    version: "1.0.0+1"
+    version: "1.0.5+6"
   custom_lint:
     dependency: "direct dev"
     description:
@@ -303,10 +303,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "4c7db244e197a5ec8bbe7871ba5963b0cc2f8fb1"
+      resolved-ref: "31dc54d52e2c65b5e60c89259f42124485a4dac7"
       url: "https://github.com/champi-flutter/custom_widgets.git"
     source: git
-    version: "1.0.1+2"
+    version: "1.0.3+4"
   dart_style:
     dependency: transitive
     description:
@@ -859,10 +859,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "1941a03c2309581c4378f425e878039c3341f1c6"
+      resolved-ref: "87561339152dc8f9b8244a2a1db0015e3703cb94"
       url: "https://github.com/champi-flutter/riverpod_wrapper.git"
     source: git
-    version: "1.0.2+3"
+    version: "1.0.3+4"
   rxdart:
     dependency: "direct main"
     description:

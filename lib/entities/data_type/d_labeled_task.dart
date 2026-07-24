@@ -8,7 +8,7 @@ abstract class DLabeledTask with _$DLabeledTask {
 
   const factory DLabeledTask({
     required String label,
-    required int taskId,
+    required int labelId,
     required List<int> dailyIdList,
     required List<int> weeklyIdList,
     required List<int> monthlyIdList,

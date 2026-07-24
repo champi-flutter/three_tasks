@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
@@ -10,7 +11,8 @@ part 'labeled_tasks_view_model.g.dart';
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 @riverpod
-class LabeledTasksViewModel extends _$LabeledTasksViewModel{
+class LabeledTasksViewModel extends _$LabeledTasksViewModel
+    with LoadingHandler {
   // todo 依存先
   /// [LabeledTasksService] のインスタンスを参照する内部的な getter
   ///
@@ -18,15 +20,19 @@ class LabeledTasksViewModel extends _$LabeledTasksViewModel{
   LabeledTasksService get _readLabeledTasksService =>
       ref.read(labeledTasksServiceProvider);
 
+  /// ローディング管理クラス
+  @override
+  LoadingViewModel get loadingVM => ref.read(loadingViewModelProvider.notifier);
 
   // todo 初期化
   @override
-  List<VLabeledTask> build(){
+  List<VLabeledTask> build() {
     _initViewModel();
     return [];
   }
+
   /// このクラスの初期化
-  void _initViewModel(){
+  void _initViewModel() {
     // 古い購読を破棄
     _disposeSubscription();
     // 購読を開始
@@ -59,9 +65,38 @@ class LabeledTasksViewModel extends _$LabeledTasksViewModel{
   }
 
   // todo 書き換え
-  Future<void> labeling({required VTask vTask}) async {
-    await _readLabeledTasksService.labeling(vTask: vTask);
-  }
+  /// 指定タスクをラベル化するメソッド
+  ///
+  /// 新規ラベルの ID を返す。
+  ///
+  /// 例外が発生した場合は、`null` を返す。
+  Future<int?> labeling({required VTask vTask}) => loadAsync<int?>(() async {
+        return await _readLabeledTasksService.labeling(vTask: vTask);
+      });
+
+  /// タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[vTask.id]）を追加する。
+  ///
+  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  Future<void> addToLabel({
+    required VTask vTask,
+    required int labelId,
+  }) =>
+      loadAsync(() async {
+        await _readLabeledTasksService.addToLabel(
+            vTask: vTask, labelId: labelId);
+      });
+
+  /// ラベル化解除メソッド
+  ///
+  /// 指定タスク（[vTask]）がこの段階で属しているラベルから、このタスクのIDを除外する。
+  Future<void> unlabeling({
+    required VTask vTask,
+  }) =>
+      loadAsync(() async {
+        await _readLabeledTasksService.unlabeling(vTask: vTask);
+      });
 
   // todo dispose
   /// このクラスのオブジェクトが破棄される際に呼び出す明示的な破棄

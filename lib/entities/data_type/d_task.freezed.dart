@@ -18,6 +18,7 @@ mixin _$DDayTask {
   Date get date;
   int get id;
   bool? get isChecked;
+  int? get labelId;
 
   /// Create a copy of DDayTask
   /// with the given fields replaced by the non-null parameter values.
@@ -35,15 +36,17 @@ mixin _$DDayTask {
             (identical(other.date, date) || other.date == date) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, date, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, date, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DDayTask(task: $task, date: $date, id: $id, isChecked: $isChecked)';
+    return 'DDayTask(task: $task, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -52,7 +55,7 @@ abstract mixin class $DDayTaskCopyWith<$Res> {
   factory $DDayTaskCopyWith(DDayTask value, $Res Function(DDayTask) _then) =
       _$DDayTaskCopyWithImpl;
   @useResult
-  $Res call({String? task, Date date, int id, bool? isChecked});
+  $Res call({String? task, Date date, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -71,6 +74,7 @@ class _$DDayTaskCopyWithImpl<$Res> implements $DDayTaskCopyWith<$Res> {
     Object? date = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_self.copyWith(
       task: freezed == task
@@ -89,6 +93,10 @@ class _$DDayTaskCopyWithImpl<$Res> implements $DDayTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -186,14 +194,16 @@ extension DDayTaskPatterns on DDayTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? task, Date date, int id, bool? isChecked)?
+    TResult Function(
+            String? task, Date date, int id, bool? isChecked, int? labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _DDayTask() when $default != null:
-        return $default(_that.task, _that.date, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.date, _that.id, _that.isChecked, _that.labelId);
       case _:
         return orElse();
     }
@@ -214,12 +224,15 @@ extension DDayTaskPatterns on DDayTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? task, Date date, int id, bool? isChecked) $default,
+    TResult Function(
+            String? task, Date date, int id, bool? isChecked, int? labelId)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DDayTask():
-        return $default(_that.task, _that.date, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.date, _that.id, _that.isChecked, _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -239,13 +252,15 @@ extension DDayTaskPatterns on DDayTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? task, Date date, int id, bool? isChecked)?
+    TResult? Function(
+            String? task, Date date, int id, bool? isChecked, int? labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DDayTask() when $default != null:
-        return $default(_that.task, _that.date, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.date, _that.id, _that.isChecked, _that.labelId);
       case _:
         return null;
     }
@@ -259,7 +274,8 @@ class _DDayTask extends DDayTask {
       {required this.task,
       required this.date,
       required this.id,
-      required this.isChecked})
+      required this.isChecked,
+      required this.labelId})
       : super._();
 
   @override
@@ -270,6 +286,8 @@ class _DDayTask extends DDayTask {
   final int id;
   @override
   final bool? isChecked;
+  @override
+  final int? labelId;
 
   /// Create a copy of DDayTask
   /// with the given fields replaced by the non-null parameter values.
@@ -288,15 +306,17 @@ class _DDayTask extends DDayTask {
             (identical(other.date, date) || other.date == date) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, date, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, date, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DDayTask(task: $task, date: $date, id: $id, isChecked: $isChecked)';
+    return 'DDayTask(task: $task, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -307,7 +327,7 @@ abstract mixin class _$DDayTaskCopyWith<$Res>
       __$DDayTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String? task, Date date, int id, bool? isChecked});
+  $Res call({String? task, Date date, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -326,6 +346,7 @@ class __$DDayTaskCopyWithImpl<$Res> implements _$DDayTaskCopyWith<$Res> {
     Object? date = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_DDayTask(
       task: freezed == task
@@ -344,6 +365,10 @@ class __$DDayTaskCopyWithImpl<$Res> implements _$DDayTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -354,6 +379,7 @@ mixin _$DWeeklyTask {
   UniqueWeek get week;
   int get id;
   bool? get isChecked;
+  int? get labelId;
 
   /// Create a copy of DWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -371,15 +397,17 @@ mixin _$DWeeklyTask {
             (identical(other.week, week) || other.week == week) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, week, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, week, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DWeeklyTask(task: $task, week: $week, id: $id, isChecked: $isChecked)';
+    return 'DWeeklyTask(task: $task, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -389,7 +417,8 @@ abstract mixin class $DWeeklyTaskCopyWith<$Res> {
           DWeeklyTask value, $Res Function(DWeeklyTask) _then) =
       _$DWeeklyTaskCopyWithImpl;
   @useResult
-  $Res call({String? task, UniqueWeek week, int id, bool? isChecked});
+  $Res call(
+      {String? task, UniqueWeek week, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -408,6 +437,7 @@ class _$DWeeklyTaskCopyWithImpl<$Res> implements $DWeeklyTaskCopyWith<$Res> {
     Object? week = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_self.copyWith(
       task: freezed == task
@@ -426,6 +456,10 @@ class _$DWeeklyTaskCopyWithImpl<$Res> implements $DWeeklyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -523,14 +557,16 @@ extension DWeeklyTaskPatterns on DWeeklyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? task, UniqueWeek week, int id, bool? isChecked)?
+    TResult Function(String? task, UniqueWeek week, int id, bool? isChecked,
+            int? labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _DWeeklyTask() when $default != null:
-        return $default(_that.task, _that.week, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.week, _that.id, _that.isChecked, _that.labelId);
       case _:
         return orElse();
     }
@@ -551,13 +587,15 @@ extension DWeeklyTaskPatterns on DWeeklyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? task, UniqueWeek week, int id, bool? isChecked)
+    TResult Function(String? task, UniqueWeek week, int id, bool? isChecked,
+            int? labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DWeeklyTask():
-        return $default(_that.task, _that.week, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.week, _that.id, _that.isChecked, _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -577,13 +615,15 @@ extension DWeeklyTaskPatterns on DWeeklyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? task, UniqueWeek week, int id, bool? isChecked)?
+    TResult? Function(String? task, UniqueWeek week, int id, bool? isChecked,
+            int? labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DWeeklyTask() when $default != null:
-        return $default(_that.task, _that.week, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.week, _that.id, _that.isChecked, _that.labelId);
       case _:
         return null;
     }
@@ -597,7 +637,8 @@ class _DWeeklyTask extends DWeeklyTask {
       {required this.task,
       required this.week,
       required this.id,
-      required this.isChecked})
+      required this.isChecked,
+      required this.labelId})
       : super._();
 
   @override
@@ -608,6 +649,8 @@ class _DWeeklyTask extends DWeeklyTask {
   final int id;
   @override
   final bool? isChecked;
+  @override
+  final int? labelId;
 
   /// Create a copy of DWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -626,15 +669,17 @@ class _DWeeklyTask extends DWeeklyTask {
             (identical(other.week, week) || other.week == week) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, week, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, week, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DWeeklyTask(task: $task, week: $week, id: $id, isChecked: $isChecked)';
+    return 'DWeeklyTask(task: $task, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -646,7 +691,8 @@ abstract mixin class _$DWeeklyTaskCopyWith<$Res>
       __$DWeeklyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String? task, UniqueWeek week, int id, bool? isChecked});
+  $Res call(
+      {String? task, UniqueWeek week, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -665,6 +711,7 @@ class __$DWeeklyTaskCopyWithImpl<$Res> implements _$DWeeklyTaskCopyWith<$Res> {
     Object? week = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_DWeeklyTask(
       task: freezed == task
@@ -683,6 +730,10 @@ class __$DWeeklyTaskCopyWithImpl<$Res> implements _$DWeeklyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -693,6 +744,7 @@ mixin _$DMonthlyTask {
   Month get month;
   int get id;
   bool? get isChecked;
+  int? get labelId;
 
   /// Create a copy of DMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -711,15 +763,17 @@ mixin _$DMonthlyTask {
             (identical(other.month, month) || other.month == month) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, month, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, month, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DMonthlyTask(task: $task, month: $month, id: $id, isChecked: $isChecked)';
+    return 'DMonthlyTask(task: $task, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -729,7 +783,7 @@ abstract mixin class $DMonthlyTaskCopyWith<$Res> {
           DMonthlyTask value, $Res Function(DMonthlyTask) _then) =
       _$DMonthlyTaskCopyWithImpl;
   @useResult
-  $Res call({String? task, Month month, int id, bool? isChecked});
+  $Res call({String? task, Month month, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -748,6 +802,7 @@ class _$DMonthlyTaskCopyWithImpl<$Res> implements $DMonthlyTaskCopyWith<$Res> {
     Object? month = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_self.copyWith(
       task: freezed == task
@@ -766,6 +821,10 @@ class _$DMonthlyTaskCopyWithImpl<$Res> implements $DMonthlyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -863,14 +922,16 @@ extension DMonthlyTaskPatterns on DMonthlyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? task, Month month, int id, bool? isChecked)?
+    TResult Function(
+            String? task, Month month, int id, bool? isChecked, int? labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _DMonthlyTask() when $default != null:
-        return $default(_that.task, _that.month, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.month, _that.id, _that.isChecked, _that.labelId);
       case _:
         return orElse();
     }
@@ -891,13 +952,15 @@ extension DMonthlyTaskPatterns on DMonthlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? task, Month month, int id, bool? isChecked)
+    TResult Function(
+            String? task, Month month, int id, bool? isChecked, int? labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DMonthlyTask():
-        return $default(_that.task, _that.month, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.month, _that.id, _that.isChecked, _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -917,13 +980,15 @@ extension DMonthlyTaskPatterns on DMonthlyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? task, Month month, int id, bool? isChecked)?
+    TResult? Function(
+            String? task, Month month, int id, bool? isChecked, int? labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DMonthlyTask() when $default != null:
-        return $default(_that.task, _that.month, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.month, _that.id, _that.isChecked, _that.labelId);
       case _:
         return null;
     }
@@ -937,7 +1002,8 @@ class _DMonthlyTask extends DMonthlyTask {
       {required this.task,
       required this.month,
       required this.id,
-      required this.isChecked})
+      required this.isChecked,
+      required this.labelId})
       : super._();
 
   @override
@@ -948,6 +1014,8 @@ class _DMonthlyTask extends DMonthlyTask {
   final int id;
   @override
   final bool? isChecked;
+  @override
+  final int? labelId;
 
   /// Create a copy of DMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -966,15 +1034,17 @@ class _DMonthlyTask extends DMonthlyTask {
             (identical(other.month, month) || other.month == month) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, month, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, month, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DMonthlyTask(task: $task, month: $month, id: $id, isChecked: $isChecked)';
+    return 'DMonthlyTask(task: $task, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -986,7 +1056,7 @@ abstract mixin class _$DMonthlyTaskCopyWith<$Res>
       __$DMonthlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String? task, Month month, int id, bool? isChecked});
+  $Res call({String? task, Month month, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -1006,6 +1076,7 @@ class __$DMonthlyTaskCopyWithImpl<$Res>
     Object? month = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_DMonthlyTask(
       task: freezed == task
@@ -1024,6 +1095,10 @@ class __$DMonthlyTaskCopyWithImpl<$Res>
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -1034,6 +1109,7 @@ mixin _$DYearlyTask {
   int get year;
   int get id;
   bool? get isChecked;
+  int? get labelId;
 
   /// Create a copy of DYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1051,15 +1127,17 @@ mixin _$DYearlyTask {
             (identical(other.year, year) || other.year == year) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, year, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, year, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DYearlyTask(task: $task, year: $year, id: $id, isChecked: $isChecked)';
+    return 'DYearlyTask(task: $task, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -1069,7 +1147,7 @@ abstract mixin class $DYearlyTaskCopyWith<$Res> {
           DYearlyTask value, $Res Function(DYearlyTask) _then) =
       _$DYearlyTaskCopyWithImpl;
   @useResult
-  $Res call({String? task, int year, int id, bool? isChecked});
+  $Res call({String? task, int year, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -1088,6 +1166,7 @@ class _$DYearlyTaskCopyWithImpl<$Res> implements $DYearlyTaskCopyWith<$Res> {
     Object? year = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_self.copyWith(
       task: freezed == task
@@ -1106,6 +1185,10 @@ class _$DYearlyTaskCopyWithImpl<$Res> implements $DYearlyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -1203,14 +1286,16 @@ extension DYearlyTaskPatterns on DYearlyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? task, int year, int id, bool? isChecked)?
+    TResult Function(
+            String? task, int year, int id, bool? isChecked, int? labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _DYearlyTask() when $default != null:
-        return $default(_that.task, _that.year, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.year, _that.id, _that.isChecked, _that.labelId);
       case _:
         return orElse();
     }
@@ -1231,12 +1316,15 @@ extension DYearlyTaskPatterns on DYearlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? task, int year, int id, bool? isChecked) $default,
+    TResult Function(
+            String? task, int year, int id, bool? isChecked, int? labelId)
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DYearlyTask():
-        return $default(_that.task, _that.year, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.year, _that.id, _that.isChecked, _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1256,13 +1344,15 @@ extension DYearlyTaskPatterns on DYearlyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? task, int year, int id, bool? isChecked)?
+    TResult? Function(
+            String? task, int year, int id, bool? isChecked, int? labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DYearlyTask() when $default != null:
-        return $default(_that.task, _that.year, _that.id, _that.isChecked);
+        return $default(
+            _that.task, _that.year, _that.id, _that.isChecked, _that.labelId);
       case _:
         return null;
     }
@@ -1276,7 +1366,8 @@ class _DYearlyTask extends DYearlyTask {
       {required this.task,
       required this.year,
       required this.id,
-      required this.isChecked})
+      required this.isChecked,
+      required this.labelId})
       : super._();
 
   @override
@@ -1287,6 +1378,8 @@ class _DYearlyTask extends DYearlyTask {
   final int id;
   @override
   final bool? isChecked;
+  @override
+  final int? labelId;
 
   /// Create a copy of DYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1305,15 +1398,17 @@ class _DYearlyTask extends DYearlyTask {
             (identical(other.year, year) || other.year == year) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
-                other.isChecked == isChecked));
+                other.isChecked == isChecked) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, task, year, id, isChecked);
+  int get hashCode =>
+      Object.hash(runtimeType, task, year, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'DYearlyTask(task: $task, year: $year, id: $id, isChecked: $isChecked)';
+    return 'DYearlyTask(task: $task, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -1325,7 +1420,7 @@ abstract mixin class _$DYearlyTaskCopyWith<$Res>
       __$DYearlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String? task, int year, int id, bool? isChecked});
+  $Res call({String? task, int year, int id, bool? isChecked, int? labelId});
 }
 
 /// @nodoc
@@ -1344,6 +1439,7 @@ class __$DYearlyTaskCopyWithImpl<$Res> implements _$DYearlyTaskCopyWith<$Res> {
     Object? year = null,
     Object? id = null,
     Object? isChecked = freezed,
+    Object? labelId = freezed,
   }) {
     return _then(_DYearlyTask(
       task: freezed == task
@@ -1362,6 +1458,10 @@ class __$DYearlyTaskCopyWithImpl<$Res> implements _$DYearlyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool?,
+      labelId: freezed == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }

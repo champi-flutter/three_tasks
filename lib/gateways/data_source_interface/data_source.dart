@@ -44,32 +44,120 @@ abstract class DataSource {
   });
 
   /// 日単位タスクをラベリング
-  Future<Result<void, Exception>> labelDailyTask({
+  ///
+  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
+  Future<Result<DLabeledTask, Exception>> labelDailyTask({
     required String label,
     required int newId,
   });
 
   /// 週単位タスクをラベリング
-  Future<Result<void, Exception>> labelWeeklyTask({
+  ///
+  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
+  Future<Result<DLabeledTask, Exception>> labelWeeklyTask({
     required String label,
     required int newId,
   });
 
   /// 月単位タスクをラベリング
-  Future<Result<void, Exception>> labelMonthlyTask({
+  ///
+  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
+  Future<Result<DLabeledTask, Exception>> labelMonthlyTask({
     required String label,
     required int newId,
   });
 
   /// 年単位タスクをラベリング
-  Future<Result<void, Exception>> labelYearlyTask({
+  ///
+  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
+  Future<Result<DLabeledTask, Exception>> labelYearlyTask({
     required String label,
     required int newId,
   });
 
-  /// 既存のラベルを採用した枠を作るメソッド
+  /// 日単位タスクのラベルを解除
   ///
-  /// [newIdList] は呼び出し元で管理されているキャッシュを代入すること。
-  Future<Result<void, Exception>> addDailyTaskInLabel(
-      {required List<int> newIdList});
+  /// 指定ラベル（[labelId]）からタスクの情報（[dTask]）を除外する。
+  ///
+  /// 指定タスクの [DTask.labelId] を `null` にする。
+  Future<Result<void, Exception>> unlabelDailyTask({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 週単位タスクのラベルを解除
+  ///
+  /// 指定ラベル（[labelId]）からタスクの情報（[dTask]）を除外する。
+  ///
+  /// 指定タスクの [DTask.labelId] を `null` にする。
+  Future<Result<void, Exception>> unlabelWeeklyTask({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 月単位タスクのラベルを解除
+  ///
+  /// 指定ラベル（[labelId]）からタスクの情報（[dTask]）を除外する。
+  ///
+  /// 指定タスクの [DTask.labelId] を `null` にする。
+  Future<Result<void, Exception>> unlabelMonthlyTask({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 年単位タスクのラベルを解除
+  ///
+  /// 指定ラベル（[labelId]）からタスクの情報（[dTask]）を除外する。
+  ///
+  /// 指定タスクの [DTask.labelId] を `null` にする。
+  Future<Result<void, Exception>> unlabelYearlyTask({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 日単位タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  ///
+  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  Future<Result<void, Exception>> addDailyTaskToLabel({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 週単位タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  ///
+  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  Future<Result<void, Exception>> addWeeklyTaskToLabel({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 月単位タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  ///
+  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  Future<Result<void, Exception>> addMonthlyTaskToLabel({
+    required int labelId,
+    required int targetId,
+  });
+
+  /// 年単位タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  ///
+  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  Future<Result<void, Exception>> addYearlyTaskToLabel({
+    required int labelId,
+    required int targetId,
+  });
+
+// /// 既存のラベルを採用した枠を作るメソッド
+// ///
+// /// [newIdList] は呼び出し元で管理されているキャッシュを代入すること。
+// Future<Result<void, Exception>> addDailyTaskInLabel(
+//     {required List<int> newIdList});
 }

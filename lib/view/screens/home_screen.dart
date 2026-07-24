@@ -18,8 +18,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // VMを監視
-    final List<VDayTask> dayTaskList = ref.watch(
-        todaysViewModelProvider);
+    final List<VDayTask> dayTaskList = ref.watch(todaysViewModelProvider);
 
     return SingleChildScrollView(
       child: Center(
@@ -34,37 +33,60 @@ class HomeScreen extends ConsumerWidget {
                   // 「今日のタスク」欄
                   TasksView.checkbox(
                     taskList: dayTaskList,
-                    // 保存処理
-                    onSaveTask: (int position, String newValue) async {
+                    // 自動保存処理
+                    saveTaskAuto: (int position, String newValue) async {
                       // VM をイベントハンドラとして参照
-                      final readTodaysVM = ref.read(
-                          todaysViewModelProvider.notifier);
+                      final readTodaysVM =
+                          ref.read(todaysViewModelProvider.notifier);
                       // 入力値の保存を依頼
                       await readTodaysVM.saveTask(
                         targetTask: dayTaskList[position],
                         newTitle: newValue,
                       );
                     },
-                    onCheckChanged: (int position, bool newValue) async {
+                    saveCheckAuto: (int position, bool newValue) async {
                       // VM をイベントハンドラとして参照
-                      final readTodaysVM = ref.read(
-                          todaysViewModelProvider.notifier);
+                      final readTodaysVM =
+                          ref.read(todaysViewModelProvider.notifier);
                       // チェックの保存を依頼
                       await readTodaysVM.saveCheck(
                         targetTask: dayTaskList[position],
                         newValue: newValue,
                       );
                     },
-                    // ラベル化処理
-                    onLabeled: (int position, bool value) async {
+                    // ラベル化処理（自動保存）
+                    saveNewLabelAuto: (int position) async {
                       // ラベル化タスク VM をイベントハンドラとして参照
-                      final readLabeledTasksVM = ref.read(
-                          labeledTasksViewModelProvider.notifier);
+                      final readLabeledTasksVM =
+                          ref.read(labeledTasksViewModelProvider.notifier);
                       // ラベル化の登録を依頼
-                      await readLabeledTasksVM.labeling(vTask: dayTaskList[position]);
-
+                      // 例外が発生した場合は、 0 を返す
+                      return await readLabeledTasksVM.labeling(
+                              vTask: dayTaskList[position]) ??
+                          0;
                     },
-                    onJustEdited: ,
+                    // ラベル化処理（自動保存）
+                    saveAdditionToLabelAuto:
+                        (int position, int newLabelId) async {
+                      // ラベル化タスク VM をイベントハンドラとして参照
+                      final readLabeledTasksVM =
+                          ref.read(labeledTasksViewModelProvider.notifier);
+                      // 既存のラベルに追加する処理を外注
+                      await readLabeledTasksVM.addToLabel(
+                        vTask: dayTaskList[position],
+                        labelId: newLabelId,
+                      );
+                    },
+                    // ラベル化処理（自動保存）
+                    saveUnlabelAuto: (int position) async {
+                      // ラベル化タスク VM をイベントハンドラとして参照
+                      final readLabeledTasksVM =
+                          ref.read(labeledTasksViewModelProvider.notifier);
+                      // 既存のラベルに追加する処理を外注
+                      await readLabeledTasksVM.unlabeling(
+                        vTask: dayTaskList[position],
+                      );
+                    },
                   ),
 
                   // 余白

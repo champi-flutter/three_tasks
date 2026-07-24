@@ -40,7 +40,7 @@ class LabeledTasksService {
 
   /// データのストリームを管理するコントローラ
   final StreamController<List<VLabeledTask>> _labeledTasksController =
-  BehaviorSubject<List<VLabeledTask>>();
+      BehaviorSubject<List<VLabeledTask>>();
 
   /// 「ラベル化したタスク」のキャッシュが更新された際に、その情報を流すストリーム
   Stream<List<VLabeledTask>> get labeledTasksStream =>
@@ -62,7 +62,7 @@ class LabeledTasksService {
     try {
       // 受信データを表示用のデータ型に変換
       final List<VLabeledTask> convertedData =
-      [...newDataList].map((DLabeledTask newData) {
+          [...newDataList].map((DLabeledTask newData) {
         return VLabeledTask(
           label: newData.label,
           taskId: newData.taskId,
@@ -80,18 +80,206 @@ class LabeledTasksService {
   }
 
   // todo 書き換え
-  Future<void> labeling({required VTask vTask}) async {
-    final DTask dTask = switch(vTask){
-      VDayTask(task: final String task, date: final Date date, id: final int id, isChecked: final bool isChecked) =>
-          DDayTask(task: task, date: date, id: id, isChecked: isChecked,),
-      VWeeklyTask(task: final String task, week: final UniqueWeek week , id: final int id, isChecked: final bool isChecked) =>
-          DWeeklyTask(task: task, week: week, id: id, isChecked: isChecked),
-      VMonthlyTask(task: final String task, month: final Month month, id: final int id, isChecked: final bool isChecked) =>
-          DMonthlyTask(task: task, month: month, id: id, isChecked: isChecked),
-      VYearlyTask(task: final String task, year: final int year, id: final int id, isChecked: final bool isChecked) =>
-          DYearlyTask(task: task, year: year, id: id, isChecked: isChecked),
+  /// 指定タスクをラベル化するメソッド
+  ///
+  /// 新規ラベルの ID を返す。
+  ///
+  /// 例外が発生した場合は、`null` を返す。
+  Future<int?> labeling({required VTask vTask}) async {
+    final DTask dTask = switch (vTask) {
+      VDayTask(
+        task: final String task,
+        date: final Date date,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DDayTask(
+          task: task,
+          date: date,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+      VWeeklyTask(
+        task: final String task,
+        week: final UniqueWeek week,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DWeeklyTask(
+          task: task,
+          week: week,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+      VMonthlyTask(
+        task: final String task,
+        month: final Month month,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DMonthlyTask(
+          task: task,
+          month: month,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+      VYearlyTask(
+        task: final String task,
+        year: final int year,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DYearlyTask(
+          task: task,
+          year: year,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
     };
-    await _readRepository.labeling(dTask: dTask);
+    return await _readRepository.labeling(dTask: dTask);
+  }
+
+  /// タスクを既存のラベルに登録
+  ///
+  /// 指定ラベル（[labelId]）に、指定タスクのID（[vTask.id]）を追加する。
+  ///
+  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  Future<void> addToLabel({
+    required VTask vTask,
+    required int labelId,
+  })
+  // 折りたたみ用
+  async {
+    final DTask dTask = switch (vTask) {
+      VDayTask(
+        task: final String task,
+        date: final Date date,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DDayTask(
+          task: task,
+          date: date,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+      VWeeklyTask(
+        task: final String task,
+        week: final UniqueWeek week,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DWeeklyTask(
+          task: task,
+          week: week,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+      VMonthlyTask(
+        task: final String task,
+        month: final Month month,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DMonthlyTask(
+          task: task,
+          month: month,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+      VYearlyTask(
+        task: final String task,
+        year: final int year,
+        id: final int id,
+        isChecked: final bool isChecked
+      ) =>
+        DYearlyTask(
+          task: task,
+          year: year,
+          id: id,
+          isChecked: isChecked,
+          labelId: null,
+        ),
+    };
+    await _readRepository.addToLabel(dTask: dTask, labelId: labelId);
+  }
+
+  /// 指定タスクのラベル化を解除するメソッド
+  ///
+  /// 指定タスク（[vTask]）がこの段階で属しているラベルから、このタスクのIDを除外する。
+  ///
+  /// 指定タスクの [DTask.labelId] を `null` にする。
+  Future<void> unlabeling({
+    required VTask vTask,
+  })
+  // 折りたたみ用
+  async {
+    final DTask dTask = switch (vTask) {
+      VDayTask(
+        task: final String task,
+        date: final Date date,
+        id: final int id,
+        isChecked: final bool isChecked,
+        labelId: final int? labelId,
+      ) =>
+        DDayTask(
+          task: task,
+          date: date,
+          id: id,
+          isChecked: isChecked,
+          labelId: labelId,
+        ),
+      VWeeklyTask(
+        task: final String task,
+        week: final UniqueWeek week,
+        id: final int id,
+        isChecked: final bool isChecked,
+        labelId: final int? labelId,
+      ) =>
+        DWeeklyTask(
+          task: task,
+          week: week,
+          id: id,
+          isChecked: isChecked,
+          labelId: labelId,
+        ),
+      VMonthlyTask(
+        task: final String task,
+        month: final Month month,
+        id: final int id,
+        isChecked: final bool isChecked,
+        labelId: final int? labelId,
+      ) =>
+        DMonthlyTask(
+          task: task,
+          month: month,
+          id: id,
+          isChecked: isChecked,
+          labelId: labelId,
+        ),
+      VYearlyTask(
+        task: final String task,
+        year: final int year,
+        id: final int id,
+        isChecked: final bool isChecked,
+        labelId: final int? labelId,
+      ) =>
+        DYearlyTask(
+          task: task,
+          year: year,
+          id: id,
+          isChecked: isChecked,
+          labelId: labelId,
+        ),
+    };
+    await _readRepository.unlabeling(dTask: dTask);
   }
 
   // todo dispose

@@ -14,6 +14,7 @@ sealed class DTask {
   String? get task;
   int get id;
   bool? get isChecked;
+  int? get labelId;
 }
 
 /// 日単位のタスククラス
@@ -26,6 +27,7 @@ abstract class DDayTask with _$DDayTask implements DTask {
     required Date date,
     required int id,
     required bool? isChecked,
+    required int? labelId,
   }) = _DDayTask;
 
   // /// 日単位タスクの仮データを生成するファクトリ
@@ -43,6 +45,7 @@ abstract class DWeeklyTask with _$DWeeklyTask implements DTask {
     required UniqueWeek week,
     required int id,
     required bool? isChecked,
+    required int? labelId,
   }) = _DWeeklyTask;
 }
 
@@ -56,6 +59,7 @@ abstract class DMonthlyTask with _$DMonthlyTask implements DTask {
     required Month month,
     required int id,
     required bool? isChecked,
+    required int? labelId,
   }) = _DMonthlyTask;
 }
 
@@ -69,5 +73,6 @@ abstract class DYearlyTask with _$DYearlyTask implements DTask {
     required int year,
     required int id,
     required bool? isChecked,
+    required int? labelId,
   }) = _DYearlyTask;
 }

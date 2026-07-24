@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$DLabeledTask {
   String get label;
-  int get taskId;
+  int get labelId;
   List<int> get dailyIdList;
   List<int> get weeklyIdList;
   List<int> get monthlyIdList;
@@ -35,7 +35,7 @@ mixin _$DLabeledTask {
         (other.runtimeType == runtimeType &&
             other is DLabeledTask &&
             (identical(other.label, label) || other.label == label) &&
-            (identical(other.taskId, taskId) || other.taskId == taskId) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
             const DeepCollectionEquality()
                 .equals(other.dailyIdList, dailyIdList) &&
             const DeepCollectionEquality()
@@ -50,7 +50,7 @@ mixin _$DLabeledTask {
   int get hashCode => Object.hash(
       runtimeType,
       label,
-      taskId,
+      labelId,
       const DeepCollectionEquality().hash(dailyIdList),
       const DeepCollectionEquality().hash(weeklyIdList),
       const DeepCollectionEquality().hash(monthlyIdList),
@@ -58,7 +58,7 @@ mixin _$DLabeledTask {
 
   @override
   String toString() {
-    return 'DLabeledTask(label: $label, taskId: $taskId, dailyIdList: $dailyIdList, weeklyIdList: $weeklyIdList, monthlyIdList: $monthlyIdList, yearlyIdList: $yearlyIdList)';
+    return 'DLabeledTask(label: $label, labelId: $labelId, dailyIdList: $dailyIdList, weeklyIdList: $weeklyIdList, monthlyIdList: $monthlyIdList, yearlyIdList: $yearlyIdList)';
   }
 }
 
@@ -70,7 +70,7 @@ abstract mixin class $DLabeledTaskCopyWith<$Res> {
   @useResult
   $Res call(
       {String label,
-      int taskId,
+      int labelId,
       List<int> dailyIdList,
       List<int> weeklyIdList,
       List<int> monthlyIdList,
@@ -90,7 +90,7 @@ class _$DLabeledTaskCopyWithImpl<$Res> implements $DLabeledTaskCopyWith<$Res> {
   @override
   $Res call({
     Object? label = null,
-    Object? taskId = null,
+    Object? labelId = null,
     Object? dailyIdList = null,
     Object? weeklyIdList = null,
     Object? monthlyIdList = null,
@@ -101,9 +101,9 @@ class _$DLabeledTaskCopyWithImpl<$Res> implements $DLabeledTaskCopyWith<$Res> {
           ? _self.label
           : label // ignore: cast_nullable_to_non_nullable
               as String,
-      taskId: null == taskId
-          ? _self.taskId
-          : taskId // ignore: cast_nullable_to_non_nullable
+      labelId: null == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
               as int,
       dailyIdList: null == dailyIdList
           ? _self.dailyIdList
@@ -220,7 +220,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
             String label,
-            int taskId,
+            int labelId,
             List<int> dailyIdList,
             List<int> weeklyIdList,
             List<int> monthlyIdList,
@@ -231,7 +231,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
     final _that = this;
     switch (_that) {
       case _DLabeledTask() when $default != null:
-        return $default(_that.label, _that.taskId, _that.dailyIdList,
+        return $default(_that.label, _that.labelId, _that.dailyIdList,
             _that.weeklyIdList, _that.monthlyIdList, _that.yearlyIdList);
       case _:
         return orElse();
@@ -255,7 +255,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
   TResult when<TResult extends Object?>(
     TResult Function(
             String label,
-            int taskId,
+            int labelId,
             List<int> dailyIdList,
             List<int> weeklyIdList,
             List<int> monthlyIdList,
@@ -265,7 +265,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
     final _that = this;
     switch (_that) {
       case _DLabeledTask():
-        return $default(_that.label, _that.taskId, _that.dailyIdList,
+        return $default(_that.label, _that.labelId, _that.dailyIdList,
             _that.weeklyIdList, _that.monthlyIdList, _that.yearlyIdList);
       case _:
         throw StateError('Unexpected subclass');
@@ -288,7 +288,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
             String label,
-            int taskId,
+            int labelId,
             List<int> dailyIdList,
             List<int> weeklyIdList,
             List<int> monthlyIdList,
@@ -298,7 +298,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
     final _that = this;
     switch (_that) {
       case _DLabeledTask() when $default != null:
-        return $default(_that.label, _that.taskId, _that.dailyIdList,
+        return $default(_that.label, _that.labelId, _that.dailyIdList,
             _that.weeklyIdList, _that.monthlyIdList, _that.yearlyIdList);
       case _:
         return null;
@@ -311,7 +311,7 @@ extension DLabeledTaskPatterns on DLabeledTask {
 class _DLabeledTask implements DLabeledTask {
   const _DLabeledTask(
       {required this.label,
-      required this.taskId,
+      required this.labelId,
       required final List<int> dailyIdList,
       required final List<int> weeklyIdList,
       required final List<int> monthlyIdList,
@@ -324,7 +324,7 @@ class _DLabeledTask implements DLabeledTask {
   @override
   final String label;
   @override
-  final int taskId;
+  final int labelId;
   final List<int> _dailyIdList;
   @override
   List<int> get dailyIdList {
@@ -371,7 +371,7 @@ class _DLabeledTask implements DLabeledTask {
         (other.runtimeType == runtimeType &&
             other is _DLabeledTask &&
             (identical(other.label, label) || other.label == label) &&
-            (identical(other.taskId, taskId) || other.taskId == taskId) &&
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
             const DeepCollectionEquality()
                 .equals(other._dailyIdList, _dailyIdList) &&
             const DeepCollectionEquality()
@@ -386,7 +386,7 @@ class _DLabeledTask implements DLabeledTask {
   int get hashCode => Object.hash(
       runtimeType,
       label,
-      taskId,
+      labelId,
       const DeepCollectionEquality().hash(_dailyIdList),
       const DeepCollectionEquality().hash(_weeklyIdList),
       const DeepCollectionEquality().hash(_monthlyIdList),
@@ -394,7 +394,7 @@ class _DLabeledTask implements DLabeledTask {
 
   @override
   String toString() {
-    return 'DLabeledTask(label: $label, taskId: $taskId, dailyIdList: $dailyIdList, weeklyIdList: $weeklyIdList, monthlyIdList: $monthlyIdList, yearlyIdList: $yearlyIdList)';
+    return 'DLabeledTask(label: $label, labelId: $labelId, dailyIdList: $dailyIdList, weeklyIdList: $weeklyIdList, monthlyIdList: $monthlyIdList, yearlyIdList: $yearlyIdList)';
   }
 }
 
@@ -408,7 +408,7 @@ abstract mixin class _$DLabeledTaskCopyWith<$Res>
   @useResult
   $Res call(
       {String label,
-      int taskId,
+      int labelId,
       List<int> dailyIdList,
       List<int> weeklyIdList,
       List<int> monthlyIdList,
@@ -429,7 +429,7 @@ class __$DLabeledTaskCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? label = null,
-    Object? taskId = null,
+    Object? labelId = null,
     Object? dailyIdList = null,
     Object? weeklyIdList = null,
     Object? monthlyIdList = null,
@@ -440,9 +440,9 @@ class __$DLabeledTaskCopyWithImpl<$Res>
           ? _self.label
           : label // ignore: cast_nullable_to_non_nullable
               as String,
-      taskId: null == taskId
-          ? _self.taskId
-          : taskId // ignore: cast_nullable_to_non_nullable
+      labelId: null == labelId
+          ? _self.labelId
+          : labelId // ignore: cast_nullable_to_non_nullable
               as int,
       dailyIdList: null == dailyIdList
           ? _self._dailyIdList

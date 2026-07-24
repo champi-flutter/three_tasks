@@ -3,27 +3,29 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/view/screens/home_screen.dart';
+import 'package:three_tasks/view/wrapper/screens_wrapper.dart';
 
 import 'db/database.dart';
 
-late MyDatabase database;
-
-final now = DateTime.now();
-DateFormat outputFormat = DateFormat("yyyy-MM-dd");
-final today = outputFormat.format(now);
-// final tomorrow = outputFormat.format(DateTime(now.year, now.month, now.day + 1,),);
-final tomorrow = outputFormat.format(
-  now.add(Duration(days: 1)),
-);
-
-// この時点では、firstDayは0
-DateFormat weeklyOutputFormat = DateFormat("yyyy-MM-${now.day}");
-final thisWeek = weeklyOutputFormat.format(now);
-DateFormat monthlyOutputFormat = DateFormat("yyyy-MM");
-final thisMonth = monthlyOutputFormat.format(now);
-DateFormat yearlyOutputFormat = DateFormat("yyyy");
-final thisYear = yearlyOutputFormat.format(now);
+// late MyDatabase database;
+//
+// final now = DateTime.now();
+// DateFormat outputFormat = DateFormat("yyyy-MM-dd");
+// final today = outputFormat.format(now);
+// // final tomorrow = outputFormat.format(DateTime(now.year, now.month, now.day + 1,),);
+// final tomorrow = outputFormat.format(
+//   now.add(Duration(days: 1)),
+// );
+//
+// // この時点では、firstDayは0
+// DateFormat weeklyOutputFormat = DateFormat("yyyy-MM-${now.day}");
+// final thisWeek = weeklyOutputFormat.format(now);
+// DateFormat monthlyOutputFormat = DateFormat("yyyy-MM");
+// final thisMonth = monthlyOutputFormat.format(now);
+// DateFormat yearlyOutputFormat = DateFormat("yyyy");
+// final thisYear = yearlyOutputFormat.format(now);
 
 void main() {
   // todo shared_preferencesは、shared_preferences_async/_with_catheに移行する必要あり
@@ -34,7 +36,7 @@ void main() {
   // // prefs.getBool("launched")は、初回起動時にはsetされていないためnullになる。
   // // 二回目以降は、"launched"というfalseのデータが、HomeScreenのbuildメソッドでsetされている。
   // bool _isFirstLaunch = prefs.getBool("launched") ?? true;
-  database = MyDatabase();
+  // database = MyDatabase();
 
   // // todo Mobile Ads SDKの初期化
   // WidgetsFlutterBinding.ensureInitialized();
@@ -111,10 +113,7 @@ class MyApp extends StatelessWidget {
               // ),
               ),
         ),
-        builder: FToastBuilder(),
-        home: HomeScreen(
-            // isFirstHomeScreen: isFirstLaunch,
-            ),
+        home: LoadingWrapper(child: ScreensWrapper()),
       ),
     );
   }

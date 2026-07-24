@@ -48,9 +48,15 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
   late final GeneratedColumn<String> improvement = GeneratedColumn<String>(
       'improvement', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _labelIdMeta =
+      const VerificationMeta('labelId');
+  @override
+  late final GeneratedColumn<int> labelId = GeneratedColumn<int>(
+      'label_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [task, date, id, isChecked, result, improvement];
+      [task, date, id, isChecked, result, improvement, labelId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -90,6 +96,10 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
           improvement.isAcceptableOrUnknown(
               data['improvement']!, _improvementMeta));
     }
+    if (data.containsKey('label_id')) {
+      context.handle(_labelIdMeta,
+          labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
+    }
     return context;
   }
 
@@ -111,6 +121,8 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
           .read(DriftSqlType.string, data['${effectivePrefix}result']),
       improvement: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}improvement']),
+      labelId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}label_id']),
     );
   }
 
@@ -127,13 +139,15 @@ class DayTask extends DataClass implements Insertable<DayTask> {
   final bool isChecked;
   final String? result;
   final String? improvement;
+  final int? labelId;
   const DayTask(
       {required this.task,
       required this.date,
       required this.id,
       required this.isChecked,
       this.result,
-      this.improvement});
+      this.improvement,
+      this.labelId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -146,6 +160,9 @@ class DayTask extends DataClass implements Insertable<DayTask> {
     }
     if (!nullToAbsent || improvement != null) {
       map['improvement'] = Variable<String>(improvement);
+    }
+    if (!nullToAbsent || labelId != null) {
+      map['label_id'] = Variable<int>(labelId);
     }
     return map;
   }
@@ -161,6 +178,9 @@ class DayTask extends DataClass implements Insertable<DayTask> {
       improvement: improvement == null && nullToAbsent
           ? const Value.absent()
           : Value(improvement),
+      labelId: labelId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(labelId),
     );
   }
 
@@ -174,6 +194,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       result: serializer.fromJson<String?>(json['result']),
       improvement: serializer.fromJson<String?>(json['improvement']),
+      labelId: serializer.fromJson<int?>(json['labelId']),
     );
   }
   @override
@@ -186,6 +207,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
       'isChecked': serializer.toJson<bool>(isChecked),
       'result': serializer.toJson<String?>(result),
       'improvement': serializer.toJson<String?>(improvement),
+      'labelId': serializer.toJson<int?>(labelId),
     };
   }
 
@@ -195,7 +217,8 @@ class DayTask extends DataClass implements Insertable<DayTask> {
           int? id,
           bool? isChecked,
           Value<String?> result = const Value.absent(),
-          Value<String?> improvement = const Value.absent()}) =>
+          Value<String?> improvement = const Value.absent(),
+          Value<int?> labelId = const Value.absent()}) =>
       DayTask(
         task: task ?? this.task,
         date: date ?? this.date,
@@ -203,6 +226,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
         isChecked: isChecked ?? this.isChecked,
         result: result.present ? result.value : this.result,
         improvement: improvement.present ? improvement.value : this.improvement,
+        labelId: labelId.present ? labelId.value : this.labelId,
       );
   DayTask copyWithCompanion(DayTasksCompanion data) {
     return DayTask(
@@ -213,6 +237,7 @@ class DayTask extends DataClass implements Insertable<DayTask> {
       result: data.result.present ? data.result.value : this.result,
       improvement:
           data.improvement.present ? data.improvement.value : this.improvement,
+      labelId: data.labelId.present ? data.labelId.value : this.labelId,
     );
   }
 
@@ -224,14 +249,15 @@ class DayTask extends DataClass implements Insertable<DayTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(task, date, id, isChecked, result, improvement);
+      Object.hash(task, date, id, isChecked, result, improvement, labelId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -241,7 +267,8 @@ class DayTask extends DataClass implements Insertable<DayTask> {
           other.id == this.id &&
           other.isChecked == this.isChecked &&
           other.result == this.result &&
-          other.improvement == this.improvement);
+          other.improvement == this.improvement &&
+          other.labelId == this.labelId);
 }
 
 class DayTasksCompanion extends UpdateCompanion<DayTask> {
@@ -251,6 +278,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
   final Value<bool> isChecked;
   final Value<String?> result;
   final Value<String?> improvement;
+  final Value<int?> labelId;
   const DayTasksCompanion({
     this.task = const Value.absent(),
     this.date = const Value.absent(),
@@ -258,6 +286,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   });
   DayTasksCompanion.insert({
     required String task,
@@ -266,6 +295,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   })  : task = Value(task),
         date = Value(date);
   static Insertable<DayTask> custom({
@@ -275,6 +305,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
     Expression<bool>? isChecked,
     Expression<String>? result,
     Expression<String>? improvement,
+    Expression<int>? labelId,
   }) {
     return RawValuesInsertable({
       if (task != null) 'task': task,
@@ -283,6 +314,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
       if (isChecked != null) 'is_checked': isChecked,
       if (result != null) 'result': result,
       if (improvement != null) 'improvement': improvement,
+      if (labelId != null) 'label_id': labelId,
     });
   }
 
@@ -292,7 +324,8 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
       Value<int>? id,
       Value<bool>? isChecked,
       Value<String?>? result,
-      Value<String?>? improvement}) {
+      Value<String?>? improvement,
+      Value<int?>? labelId}) {
     return DayTasksCompanion(
       task: task ?? this.task,
       date: date ?? this.date,
@@ -300,6 +333,7 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
       isChecked: isChecked ?? this.isChecked,
       result: result ?? this.result,
       improvement: improvement ?? this.improvement,
+      labelId: labelId ?? this.labelId,
     );
   }
 
@@ -324,6 +358,9 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
     if (improvement.present) {
       map['improvement'] = Variable<String>(improvement.value);
     }
+    if (labelId.present) {
+      map['label_id'] = Variable<int>(labelId.value);
+    }
     return map;
   }
 
@@ -335,7 +372,8 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
@@ -388,9 +426,15 @@ class $WeeklyTasksTable extends WeeklyTasks
   late final GeneratedColumn<String> improvement = GeneratedColumn<String>(
       'improvement', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _labelIdMeta =
+      const VerificationMeta('labelId');
+  @override
+  late final GeneratedColumn<int> labelId = GeneratedColumn<int>(
+      'label_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [task, firstDate, id, isChecked, result, improvement];
+      [task, firstDate, id, isChecked, result, improvement, labelId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -430,6 +474,10 @@ class $WeeklyTasksTable extends WeeklyTasks
           improvement.isAcceptableOrUnknown(
               data['improvement']!, _improvementMeta));
     }
+    if (data.containsKey('label_id')) {
+      context.handle(_labelIdMeta,
+          labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
+    }
     return context;
   }
 
@@ -451,6 +499,8 @@ class $WeeklyTasksTable extends WeeklyTasks
           .read(DriftSqlType.string, data['${effectivePrefix}result']),
       improvement: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}improvement']),
+      labelId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}label_id']),
     );
   }
 
@@ -467,13 +517,15 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
   final bool isChecked;
   final String? result;
   final String? improvement;
+  final int? labelId;
   const WeeklyTask(
       {required this.task,
       required this.firstDate,
       required this.id,
       required this.isChecked,
       this.result,
-      this.improvement});
+      this.improvement,
+      this.labelId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -486,6 +538,9 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
     }
     if (!nullToAbsent || improvement != null) {
       map['improvement'] = Variable<String>(improvement);
+    }
+    if (!nullToAbsent || labelId != null) {
+      map['label_id'] = Variable<int>(labelId);
     }
     return map;
   }
@@ -501,6 +556,9 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
       improvement: improvement == null && nullToAbsent
           ? const Value.absent()
           : Value(improvement),
+      labelId: labelId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(labelId),
     );
   }
 
@@ -514,6 +572,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       result: serializer.fromJson<String?>(json['result']),
       improvement: serializer.fromJson<String?>(json['improvement']),
+      labelId: serializer.fromJson<int?>(json['labelId']),
     );
   }
   @override
@@ -526,6 +585,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
       'isChecked': serializer.toJson<bool>(isChecked),
       'result': serializer.toJson<String?>(result),
       'improvement': serializer.toJson<String?>(improvement),
+      'labelId': serializer.toJson<int?>(labelId),
     };
   }
 
@@ -535,7 +595,8 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
           int? id,
           bool? isChecked,
           Value<String?> result = const Value.absent(),
-          Value<String?> improvement = const Value.absent()}) =>
+          Value<String?> improvement = const Value.absent(),
+          Value<int?> labelId = const Value.absent()}) =>
       WeeklyTask(
         task: task ?? this.task,
         firstDate: firstDate ?? this.firstDate,
@@ -543,6 +604,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
         isChecked: isChecked ?? this.isChecked,
         result: result.present ? result.value : this.result,
         improvement: improvement.present ? improvement.value : this.improvement,
+        labelId: labelId.present ? labelId.value : this.labelId,
       );
   WeeklyTask copyWithCompanion(WeeklyTasksCompanion data) {
     return WeeklyTask(
@@ -553,6 +615,7 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
       result: data.result.present ? data.result.value : this.result,
       improvement:
           data.improvement.present ? data.improvement.value : this.improvement,
+      labelId: data.labelId.present ? data.labelId.value : this.labelId,
     );
   }
 
@@ -564,14 +627,15 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(task, firstDate, id, isChecked, result, improvement);
+      Object.hash(task, firstDate, id, isChecked, result, improvement, labelId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -581,7 +645,8 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
           other.id == this.id &&
           other.isChecked == this.isChecked &&
           other.result == this.result &&
-          other.improvement == this.improvement);
+          other.improvement == this.improvement &&
+          other.labelId == this.labelId);
 }
 
 class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
@@ -591,6 +656,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
   final Value<bool> isChecked;
   final Value<String?> result;
   final Value<String?> improvement;
+  final Value<int?> labelId;
   const WeeklyTasksCompanion({
     this.task = const Value.absent(),
     this.firstDate = const Value.absent(),
@@ -598,6 +664,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   });
   WeeklyTasksCompanion.insert({
     required String task,
@@ -606,6 +673,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   })  : task = Value(task),
         firstDate = Value(firstDate);
   static Insertable<WeeklyTask> custom({
@@ -615,6 +683,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
     Expression<bool>? isChecked,
     Expression<String>? result,
     Expression<String>? improvement,
+    Expression<int>? labelId,
   }) {
     return RawValuesInsertable({
       if (task != null) 'task': task,
@@ -623,6 +692,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
       if (isChecked != null) 'is_checked': isChecked,
       if (result != null) 'result': result,
       if (improvement != null) 'improvement': improvement,
+      if (labelId != null) 'label_id': labelId,
     });
   }
 
@@ -632,7 +702,8 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
       Value<int>? id,
       Value<bool>? isChecked,
       Value<String?>? result,
-      Value<String?>? improvement}) {
+      Value<String?>? improvement,
+      Value<int?>? labelId}) {
     return WeeklyTasksCompanion(
       task: task ?? this.task,
       firstDate: firstDate ?? this.firstDate,
@@ -640,6 +711,7 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
       isChecked: isChecked ?? this.isChecked,
       result: result ?? this.result,
       improvement: improvement ?? this.improvement,
+      labelId: labelId ?? this.labelId,
     );
   }
 
@@ -664,6 +736,9 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
     if (improvement.present) {
       map['improvement'] = Variable<String>(improvement.value);
     }
+    if (labelId.present) {
+      map['label_id'] = Variable<int>(labelId.value);
+    }
     return map;
   }
 
@@ -675,7 +750,8 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
@@ -727,9 +803,15 @@ class $MonthlyTasksTable extends MonthlyTasks
   late final GeneratedColumn<String> improvement = GeneratedColumn<String>(
       'improvement', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _labelIdMeta =
+      const VerificationMeta('labelId');
+  @override
+  late final GeneratedColumn<int> labelId = GeneratedColumn<int>(
+      'label_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [task, month, id, isChecked, result, improvement];
+      [task, month, id, isChecked, result, improvement, labelId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -769,6 +851,10 @@ class $MonthlyTasksTable extends MonthlyTasks
           improvement.isAcceptableOrUnknown(
               data['improvement']!, _improvementMeta));
     }
+    if (data.containsKey('label_id')) {
+      context.handle(_labelIdMeta,
+          labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
+    }
     return context;
   }
 
@@ -790,6 +876,8 @@ class $MonthlyTasksTable extends MonthlyTasks
           .read(DriftSqlType.string, data['${effectivePrefix}result']),
       improvement: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}improvement']),
+      labelId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}label_id']),
     );
   }
 
@@ -806,13 +894,15 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
   final bool isChecked;
   final String? result;
   final String? improvement;
+  final int? labelId;
   const MonthlyTask(
       {required this.task,
       required this.month,
       required this.id,
       required this.isChecked,
       this.result,
-      this.improvement});
+      this.improvement,
+      this.labelId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -825,6 +915,9 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
     }
     if (!nullToAbsent || improvement != null) {
       map['improvement'] = Variable<String>(improvement);
+    }
+    if (!nullToAbsent || labelId != null) {
+      map['label_id'] = Variable<int>(labelId);
     }
     return map;
   }
@@ -840,6 +933,9 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
       improvement: improvement == null && nullToAbsent
           ? const Value.absent()
           : Value(improvement),
+      labelId: labelId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(labelId),
     );
   }
 
@@ -853,6 +949,7 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       result: serializer.fromJson<String?>(json['result']),
       improvement: serializer.fromJson<String?>(json['improvement']),
+      labelId: serializer.fromJson<int?>(json['labelId']),
     );
   }
   @override
@@ -865,6 +962,7 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
       'isChecked': serializer.toJson<bool>(isChecked),
       'result': serializer.toJson<String?>(result),
       'improvement': serializer.toJson<String?>(improvement),
+      'labelId': serializer.toJson<int?>(labelId),
     };
   }
 
@@ -874,7 +972,8 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
           int? id,
           bool? isChecked,
           Value<String?> result = const Value.absent(),
-          Value<String?> improvement = const Value.absent()}) =>
+          Value<String?> improvement = const Value.absent(),
+          Value<int?> labelId = const Value.absent()}) =>
       MonthlyTask(
         task: task ?? this.task,
         month: month ?? this.month,
@@ -882,6 +981,7 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
         isChecked: isChecked ?? this.isChecked,
         result: result.present ? result.value : this.result,
         improvement: improvement.present ? improvement.value : this.improvement,
+        labelId: labelId.present ? labelId.value : this.labelId,
       );
   MonthlyTask copyWithCompanion(MonthlyTasksCompanion data) {
     return MonthlyTask(
@@ -892,6 +992,7 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
       result: data.result.present ? data.result.value : this.result,
       improvement:
           data.improvement.present ? data.improvement.value : this.improvement,
+      labelId: data.labelId.present ? data.labelId.value : this.labelId,
     );
   }
 
@@ -903,14 +1004,15 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(task, month, id, isChecked, result, improvement);
+      Object.hash(task, month, id, isChecked, result, improvement, labelId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -920,7 +1022,8 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
           other.id == this.id &&
           other.isChecked == this.isChecked &&
           other.result == this.result &&
-          other.improvement == this.improvement);
+          other.improvement == this.improvement &&
+          other.labelId == this.labelId);
 }
 
 class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
@@ -930,6 +1033,7 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
   final Value<bool> isChecked;
   final Value<String?> result;
   final Value<String?> improvement;
+  final Value<int?> labelId;
   const MonthlyTasksCompanion({
     this.task = const Value.absent(),
     this.month = const Value.absent(),
@@ -937,6 +1041,7 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   });
   MonthlyTasksCompanion.insert({
     required String task,
@@ -945,6 +1050,7 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   })  : task = Value(task),
         month = Value(month);
   static Insertable<MonthlyTask> custom({
@@ -954,6 +1060,7 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
     Expression<bool>? isChecked,
     Expression<String>? result,
     Expression<String>? improvement,
+    Expression<int>? labelId,
   }) {
     return RawValuesInsertable({
       if (task != null) 'task': task,
@@ -962,6 +1069,7 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
       if (isChecked != null) 'is_checked': isChecked,
       if (result != null) 'result': result,
       if (improvement != null) 'improvement': improvement,
+      if (labelId != null) 'label_id': labelId,
     });
   }
 
@@ -971,7 +1079,8 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
       Value<int>? id,
       Value<bool>? isChecked,
       Value<String?>? result,
-      Value<String?>? improvement}) {
+      Value<String?>? improvement,
+      Value<int?>? labelId}) {
     return MonthlyTasksCompanion(
       task: task ?? this.task,
       month: month ?? this.month,
@@ -979,6 +1088,7 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
       isChecked: isChecked ?? this.isChecked,
       result: result ?? this.result,
       improvement: improvement ?? this.improvement,
+      labelId: labelId ?? this.labelId,
     );
   }
 
@@ -1003,6 +1113,9 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
     if (improvement.present) {
       map['improvement'] = Variable<String>(improvement.value);
     }
+    if (labelId.present) {
+      map['label_id'] = Variable<int>(labelId.value);
+    }
     return map;
   }
 
@@ -1014,7 +1127,8 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
@@ -1066,9 +1180,15 @@ class $YearlyTasksTable extends YearlyTasks
   late final GeneratedColumn<String> improvement = GeneratedColumn<String>(
       'improvement', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _labelIdMeta =
+      const VerificationMeta('labelId');
+  @override
+  late final GeneratedColumn<int> labelId = GeneratedColumn<int>(
+      'label_id', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [task, year, id, isChecked, result, improvement];
+      [task, year, id, isChecked, result, improvement, labelId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1108,6 +1228,10 @@ class $YearlyTasksTable extends YearlyTasks
           improvement.isAcceptableOrUnknown(
               data['improvement']!, _improvementMeta));
     }
+    if (data.containsKey('label_id')) {
+      context.handle(_labelIdMeta,
+          labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
+    }
     return context;
   }
 
@@ -1129,6 +1253,8 @@ class $YearlyTasksTable extends YearlyTasks
           .read(DriftSqlType.string, data['${effectivePrefix}result']),
       improvement: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}improvement']),
+      labelId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}label_id']),
     );
   }
 
@@ -1145,13 +1271,15 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
   final bool isChecked;
   final String? result;
   final String? improvement;
+  final int? labelId;
   const YearlyTask(
       {required this.task,
       required this.year,
       required this.id,
       required this.isChecked,
       this.result,
-      this.improvement});
+      this.improvement,
+      this.labelId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1164,6 +1292,9 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
     }
     if (!nullToAbsent || improvement != null) {
       map['improvement'] = Variable<String>(improvement);
+    }
+    if (!nullToAbsent || labelId != null) {
+      map['label_id'] = Variable<int>(labelId);
     }
     return map;
   }
@@ -1179,6 +1310,9 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
       improvement: improvement == null && nullToAbsent
           ? const Value.absent()
           : Value(improvement),
+      labelId: labelId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(labelId),
     );
   }
 
@@ -1192,6 +1326,7 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       result: serializer.fromJson<String?>(json['result']),
       improvement: serializer.fromJson<String?>(json['improvement']),
+      labelId: serializer.fromJson<int?>(json['labelId']),
     );
   }
   @override
@@ -1204,6 +1339,7 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
       'isChecked': serializer.toJson<bool>(isChecked),
       'result': serializer.toJson<String?>(result),
       'improvement': serializer.toJson<String?>(improvement),
+      'labelId': serializer.toJson<int?>(labelId),
     };
   }
 
@@ -1213,7 +1349,8 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
           int? id,
           bool? isChecked,
           Value<String?> result = const Value.absent(),
-          Value<String?> improvement = const Value.absent()}) =>
+          Value<String?> improvement = const Value.absent(),
+          Value<int?> labelId = const Value.absent()}) =>
       YearlyTask(
         task: task ?? this.task,
         year: year ?? this.year,
@@ -1221,6 +1358,7 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
         isChecked: isChecked ?? this.isChecked,
         result: result.present ? result.value : this.result,
         improvement: improvement.present ? improvement.value : this.improvement,
+        labelId: labelId.present ? labelId.value : this.labelId,
       );
   YearlyTask copyWithCompanion(YearlyTasksCompanion data) {
     return YearlyTask(
@@ -1231,6 +1369,7 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
       result: data.result.present ? data.result.value : this.result,
       improvement:
           data.improvement.present ? data.improvement.value : this.improvement,
+      labelId: data.labelId.present ? data.labelId.value : this.labelId,
     );
   }
 
@@ -1242,14 +1381,15 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(task, year, id, isChecked, result, improvement);
+      Object.hash(task, year, id, isChecked, result, improvement, labelId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1259,7 +1399,8 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
           other.id == this.id &&
           other.isChecked == this.isChecked &&
           other.result == this.result &&
-          other.improvement == this.improvement);
+          other.improvement == this.improvement &&
+          other.labelId == this.labelId);
 }
 
 class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
@@ -1269,6 +1410,7 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
   final Value<bool> isChecked;
   final Value<String?> result;
   final Value<String?> improvement;
+  final Value<int?> labelId;
   const YearlyTasksCompanion({
     this.task = const Value.absent(),
     this.year = const Value.absent(),
@@ -1276,6 +1418,7 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   });
   YearlyTasksCompanion.insert({
     required String task,
@@ -1284,6 +1427,7 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
     this.isChecked = const Value.absent(),
     this.result = const Value.absent(),
     this.improvement = const Value.absent(),
+    this.labelId = const Value.absent(),
   })  : task = Value(task),
         year = Value(year);
   static Insertable<YearlyTask> custom({
@@ -1293,6 +1437,7 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
     Expression<bool>? isChecked,
     Expression<String>? result,
     Expression<String>? improvement,
+    Expression<int>? labelId,
   }) {
     return RawValuesInsertable({
       if (task != null) 'task': task,
@@ -1301,6 +1446,7 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
       if (isChecked != null) 'is_checked': isChecked,
       if (result != null) 'result': result,
       if (improvement != null) 'improvement': improvement,
+      if (labelId != null) 'label_id': labelId,
     });
   }
 
@@ -1310,7 +1456,8 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
       Value<int>? id,
       Value<bool>? isChecked,
       Value<String?>? result,
-      Value<String?>? improvement}) {
+      Value<String?>? improvement,
+      Value<int?>? labelId}) {
     return YearlyTasksCompanion(
       task: task ?? this.task,
       year: year ?? this.year,
@@ -1318,6 +1465,7 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
       isChecked: isChecked ?? this.isChecked,
       result: result ?? this.result,
       improvement: improvement ?? this.improvement,
+      labelId: labelId ?? this.labelId,
     );
   }
 
@@ -1342,6 +1490,9 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
     if (improvement.present) {
       map['improvement'] = Variable<String>(improvement.value);
     }
+    if (labelId.present) {
+      map['label_id'] = Variable<int>(labelId.value);
+    }
     return map;
   }
 
@@ -1353,7 +1504,8 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
+          ..write('improvement: $improvement, ')
+          ..write('labelId: $labelId')
           ..write(')'))
         .toString();
   }
@@ -1742,6 +1894,7 @@ typedef $$DayTasksTableCreateCompanionBuilder = DayTasksCompanion Function({
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 typedef $$DayTasksTableUpdateCompanionBuilder = DayTasksCompanion Function({
   Value<String> task,
@@ -1750,6 +1903,7 @@ typedef $$DayTasksTableUpdateCompanionBuilder = DayTasksCompanion Function({
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 
 class $$DayTasksTableFilterComposer
@@ -1778,6 +1932,9 @@ class $$DayTasksTableFilterComposer
 
   ColumnFilters<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnFilters(column));
 }
 
 class $$DayTasksTableOrderingComposer
@@ -1806,6 +1963,9 @@ class $$DayTasksTableOrderingComposer
 
   ColumnOrderings<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$DayTasksTableAnnotationComposer
@@ -1834,6 +1994,9 @@ class $$DayTasksTableAnnotationComposer
 
   GeneratedColumn<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => column);
+
+  GeneratedColumn<int> get labelId =>
+      $composableBuilder(column: $table.labelId, builder: (column) => column);
 }
 
 class $$DayTasksTableTableManager extends RootTableManager<
@@ -1865,6 +2028,7 @@ class $$DayTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               DayTasksCompanion(
             task: task,
@@ -1873,6 +2037,7 @@ class $$DayTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           createCompanionCallback: ({
             required String task,
@@ -1881,6 +2046,7 @@ class $$DayTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               DayTasksCompanion.insert(
             task: task,
@@ -1889,6 +2055,7 @@ class $$DayTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -1917,6 +2084,7 @@ typedef $$WeeklyTasksTableCreateCompanionBuilder = WeeklyTasksCompanion
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 typedef $$WeeklyTasksTableUpdateCompanionBuilder = WeeklyTasksCompanion
     Function({
@@ -1926,6 +2094,7 @@ typedef $$WeeklyTasksTableUpdateCompanionBuilder = WeeklyTasksCompanion
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 
 class $$WeeklyTasksTableFilterComposer
@@ -1954,6 +2123,9 @@ class $$WeeklyTasksTableFilterComposer
 
   ColumnFilters<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnFilters(column));
 }
 
 class $$WeeklyTasksTableOrderingComposer
@@ -1982,6 +2154,9 @@ class $$WeeklyTasksTableOrderingComposer
 
   ColumnOrderings<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$WeeklyTasksTableAnnotationComposer
@@ -2010,6 +2185,9 @@ class $$WeeklyTasksTableAnnotationComposer
 
   GeneratedColumn<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => column);
+
+  GeneratedColumn<int> get labelId =>
+      $composableBuilder(column: $table.labelId, builder: (column) => column);
 }
 
 class $$WeeklyTasksTableTableManager extends RootTableManager<
@@ -2041,6 +2219,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               WeeklyTasksCompanion(
             task: task,
@@ -2049,6 +2228,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           createCompanionCallback: ({
             required String task,
@@ -2057,6 +2237,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               WeeklyTasksCompanion.insert(
             task: task,
@@ -2065,6 +2246,7 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2093,6 +2275,7 @@ typedef $$MonthlyTasksTableCreateCompanionBuilder = MonthlyTasksCompanion
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 typedef $$MonthlyTasksTableUpdateCompanionBuilder = MonthlyTasksCompanion
     Function({
@@ -2102,6 +2285,7 @@ typedef $$MonthlyTasksTableUpdateCompanionBuilder = MonthlyTasksCompanion
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 
 class $$MonthlyTasksTableFilterComposer
@@ -2130,6 +2314,9 @@ class $$MonthlyTasksTableFilterComposer
 
   ColumnFilters<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnFilters(column));
 }
 
 class $$MonthlyTasksTableOrderingComposer
@@ -2158,6 +2345,9 @@ class $$MonthlyTasksTableOrderingComposer
 
   ColumnOrderings<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$MonthlyTasksTableAnnotationComposer
@@ -2186,6 +2376,9 @@ class $$MonthlyTasksTableAnnotationComposer
 
   GeneratedColumn<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => column);
+
+  GeneratedColumn<int> get labelId =>
+      $composableBuilder(column: $table.labelId, builder: (column) => column);
 }
 
 class $$MonthlyTasksTableTableManager extends RootTableManager<
@@ -2220,6 +2413,7 @@ class $$MonthlyTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               MonthlyTasksCompanion(
             task: task,
@@ -2228,6 +2422,7 @@ class $$MonthlyTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           createCompanionCallback: ({
             required String task,
@@ -2236,6 +2431,7 @@ class $$MonthlyTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               MonthlyTasksCompanion.insert(
             task: task,
@@ -2244,6 +2440,7 @@ class $$MonthlyTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2275,6 +2472,7 @@ typedef $$YearlyTasksTableCreateCompanionBuilder = YearlyTasksCompanion
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 typedef $$YearlyTasksTableUpdateCompanionBuilder = YearlyTasksCompanion
     Function({
@@ -2284,6 +2482,7 @@ typedef $$YearlyTasksTableUpdateCompanionBuilder = YearlyTasksCompanion
   Value<bool> isChecked,
   Value<String?> result,
   Value<String?> improvement,
+  Value<int?> labelId,
 });
 
 class $$YearlyTasksTableFilterComposer
@@ -2312,6 +2511,9 @@ class $$YearlyTasksTableFilterComposer
 
   ColumnFilters<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnFilters(column));
 }
 
 class $$YearlyTasksTableOrderingComposer
@@ -2340,6 +2542,9 @@ class $$YearlyTasksTableOrderingComposer
 
   ColumnOrderings<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get labelId => $composableBuilder(
+      column: $table.labelId, builder: (column) => ColumnOrderings(column));
 }
 
 class $$YearlyTasksTableAnnotationComposer
@@ -2368,6 +2573,9 @@ class $$YearlyTasksTableAnnotationComposer
 
   GeneratedColumn<String> get improvement => $composableBuilder(
       column: $table.improvement, builder: (column) => column);
+
+  GeneratedColumn<int> get labelId =>
+      $composableBuilder(column: $table.labelId, builder: (column) => column);
 }
 
 class $$YearlyTasksTableTableManager extends RootTableManager<
@@ -2399,6 +2607,7 @@ class $$YearlyTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               YearlyTasksCompanion(
             task: task,
@@ -2407,6 +2616,7 @@ class $$YearlyTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           createCompanionCallback: ({
             required String task,
@@ -2415,6 +2625,7 @@ class $$YearlyTasksTableTableManager extends RootTableManager<
             Value<bool> isChecked = const Value.absent(),
             Value<String?> result = const Value.absent(),
             Value<String?> improvement = const Value.absent(),
+            Value<int?> labelId = const Value.absent(),
           }) =>
               YearlyTasksCompanion.insert(
             task: task,
@@ -2423,6 +2634,7 @@ class $$YearlyTasksTableTableManager extends RootTableManager<
             isChecked: isChecked,
             result: result,
             improvement: improvement,
+            labelId: labelId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
