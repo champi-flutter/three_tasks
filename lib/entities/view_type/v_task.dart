@@ -16,7 +16,8 @@ sealed class VTask {
 
   bool get isChecked;
 
-  int? get labelId;
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+  int get labelId;
 
   /// このタスクがラベル化されているかどうか
   bool isLabeled({required List<VLabeledTask> labeledTaskList});
@@ -32,12 +33,19 @@ abstract class VDayTask with _$VDayTask implements VTask {
     required Date date,
     required int id,
     required bool isChecked,
-    required int? labelId,
+
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _VDayTask;
 
   /// 日単位タスクの仮データを生成するファクトリ
-  factory VDayTask.placeholder({required Date date}) =>
-      VDayTask(task: "", date: date, id: -1, isChecked: false, labelId: null,);
+  factory VDayTask.placeholder({required Date date}) => VDayTask(
+        task: "",
+        date: date,
+        id: -1,
+        isChecked: false,
+        labelId: -1,
+      );
 
   /// このタスクがラベル化されているかどうか
   @override
@@ -51,8 +59,6 @@ abstract class VDayTask with _$VDayTask implements VTask {
     // 最後までなかったら、false を返す
     return false;
   }
-
-
 }
 
 /// 週単位のタスククラス
@@ -65,7 +71,9 @@ abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
     required UniqueWeek week,
     required int id,
     required bool isChecked,
-    required int? labelId,
+
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _VWeeklyTask;
 
   /// このタスクがラベル化されているかどうか
@@ -83,12 +91,12 @@ abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
 
   /// 週単位タスクの仮データを生成するファクトリ
   factory VWeeklyTask.placeholder() => VWeeklyTask(
-      task: "",
-      week: UniqueWeek.fromDate(currentDate: today, firstDate: today),
-      id: -1,
-      isChecked: false,
-    labelId: null,
-  );
+        task: "",
+        week: UniqueWeek.fromDate(currentDate: today, firstDate: today),
+        id: -1,
+        isChecked: false,
+        labelId: -1,
+      );
 }
 
 /// 月単位のタスククラス
@@ -101,7 +109,9 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
     required Month month,
     required int id,
     required bool isChecked,
-    required int? labelId,
+
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _VMonthlyTask;
 
   /// このタスクがラベル化されているかどうか
@@ -118,8 +128,13 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
   }
 
   /// 週単位タスクの仮データを生成するファクトリ
-  factory VMonthlyTask.placeholder() =>
-      VMonthlyTask(task: "", month: thisMonth, id: -1, isChecked: false, labelId: null,);
+  factory VMonthlyTask.placeholder() => VMonthlyTask(
+        task: "",
+        month: thisMonth,
+        id: -1,
+        isChecked: false,
+        labelId: -1,
+      );
 }
 
 /// 年単位のタスククラス
@@ -132,7 +147,9 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
     required int year,
     required int id,
     required bool isChecked,
-    required int? labelId,
+
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _VYearlyTask;
 
   /// このタスクがラベル化されているかどうか
@@ -149,8 +166,13 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
   }
 
   /// 週単位タスクの仮データを生成するファクトリ
-  factory VYearlyTask.placeholder() =>
-      VYearlyTask(task: "", year: thisYear, id: -1, isChecked: false, labelId: null,);
+  factory VYearlyTask.placeholder() => VYearlyTask(
+        task: "",
+        year: thisYear,
+        id: -1,
+        isChecked: false,
+        labelId: -1,
+      );
 }
 
 // @freezed

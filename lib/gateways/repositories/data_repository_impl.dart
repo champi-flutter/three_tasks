@@ -495,6 +495,52 @@ class DataRepositoryImpl implements DataRepository {
     return result;
   }
 
+
+  /// タスク情報変更保存メソッド
+  @override
+  Future<Result<void, Exception>> saveTaskChanges({
+    required List<DTask> newTaskList,
+  })
+  // 折りたたみ用
+  async {
+    final Result<void, Exception> result = await _dataSource.saveTaskChanges(
+      newTaskList: newTaskList,
+    );
+    switch (result) {
+      case Success():
+      // 日単位の値
+        final Map<Date, List<DDayTask>> resultDay = {};
+        // 週単位の値
+        final List<DWeeklyTask> resultWeek = [];
+        for (DTask task in newTaskList) {
+          switch (task) {
+            case DDayTask():
+            // 対象日付の key のリストに task を追加
+              resultDay.addNullable(key: task.date, value: task);
+            case DWeeklyTask():
+            // 週単位の値に追加
+              resultWeek.add(task);
+            case DMonthlyTask():
+              _;
+            case DYearlyTask():
+              _;
+          }
+        }
+        // 日単位の分があればストリームに流す
+        if (resultDay.isNotEmpty) {
+          _streamNewDayTasks({...resultDay});
+        }
+        // 週単位の分があればストリームに流す
+        if (resultWeek.isNotEmpty) {
+          _streamNewWeeklyTasks([...resultWeek]);
+        }
+    // todo 月、年単位の場合のストリーム（2026/06/30）＞＞
+      case Failure(exception: Exception error, methodName: String? methodName):
+      // todo エラーハンドリング（2026/05/23）＞＞
+    }
+    return result;
+  }
+
   /// タスクタイトル保存メソッド
   ///
   /// 引数 [newTaskMap] は、key が ID, value がタスクタイトルの Map 。

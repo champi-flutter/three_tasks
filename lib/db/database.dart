@@ -389,6 +389,154 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     }
   }
 
+  /// タスク情報変更保存メソッド
+  @override
+  Future<Result<void, Exception>> saveTaskChanges({
+    required List<DTask> newTaskList,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      // // 返す Map の枠
+      // final Map<Date, List<DDayTask>> dataMap = {};
+      await transaction(() async {
+        /// task ごとに情報を保存
+        for (DTask task in newTaskList) {
+          await _saveDTask(newDTask: task);
+        }
+      });
+      return Success(null);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "saveTaskTitles");
+    }
+  }
+
+  /// タイプ（日単位、週単位、など）別でタスク情報の変更を保存するメソッド
+  ///
+  /// sealed class の網羅性を使って条件分岐する。
+  Future<void> _saveDTask({required DTask newDTask}) async {
+    try {
+      switch (newDTask) {
+        case DDayTask(
+            task: final String? taskTitle,
+            isChecked: final bool? isChecked,
+            labelId: final int? labelId,
+            id: final int id,
+          ):
+          if (kDebugMode) {
+            final String? printTitle =
+                taskTitle == null ? "" : "  タスクタイトル: $taskTitle \n";
+            final String? printChecked =
+                isChecked == null ? "" : "  チェック: $isChecked\n";
+            final String? printLabel =
+                labelId == null ? "" : "  ラベルID: $labelId\n";
+            _print(
+              "タスクを DB に保存",
+              "  ID: ${id}",
+              "$printTitle $printChecked $printLabel",
+            );
+          }
+          // DBに変更を保存
+          await managers.dayTasks.filter((dayTask) => dayTask.id(id)).update(
+                (task) => task(
+                  task: Value.absentIfNull(taskTitle),
+                  isChecked: Value.absentIfNull(isChecked),
+                  labelId: Value.absentIfNull(labelId),
+                ),
+              );
+        case DWeeklyTask(
+            task: final String? taskTitle,
+            isChecked: final bool? isChecked,
+            labelId: final int? labelId,
+            id: final int id,
+          ):
+          if (kDebugMode) {
+            final String? printTitle =
+                taskTitle == null ? "" : "  タスクタイトル: $taskTitle \n";
+            final String? printChecked =
+                isChecked == null ? "" : "  チェック: $isChecked\n";
+            final String? printLabel =
+                labelId == null ? "" : "  ラベルID: $labelId\n";
+            _print(
+              "タスクを DB に保存",
+              "  ID: ${id}",
+              "$printTitle $printChecked $printLabel",
+            );
+          }
+          // DBに変更を保存
+          await managers.weeklyTasks
+              .filter((weeklyTask) => weeklyTask.id(id))
+              .update(
+                (task) => task(
+                  task: Value.absentIfNull(taskTitle),
+                  isChecked: Value.absentIfNull(isChecked),
+                  labelId: Value.absentIfNull(labelId),
+                ),
+              );
+        case DMonthlyTask(
+            task: final String? taskTitle,
+            isChecked: final bool? isChecked,
+            labelId: final int? labelId,
+            id: final int id,
+          ):
+          if (kDebugMode) {
+            final String? printTitle =
+                taskTitle == null ? "" : "  タスクタイトル: $taskTitle \n";
+            final String? printChecked =
+                isChecked == null ? "" : "  チェック: $isChecked\n";
+            final String? printLabel =
+                labelId == null ? "" : "  ラベルID: $labelId\n";
+            _print(
+              "タスクを DB に保存",
+              "  ID: ${id}",
+              "$printTitle $printChecked $printLabel",
+            );
+          }
+          // DBに変更を保存
+          await managers.monthlyTasks
+              .filter((monthlyTask) => monthlyTask.id(id))
+              .update(
+                (task) => task(
+                  task: Value.absentIfNull(taskTitle),
+                  isChecked: Value.absentIfNull(isChecked),
+                  labelId: Value.absentIfNull(labelId),
+                ),
+              );
+        case DYearlyTask(
+            task: final String? taskTitle,
+            isChecked: final bool? isChecked,
+            labelId: final int? labelId,
+            id: final int id,
+          ):
+          if (kDebugMode) {
+            final String? printTitle =
+                taskTitle == null ? "" : "  タスクタイトル: $taskTitle \n";
+            final String? printChecked =
+                isChecked == null ? "" : "  チェック: $isChecked\n";
+            final String? printLabel =
+                labelId == null ? "" : "  ラベルID: $labelId\n";
+            _print(
+              "タスクを DB に保存",
+              "  ID: ${id}",
+              "$printTitle $printChecked $printLabel",
+            );
+          }
+          // DBに変更を保存
+          await managers.yearlyTasks
+              .filter((yearlyTask) => yearlyTask.id(id))
+              .update(
+                (task) => task(
+                  task: Value.absentIfNull(taskTitle),
+                  isChecked: Value.absentIfNull(isChecked),
+                  labelId: Value.absentIfNull(labelId),
+                ),
+              );
+      }
+    } catch (_) {
+      rethrow;
+    }
+  }
+
   /// タイプ（日単位、週単位、など）別でタスクタイトルを保存するメソッド
   ///
   /// sealed class の網羅性を使って条件分岐する。
@@ -867,14 +1015,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             ),
           ),
         );
-          // タスクIDに該当するタスクの labelId を更新
-          await managers.dayTasks.filter((dayTask) => dayTask.id(newId)).update(
-                (dayTask) => dayTask(
-              labelId: Value(_labeledTask!.labeledId),
-            ),
-          );
+        // タスクIDに該当するタスクの labelId を更新
+        await managers.dayTasks.filter((dayTask) => dayTask.id(newId)).update(
+              (dayTask) => dayTask(
+                labelId: Value(_labeledTask!.labeledId),
+              ),
+            );
       });
-      if(_labeledTask != null) {
+      if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
       }
       // transaction 内でエラーを投げると思われるが一応
@@ -918,7 +1066,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
               ),
             );
       });
-      if(_labeledTask != null) {
+      if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
       }
       // transaction 内でエラーを投げると思われるが一応
@@ -961,7 +1109,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
               ),
             );
       });
-      if(_labeledTask != null) {
+      if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
       }
       // transaction 内でエラーを投げると思われるが一応
@@ -1005,7 +1153,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
               ),
             );
       });
-      if(_labeledTask != null) {
+      if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
       }
       // transaction 内でエラーを投げると思われるが一応
@@ -1028,7 +1176,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     try {
       await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().dailyIdList.value];
           // targetId を remove
@@ -1060,9 +1210,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await transaction(()async{
+      await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().weeklyIdList.value];
           // targetId を remove
@@ -1075,9 +1227,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((weeklyTask) => weeklyTask.id(targetId))
             .update(
               (weeklyTask) => weeklyTask(
-            labelId: Value(null),
-          ),
-        );
+                labelId: Value(null),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {
@@ -1094,9 +1246,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await transaction(()async {
+      await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().monthlyIdList.value];
           // targetId を remove
@@ -1109,9 +1263,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((monthlyTask) => monthlyTask.id(targetId))
             .update(
               (monthlyTask) => monthlyTask(
-            labelId: Value(null),
-          ),
-        );
+                labelId: Value(null),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {
@@ -1128,9 +1282,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await transaction(()async {
+      await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().yearlyIdList.value];
           // targetId を remove
@@ -1143,9 +1299,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((yearlyTask) => yearlyTask.id(targetId))
             .update(
               (yearlyTask) => yearlyTask(
-            labelId: Value(null),
-          ),
-        );
+                labelId: Value(null),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {
@@ -1168,7 +1324,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     try {
       await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().dailyIdList.value];
           // targetId を add
@@ -1181,9 +1339,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((dayTask) => dayTask.id(targetId))
             .update(
               (dayTask) => dayTask(
-            labelId: Value(labelId),
-          ),
-        );
+                labelId: Value(labelId),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {
@@ -1204,9 +1362,10 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await transaction(()async{
+      await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId))
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().weeklyIdList.value];
@@ -1220,9 +1379,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((weeklyTask) => weeklyTask.id(targetId))
             .update(
               (weeklyTask) => weeklyTask(
-            labelId: Value(labelId),
-          ),
-        );
+                labelId: Value(labelId),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {
@@ -1243,9 +1402,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await transaction(()async {
+      await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().monthlyIdList.value];
           // targetId を add
@@ -1258,9 +1419,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((monthlyTask) => monthlyTask.id(targetId))
             .update(
               (monthlyTask) => monthlyTask(
-            labelId: Value(labelId),
-          ),
-        );
+                labelId: Value(labelId),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {
@@ -1281,9 +1442,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await transaction(()async {
+      await transaction(() async {
         // ラベルを更新
-        await managers.labeledTasks.filter((label)=>label.labeledId(labelId)).update((record) {
+        await managers.labeledTasks
+            .filter((label) => label.labeledId(labelId))
+            .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().yearlyIdList.value];
           // targetId を add
@@ -1296,9 +1459,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .filter((yearlyTask) => yearlyTask.id(targetId))
             .update(
               (yearlyTask) => yearlyTask(
-            labelId: Value(labelId),
-          ),
-        );
+                labelId: Value(labelId),
+              ),
+            );
       });
       return Success(null);
     } catch (e) {

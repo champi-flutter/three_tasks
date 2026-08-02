@@ -33,6 +33,11 @@ abstract class DataSource {
     required List<Date> dateList,
   });
 
+  /// タスク情報変更保存メソッド
+  Future<Result<void, Exception>> saveTaskChanges({
+    required List<DTask> newTaskList,
+  });
+
   /// タスクタイトル保存メソッド
   Future<Result<void, Exception>> saveTaskTitles({
     required List<DTask> newTaskList,
