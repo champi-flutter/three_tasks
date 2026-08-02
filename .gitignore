@@ -49,6 +49,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-#IDE用のアーキテクチャ図
-architecture/three_tasks_architecture_ide.drawio.png
