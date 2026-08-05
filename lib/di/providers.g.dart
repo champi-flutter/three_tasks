@@ -274,3 +274,184 @@ final class LabeledTasksServiceProvider extends $FunctionalProvider<
 
 String _$labeledTasksServiceHash() =>
     r'9e64f658f95bc9c94960866ca54913832d3927cb';
+
+@ProviderFor(saveTaskChangesUseCase)
+const saveTaskChangesUseCaseProvider = SaveTaskChangesUseCaseProvider._();
+
+final class SaveTaskChangesUseCaseProvider extends $FunctionalProvider<
+    SaveTaskChangesUseCase,
+    SaveTaskChangesUseCase,
+    SaveTaskChangesUseCase> with $Provider<SaveTaskChangesUseCase> {
+  const SaveTaskChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'saveTaskChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$saveTaskChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SaveTaskChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SaveTaskChangesUseCase create(Ref ref) {
+    return saveTaskChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SaveTaskChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SaveTaskChangesUseCase>(value),
+    );
+  }
+}
+
+String _$saveTaskChangesUseCaseHash() =>
+    r'b99740592a88cfa0abf923ebcda9e94baa6da157';
+
+/// 日単位タスクの監視フロー
+
+@ProviderFor(watchDailyTasksUseCase)
+const watchDailyTasksUseCaseProvider = WatchDailyTasksUseCaseProvider._();
+
+/// 日単位タスクの監視フロー
+
+final class WatchDailyTasksUseCaseProvider extends $FunctionalProvider<
+    WatchDailyTasksUseCase,
+    WatchDailyTasksUseCase,
+    WatchDailyTasksUseCase> with $Provider<WatchDailyTasksUseCase> {
+  /// 日単位タスクの監視フロー
+  const WatchDailyTasksUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'watchDailyTasksUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$watchDailyTasksUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<WatchDailyTasksUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WatchDailyTasksUseCase create(Ref ref) {
+    return watchDailyTasksUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WatchDailyTasksUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WatchDailyTasksUseCase>(value),
+    );
+  }
+}
+
+String _$watchDailyTasksUseCaseHash() =>
+    r'076dac0252d942d660e9ce2ad9ec2bc68477dfc1';
+
+@ProviderFor(dailyTasksPublisher)
+const dailyTasksPublisherProvider = DailyTasksPublisherProvider._();
+
+final class DailyTasksPublisherProvider extends $FunctionalProvider<
+    DailyTasksPublisher,
+    DailyTasksPublisher,
+    DailyTasksPublisher> with $Provider<DailyTasksPublisher> {
+  const DailyTasksPublisherProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dailyTasksPublisherProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dailyTasksPublisherHash();
+
+  @$internal
+  @override
+  $ProviderElement<DailyTasksPublisher> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DailyTasksPublisher create(Ref ref) {
+    return dailyTasksPublisher(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DailyTasksPublisher value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DailyTasksPublisher>(value),
+    );
+  }
+}
+
+String _$dailyTasksPublisherHash() =>
+    r'7146cebf6616ffabfb2320d63622f7983c929c85';
+
+@ProviderFor(dailyTasksStreamHandler)
+const dailyTasksStreamHandlerProvider = DailyTasksStreamHandlerProvider._();
+
+final class DailyTasksStreamHandlerProvider extends $FunctionalProvider<
+    DailyTasksStreamHandler,
+    DailyTasksStreamHandler,
+    DailyTasksStreamHandler> with $Provider<DailyTasksStreamHandler> {
+  const DailyTasksStreamHandlerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dailyTasksStreamHandlerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dailyTasksStreamHandlerHash();
+
+  @$internal
+  @override
+  $ProviderElement<DailyTasksStreamHandler> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DailyTasksStreamHandler create(Ref ref) {
+    return dailyTasksStreamHandler(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DailyTasksStreamHandler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DailyTasksStreamHandler>(value),
+    );
+  }
+}
+
+String _$dailyTasksStreamHandlerHash() =>
+    r'9069f5ff8d96d949d073f2945bebe22456581652';

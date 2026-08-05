@@ -13,25 +13,27 @@ part of 'v_task.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
-mixin _$VDayTask {
+mixin _$VDailyTask {
   String get task;
   Date get date;
   int get id;
   bool get isChecked;
-  int? get labelId;
 
-  /// Create a copy of VDayTask
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+  int get labelId;
+
+  /// Create a copy of VDailyTask
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $VDayTaskCopyWith<VDayTask> get copyWith =>
-      _$VDayTaskCopyWithImpl<VDayTask>(this as VDayTask, _$identity);
+  $VDailyTaskCopyWith<VDailyTask> get copyWith =>
+      _$VDailyTaskCopyWithImpl<VDailyTask>(this as VDailyTask, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is VDayTask &&
+            other is VDailyTask &&
             (identical(other.task, task) || other.task == task) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.id, id) || other.id == id) &&
@@ -46,26 +48,27 @@ mixin _$VDayTask {
 
   @override
   String toString() {
-    return 'VDayTask(task: $task, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'VDailyTask(task: $task, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
 /// @nodoc
-abstract mixin class $VDayTaskCopyWith<$Res> {
-  factory $VDayTaskCopyWith(VDayTask value, $Res Function(VDayTask) _then) =
-      _$VDayTaskCopyWithImpl;
+abstract mixin class $VDailyTaskCopyWith<$Res> {
+  factory $VDailyTaskCopyWith(
+          VDailyTask value, $Res Function(VDailyTask) _then) =
+      _$VDailyTaskCopyWithImpl;
   @useResult
-  $Res call({String task, Date date, int id, bool isChecked, int? labelId});
+  $Res call({String task, Date date, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
-class _$VDayTaskCopyWithImpl<$Res> implements $VDayTaskCopyWith<$Res> {
-  _$VDayTaskCopyWithImpl(this._self, this._then);
+class _$VDailyTaskCopyWithImpl<$Res> implements $VDailyTaskCopyWith<$Res> {
+  _$VDailyTaskCopyWithImpl(this._self, this._then);
 
-  final VDayTask _self;
-  final $Res Function(VDayTask) _then;
+  final VDailyTask _self;
+  final $Res Function(VDailyTask) _then;
 
-  /// Create a copy of VDayTask
+  /// Create a copy of VDailyTask
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
@@ -74,7 +77,7 @@ class _$VDayTaskCopyWithImpl<$Res> implements $VDayTaskCopyWith<$Res> {
     Object? date = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
       task: null == task
@@ -93,16 +96,16 @@ class _$VDayTaskCopyWithImpl<$Res> implements $VDayTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
 
-/// Adds pattern-matching-related methods to [VDayTask].
-extension VDayTaskPatterns on VDayTask {
+/// Adds pattern-matching-related methods to [VDailyTask].
+extension VDailyTaskPatterns on VDailyTask {
   /// A variant of `map` that fallback to returning `orElse`.
   ///
   /// It is equivalent to doing:
@@ -117,12 +120,12 @@ extension VDayTaskPatterns on VDayTask {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>(
-    TResult Function(_VDayTask value)? $default, {
+    TResult Function(_VDailyTask value)? $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _VDayTask() when $default != null:
+      case _VDailyTask() when $default != null:
         return $default(_that);
       case _:
         return orElse();
@@ -144,11 +147,11 @@ extension VDayTaskPatterns on VDayTask {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>(
-    TResult Function(_VDayTask value) $default,
+    TResult Function(_VDailyTask value) $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _VDayTask():
+      case _VDailyTask():
         return $default(_that);
       case _:
         throw StateError('Unexpected subclass');
@@ -169,11 +172,11 @@ extension VDayTaskPatterns on VDayTask {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>(
-    TResult? Function(_VDayTask value)? $default,
+    TResult? Function(_VDailyTask value)? $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _VDayTask() when $default != null:
+      case _VDailyTask() when $default != null:
         return $default(_that);
       case _:
         return null;
@@ -195,13 +198,13 @@ extension VDayTaskPatterns on VDayTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String task, Date date, int id, bool isChecked, int? labelId)?
+            String task, Date date, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
-      case _VDayTask() when $default != null:
+      case _VDailyTask() when $default != null:
         return $default(
             _that.task, _that.date, _that.id, _that.isChecked, _that.labelId);
       case _:
@@ -225,12 +228,12 @@ extension VDayTaskPatterns on VDayTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String task, Date date, int id, bool isChecked, int? labelId)
+            String task, Date date, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _VDayTask():
+      case _VDailyTask():
         return $default(
             _that.task, _that.date, _that.id, _that.isChecked, _that.labelId);
       case _:
@@ -253,12 +256,12 @@ extension VDayTaskPatterns on VDayTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String task, Date date, int id, bool isChecked, int? labelId)?
+            String task, Date date, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
-      case _VDayTask() when $default != null:
+      case _VDailyTask() when $default != null:
         return $default(
             _that.task, _that.date, _that.id, _that.isChecked, _that.labelId);
       case _:
@@ -269,8 +272,8 @@ extension VDayTaskPatterns on VDayTask {
 
 /// @nodoc
 
-class _VDayTask extends VDayTask {
-  const _VDayTask(
+class _VDailyTask extends VDailyTask {
+  const _VDailyTask(
       {required this.task,
       required this.date,
       required this.id,
@@ -286,22 +289,24 @@ class _VDayTask extends VDayTask {
   final int id;
   @override
   final bool isChecked;
-  @override
-  final int? labelId;
 
-  /// Create a copy of VDayTask
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+  @override
+  final int labelId;
+
+  /// Create a copy of VDailyTask
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  _$VDayTaskCopyWith<_VDayTask> get copyWith =>
-      __$VDayTaskCopyWithImpl<_VDayTask>(this, _$identity);
+  _$VDailyTaskCopyWith<_VDailyTask> get copyWith =>
+      __$VDailyTaskCopyWithImpl<_VDailyTask>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _VDayTask &&
+            other is _VDailyTask &&
             (identical(other.task, task) || other.task == task) &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.id, id) || other.id == id) &&
@@ -316,28 +321,29 @@ class _VDayTask extends VDayTask {
 
   @override
   String toString() {
-    return 'VDayTask(task: $task, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'VDailyTask(task: $task, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
 /// @nodoc
-abstract mixin class _$VDayTaskCopyWith<$Res>
-    implements $VDayTaskCopyWith<$Res> {
-  factory _$VDayTaskCopyWith(_VDayTask value, $Res Function(_VDayTask) _then) =
-      __$VDayTaskCopyWithImpl;
+abstract mixin class _$VDailyTaskCopyWith<$Res>
+    implements $VDailyTaskCopyWith<$Res> {
+  factory _$VDailyTaskCopyWith(
+          _VDailyTask value, $Res Function(_VDailyTask) _then) =
+      __$VDailyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String task, Date date, int id, bool isChecked, int? labelId});
+  $Res call({String task, Date date, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
-class __$VDayTaskCopyWithImpl<$Res> implements _$VDayTaskCopyWith<$Res> {
-  __$VDayTaskCopyWithImpl(this._self, this._then);
+class __$VDailyTaskCopyWithImpl<$Res> implements _$VDailyTaskCopyWith<$Res> {
+  __$VDailyTaskCopyWithImpl(this._self, this._then);
 
-  final _VDayTask _self;
-  final $Res Function(_VDayTask) _then;
+  final _VDailyTask _self;
+  final $Res Function(_VDailyTask) _then;
 
-  /// Create a copy of VDayTask
+  /// Create a copy of VDailyTask
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
@@ -346,9 +352,9 @@ class __$VDayTaskCopyWithImpl<$Res> implements _$VDayTaskCopyWith<$Res> {
     Object? date = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
-    return _then(_VDayTask(
+    return _then(_VDailyTask(
       task: null == task
           ? _self.task
           : task // ignore: cast_nullable_to_non_nullable
@@ -365,10 +371,10 @@ class __$VDayTaskCopyWithImpl<$Res> implements _$VDayTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -379,7 +385,9 @@ mixin _$VWeeklyTask {
   UniqueWeek get week;
   int get id;
   bool get isChecked;
-  int? get labelId;
+
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+  int get labelId;
 
   /// Create a copy of VWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -418,7 +426,7 @@ abstract mixin class $VWeeklyTaskCopyWith<$Res> {
       _$VWeeklyTaskCopyWithImpl;
   @useResult
   $Res call(
-      {String task, UniqueWeek week, int id, bool isChecked, int? labelId});
+      {String task, UniqueWeek week, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -437,7 +445,7 @@ class _$VWeeklyTaskCopyWithImpl<$Res> implements $VWeeklyTaskCopyWith<$Res> {
     Object? week = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
       task: null == task
@@ -456,10 +464,10 @@ class _$VWeeklyTaskCopyWithImpl<$Res> implements $VWeeklyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -558,7 +566,7 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String task, UniqueWeek week, int id, bool isChecked, int? labelId)?
+            String task, UniqueWeek week, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
@@ -588,7 +596,7 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String task, UniqueWeek week, int id, bool isChecked, int? labelId)
+            String task, UniqueWeek week, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
@@ -616,7 +624,7 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String task, UniqueWeek week, int id, bool isChecked, int? labelId)?
+            String task, UniqueWeek week, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
@@ -649,8 +657,10 @@ class _VWeeklyTask extends VWeeklyTask {
   final int id;
   @override
   final bool isChecked;
+
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
-  final int? labelId;
+  final int labelId;
 
   /// Create a copy of VWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -692,7 +702,7 @@ abstract mixin class _$VWeeklyTaskCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String task, UniqueWeek week, int id, bool isChecked, int? labelId});
+      {String task, UniqueWeek week, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -711,7 +721,7 @@ class __$VWeeklyTaskCopyWithImpl<$Res> implements _$VWeeklyTaskCopyWith<$Res> {
     Object? week = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_VWeeklyTask(
       task: null == task
@@ -730,10 +740,10 @@ class __$VWeeklyTaskCopyWithImpl<$Res> implements _$VWeeklyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -744,7 +754,9 @@ mixin _$VMonthlyTask {
   Month get month;
   int get id;
   bool get isChecked;
-  int? get labelId;
+
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+  int get labelId;
 
   /// Create a copy of VMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -783,7 +795,7 @@ abstract mixin class $VMonthlyTaskCopyWith<$Res> {
           VMonthlyTask value, $Res Function(VMonthlyTask) _then) =
       _$VMonthlyTaskCopyWithImpl;
   @useResult
-  $Res call({String task, Month month, int id, bool isChecked, int? labelId});
+  $Res call({String task, Month month, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -802,7 +814,7 @@ class _$VMonthlyTaskCopyWithImpl<$Res> implements $VMonthlyTaskCopyWith<$Res> {
     Object? month = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
       task: null == task
@@ -821,10 +833,10 @@ class _$VMonthlyTaskCopyWithImpl<$Res> implements $VMonthlyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -923,7 +935,7 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String task, Month month, int id, bool isChecked, int? labelId)?
+            String task, Month month, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
@@ -953,7 +965,7 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String task, Month month, int id, bool isChecked, int? labelId)
+            String task, Month month, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
@@ -981,7 +993,7 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String task, Month month, int id, bool isChecked, int? labelId)?
+            String task, Month month, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
@@ -1014,8 +1026,10 @@ class _VMonthlyTask extends VMonthlyTask {
   final int id;
   @override
   final bool isChecked;
+
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
-  final int? labelId;
+  final int labelId;
 
   /// Create a copy of VMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1056,7 +1070,7 @@ abstract mixin class _$VMonthlyTaskCopyWith<$Res>
       __$VMonthlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String task, Month month, int id, bool isChecked, int? labelId});
+  $Res call({String task, Month month, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -1076,7 +1090,7 @@ class __$VMonthlyTaskCopyWithImpl<$Res>
     Object? month = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_VMonthlyTask(
       task: null == task
@@ -1095,10 +1109,10 @@ class __$VMonthlyTaskCopyWithImpl<$Res>
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -1109,7 +1123,9 @@ mixin _$VYearlyTask {
   int get year;
   int get id;
   bool get isChecked;
-  int? get labelId;
+
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+  int get labelId;
 
   /// Create a copy of VYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1147,7 +1163,7 @@ abstract mixin class $VYearlyTaskCopyWith<$Res> {
           VYearlyTask value, $Res Function(VYearlyTask) _then) =
       _$VYearlyTaskCopyWithImpl;
   @useResult
-  $Res call({String task, int year, int id, bool isChecked, int? labelId});
+  $Res call({String task, int year, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -1166,7 +1182,7 @@ class _$VYearlyTaskCopyWithImpl<$Res> implements $VYearlyTaskCopyWith<$Res> {
     Object? year = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
       task: null == task
@@ -1185,10 +1201,10 @@ class _$VYearlyTaskCopyWithImpl<$Res> implements $VYearlyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -1287,7 +1303,7 @@ extension VYearlyTaskPatterns on VYearlyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String task, int year, int id, bool isChecked, int? labelId)?
+            String task, int year, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
@@ -1316,8 +1332,7 @@ extension VYearlyTaskPatterns on VYearlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String task, int year, int id, bool isChecked, int? labelId)
+    TResult Function(String task, int year, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
@@ -1345,7 +1360,7 @@ extension VYearlyTaskPatterns on VYearlyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String task, int year, int id, bool isChecked, int? labelId)?
+            String task, int year, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
@@ -1378,8 +1393,10 @@ class _VYearlyTask extends VYearlyTask {
   final int id;
   @override
   final bool isChecked;
+
+  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
-  final int? labelId;
+  final int labelId;
 
   /// Create a copy of VYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1420,7 +1437,7 @@ abstract mixin class _$VYearlyTaskCopyWith<$Res>
       __$VYearlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String task, int year, int id, bool isChecked, int? labelId});
+  $Res call({String task, int year, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -1439,7 +1456,7 @@ class __$VYearlyTaskCopyWithImpl<$Res> implements _$VYearlyTaskCopyWith<$Res> {
     Object? year = null,
     Object? id = null,
     Object? isChecked = null,
-    Object? labelId = freezed,
+    Object? labelId = null,
   }) {
     return _then(_VYearlyTask(
       task: null == task
@@ -1458,10 +1475,10 @@ class __$VYearlyTaskCopyWithImpl<$Res> implements _$VYearlyTaskCopyWith<$Res> {
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
               as bool,
-      labelId: freezed == labelId
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }

@@ -4,7 +4,7 @@ import 'package:three_tasks/entities/data_type/d_labeled_task.dart';
 
 abstract class DataRepository {
   /// **日単位** タスクのキャッシュが更新された際に、その情報を流すストリーム
-  Stream<Map<Date, List<DDayTask>>> get dayTasksStream;
+  Stream<Map<Date, List<DDayTask>>> get dailyTasksStream;
 
   /// **週単位** タスクのキャッシュが更新された際に、その情報を流すストリーム
   Stream<List<DWeeklyTask>> get weeklyTasksStream;

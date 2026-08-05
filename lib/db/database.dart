@@ -407,7 +407,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       });
       return Success(null);
     } catch (e) {
-      return Failure(Exception(e), methodName: "saveTaskTitles");
+      return Failure(Exception(e), methodName: "saveTaskChanges");
     }
   }
 

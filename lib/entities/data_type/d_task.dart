@@ -19,20 +19,21 @@ sealed class DTask {
 
 /// 日単位のタスククラス
 @freezed
-abstract class DDayTask with _$DDayTask implements DTask {
-  const DDayTask._();
+abstract class DDailyTask with _$DDailyTask implements DTask {
+  const DDailyTask._();
 
-  const factory DDayTask({
+  const factory DDailyTask({
     required String? task,
     required Date date,
     required int id,
     required bool? isChecked,
-    required int? labelId,
-  }) = _DDayTask;
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
+  }) = _DDailyTask;
 
   // /// 日単位タスクの仮データを生成するファクトリ
-  // factory DDayTask.placeholder({required Date date}) =>
-  //     DDayTask(task: "", date: date, id: -1, isChecked: false);
+  // factory DDailyTask.placeholder({required Date date}) =>
+  //     DDailyTask(task: "", date: date, id: -1, isChecked: false);
 }
 
 /// 週単位のタスククラス
@@ -45,7 +46,8 @@ abstract class DWeeklyTask with _$DWeeklyTask implements DTask {
     required UniqueWeek week,
     required int id,
     required bool? isChecked,
-    required int? labelId,
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _DWeeklyTask;
 }
 
@@ -59,7 +61,8 @@ abstract class DMonthlyTask with _$DMonthlyTask implements DTask {
     required Month month,
     required int id,
     required bool? isChecked,
-    required int? labelId,
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _DMonthlyTask;
 }
 
@@ -73,6 +76,7 @@ abstract class DYearlyTask with _$DYearlyTask implements DTask {
     required int year,
     required int id,
     required bool? isChecked,
-    required int? labelId,
+    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
+    required int labelId,
   }) = _DYearlyTask;
 }

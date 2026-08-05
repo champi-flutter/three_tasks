@@ -25,10 +25,10 @@ sealed class VTask {
 
 /// 日単位のタスククラス
 @freezed
-abstract class VDayTask with _$VDayTask implements VTask {
-  const VDayTask._();
+abstract class VDailyTask with _$VDailyTask implements VTask {
+  const VDailyTask._();
 
-  const factory VDayTask({
+  const factory VDailyTask({
     required String task,
     required Date date,
     required int id,
@@ -36,10 +36,10 @@ abstract class VDayTask with _$VDayTask implements VTask {
 
     /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
     required int labelId,
-  }) = _VDayTask;
+  }) = _VDailyTask;
 
   /// 日単位タスクの仮データを生成するファクトリ
-  factory VDayTask.placeholder({required Date date}) => VDayTask(
+  factory VDailyTask.placeholder({required Date date}) => VDailyTask(
         task: "",
         date: date,
         id: -1,
@@ -180,13 +180,13 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
 //   // 独自メソッドや共通 getter を定義するための空のコンストラクタ
 //   const VTask._();
 //
-//   /// 日単位のタスク (VDayTask)
+//   /// 日単位のタスク (VDailyTask)
 //   const factory VTask.day({
 //     required String task,
 //     required Date date,
 //     required int id,
 //     required bool isChecked,
-//   }) = VDayTask;
+//   }) = VDailyTask;
 //
 //   /// 週単位タスク
 //   const factory VTask.week({
@@ -253,23 +253,23 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
 // }
 
 // @freezed
-// abstract class VDayTask with _$VDayTask {
-//   const factory VDayTask({
+// abstract class VDailyTask with _$VDailyTask {
+//   const factory VDailyTask({
 //     required String task,
 //     required Date date,
 //     required int id,
 //     required bool isChecked,
-//   }) = _VDayTask;
+//   }) = _VDailyTask;
 //
-//   factory VDayTask.placeholder({required Date date}) =>
-//       VDayTask(task: "", date: date, id: -1, isChecked: false);
+//   factory VDailyTask.placeholder({required Date date}) =>
+//       VDailyTask(task: "", date: date, id: -1, isChecked: false);
 // }
 //
 
-// extension VDayTaskListEquality on List<VDayTask> {
+// extension VDailyTaskListEquality on List<VDailyTask> {
 //   /// 順不同でリストの中身が等しいか判定する
-//   bool isUnorderedEqualTo(List<VDayTask> other) {
-//     const equality = UnorderedIterableEquality<VDayTask>();
+//   bool isUnorderedEqualTo(List<VDailyTask> other) {
+//     const equality = UnorderedIterableEquality<VDailyTask>();
 //     return equality.equals(this, other);
 //   }
 // }

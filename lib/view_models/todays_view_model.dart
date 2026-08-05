@@ -5,13 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/use_case/output_boundary/daily_tasks_publisher.dart';
 import 'package:three_tasks/use_case/services/day_tasks_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'todays_view_model.g.dart';
 
 @riverpod
-class TodaysViewModel extends _$TodaysViewModel {
+class TodaysViewModel extends _$TodaysViewModel implements DailyTasksPublisher{
   // todo 初期化
   @override
   List<VDayTask> build() {
@@ -71,7 +72,8 @@ class TodaysViewModel extends _$TodaysViewModel {
   }
 
   /// 新しいキャッシュを受信した際のハンドラ
-  void _handleDayTasksUpdating(Map<Date, List<VDayTask>> newDataMap) {
+  @override
+  void handleDayTasksUpdating(Map<Date, List<VDayTask>> newDataMap) {
     // 当日のデータを含んでいるときのみ起動
     if (newDataMap.containsKey(today)) {
       // 当日のタスクを抽出
