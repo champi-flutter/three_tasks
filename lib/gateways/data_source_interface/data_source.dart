@@ -1,20 +1,18 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/entities/data_type/d_task.dart';
 import 'package:three_tasks/entities/data_type/d_labeled_task.dart';
-import 'package:three_tasks/entities/date_time_options.dart';
-import 'package:three_tasks/entities/result.dart';
 
 abstract class DataSource {
   // todo フェッチ
   /// `LabeledTask` フェッチメソッド
   Future<Result<List<DLabeledTask>, Exception>> getAllLabeledTasks();
 
-  /// `DayTask` フェッチメソッド
+  /// `DailyTask` フェッチメソッド
   ///
   /// 要求された日付（[dateList]）に該当するデータを返す。
   ///
   /// **【注意】** このデータは空の場合もある。
-  Future<Result<Map<Date, List<DDayTask>>, Exception>> getDayTasksByDate({
+  Future<Result<Map<Date, List<DDailyTask>>, Exception>> getDailyTasksByDate({
     required List<Date> dateList,
   });
 
@@ -29,7 +27,7 @@ abstract class DataSource {
   /// 日単位タスクの新しい日付の枠を作成するメソッド
   ///
   /// 複数の日付を指定可能。
-  Future<Result<Map<Date, List<DDayTask>>, Exception>> createDailyTaskRecord({
+  Future<Result<Map<Date, List<DDailyTask>>, Exception>> createDailyTaskRecord({
     required List<Date> dateList,
   });
 

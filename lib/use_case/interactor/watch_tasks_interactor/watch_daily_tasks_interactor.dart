@@ -7,33 +7,28 @@ import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/data_type/d_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/use_case/handler/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_publisher.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
-import 'package:three_tasks/use_case/stream_handler/daily_tasks_stream_handler.dart';
 
 /// 日単位タスクの監視フローを実装するクラス
-///
-/// todo 処理フローがわかりやすくなるように要改善（2026/08/05）＞＞
 class WatchDailyTasksInteractor implements WatchDailyTasksUseCase {
   // todo コンストラクタ
   WatchDailyTasksInteractor({
     required DailyTasksPublisher dailyTasksPublisher,
     required DailyTasksStreamHandler dailyTasksStreamHandler,
     required NotificationUseCase notificationUseCase,
-    required DataRepository dataRepository,
   })  : _dailyTasksPublisher = dailyTasksPublisher,
         _streamHandler = dailyTasksStreamHandler,
-        _notificationUseCase = notificationUseCase,
-        _repository = dataRepository;
+        _notificationUseCase = notificationUseCase;
 
   // todo 依存先
+  /// 受信データを反映させるポートのインスタンス
   final DailyTasksPublisher _dailyTasksPublisher;
 
+  /// ストリームを取り扱うクラスのインスタンス
   final DailyTasksStreamHandler _streamHandler;
-
-  /// [DataRepository] のインスタンス
-  final DataRepository _repository;
 
   /// 通知送信先（[NotificationUseCase]）のインスタンス
   final NotificationUseCase _notificationUseCase;
@@ -54,11 +49,15 @@ class WatchDailyTasksInteractor implements WatchDailyTasksUseCase {
   }
 
   /// 監視を開始
+  ///
+  /// 【データ受信時の処理フロー】
+  ///   1. データの型を変換する
+  ///   2. 変換後のデータを反映させる
+  ///
   @override
   void init() {
-    _streamHandler.listenTo(
-      _repository.dailyTasksStream,
-      onData: _handleDailyTasksUpdating,
+    _streamHandler.listen(
+      onData: _onData,
     );
   }
 
@@ -68,43 +67,61 @@ class WatchDailyTasksInteractor implements WatchDailyTasksUseCase {
     _streamHandler.dispose();
   }
 
-  /// 受信データを表示用のデータ型に変換して、ストリームに流すハンドラ
-  void _handleDailyTasksUpdating(Map<Date, List<DDailyTask>> newDataMap) {
+  /// データ受信時の処理フロー
+  ///
+  ///   1. データの型を変換する
+  ///   2. 変換後のデータを反映させる
+  ///
+  void _onData(Map<Date, List<DDailyTask>> newDataMap) {
     try {
-      // ストリームに流すデータを組み込む枠
-      final Map<Date, List<VDailyTask>> convertedDataMap = {};
-      // データを日付ごとに変換していく
-      for (var entry in newDataMap.entries) {
-        // データを表示用の型に変換
-        final List<VDailyTask> convertedDataList =
-        [...entry.value].map((DDailyTask dDailyTask) {
-          // リポジトリからのデータの場合は null はない
-          if (dDailyTask.task == null) {
-            throw Exception("受信データに欠陥があります。（dDailyTask.task == null）");
-          }
-          if (dDailyTask.isChecked == null) {
-            throw Exception(
-              "受信データに欠陥があります。（dDailyTask.isChecked == null）",
-            );
-          }
-          return VDailyTask(
-            task: dDailyTask.task!,
-            date: dDailyTask.date,
-            id: dDailyTask.id,
-            isChecked: dDailyTask.isChecked!,
-            labelId: dDailyTask.labelId,
-          );
-        }).toList();
-        convertedDataMap[entry.key] = [...convertedDataList];
-      }
-      // 変換後のデータをストリームに流す
-      _publishDailyTasks({...convertedDataMap});
+      // データの型を変換する
+      final Map<Date, List<VDailyTask>> convertedMap = _convertToV(newDataMap);
+      // 変換後のデータを反映させる
+      _publishDailyTasks(convertedMap);
     } catch (e) {
       _notifyError(content: "$e", specifiesLayer: true);
     }
   }
 
-  /// OutputBoundary の更新処理を呼び出す
+  /// [DDailyTask] の Map から [VDailyTask] の Map へ変換するプライベートメソッド
+  Map<Date, List<VDailyTask>> _convertToV(Map<Date, List<DDailyTask>> dMap) {
+    // ストリームに流すデータを組み込む枠
+    final Map<Date, List<VDailyTask>> result = {};
+    // データを日付ごとに変換していく
+    for (final entry in dMap.entries) {
+      // データの型を変換する
+      final List<VDailyTask> convertedDataList =
+          entry.value.map((DDailyTask dDailyTask) {
+        // リポジトリからのデータの場合は null はない
+        if (dDailyTask.task == null) {
+          throw Exception(
+            "受信データに欠陥があります。\n（dDailyTask.task == null）",
+          );
+        }
+        if (dDailyTask.isChecked == null) {
+          throw Exception(
+            "受信データに欠陥があります。\n（dDailyTask.isChecked == null）",
+          );
+        }
+        if (dDailyTask.labelId == null) {
+          throw Exception(
+            "受信データに欠陥があります。\n（dDailyTask.labelId == null）",
+          );
+        }
+        return VDailyTask(
+          task: dDailyTask.task!,
+          date: dDailyTask.date,
+          id: dDailyTask.id,
+          isChecked: dDailyTask.isChecked!,
+          labelId: dDailyTask.labelId!,
+        );
+      }).toList();
+      result[entry.key] = convertedDataList;
+    }
+    return result;
+  }
+
+  /// データを反映させるプライベートメソッド
   void _publishDailyTasks(Map<Date, List<VDailyTask>> newDataMap) {
     _dailyTasksPublisher.handleDailyTasksUpdating(newDataMap);
   }

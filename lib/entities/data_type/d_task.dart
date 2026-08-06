@@ -28,7 +28,7 @@ abstract class DDailyTask with _$DDailyTask implements DTask {
     required int id,
     required bool? isChecked,
     /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
-    required int labelId,
+    required int? labelId,
   }) = _DDailyTask;
 
   // /// 日単位タスクの仮データを生成するファクトリ
@@ -47,7 +47,7 @@ abstract class DWeeklyTask with _$DWeeklyTask implements DTask {
     required int id,
     required bool? isChecked,
     /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
-    required int labelId,
+    required int? labelId,
   }) = _DWeeklyTask;
 }
 
@@ -62,7 +62,7 @@ abstract class DMonthlyTask with _$DMonthlyTask implements DTask {
     required int id,
     required bool? isChecked,
     /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
-    required int labelId,
+    required int? labelId,
   }) = _DMonthlyTask;
 }
 
@@ -77,6 +77,6 @@ abstract class DYearlyTask with _$DYearlyTask implements DTask {
     required int id,
     required bool? isChecked,
     /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
-    required int labelId,
+    required int? labelId,
   }) = _DYearlyTask;
 }

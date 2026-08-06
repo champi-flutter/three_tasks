@@ -46,7 +46,7 @@ class DataRepositoryImpl implements DataRepository {
   // todo 各初期化メソッドを await するか（2026/06/02）＞＞
   Future<void> _initData() async {
     await _initLabeledTasks();
-    await _initDayTasksMap();
+    await _initDailyTasksMap();
   }
 
   // todo キャッシュ
@@ -219,33 +219,33 @@ class DataRepositoryImpl implements DataRepository {
   }
 
   /// 日単位タスクのキャッシュ
-  Map<Date, List<DDayTask>> _dayTasksMap = {};
+  Map<Date, List<DDailyTask>> _dailyTasksMap = {};
 
   /// 日単位タスクのキャッシュを管理するコントローラ
-  final StreamController<Map<Date, List<DDayTask>>> _dayTasksController =
-      BehaviorSubject<Map<Date, List<DDayTask>>>();
+  final StreamController<Map<Date, List<DDailyTask>>> _dailyTasksController =
+      BehaviorSubject<Map<Date, List<DDailyTask>>>();
 
   /// 日単位タスクのキャッシュが更新された際に、その情報を流すストリーム
   @override
-  Stream<Map<Date, List<DDayTask>>> get dayTasksStream =>
-      _dayTasksController.stream;
+  Stream<Map<Date, List<DDailyTask>>> get dailyTasksStream =>
+      _dailyTasksController.stream;
 
   /// 指定日付の日単位タスクをまるごと置き換えて、ストリームに流す一連のプロセス
-  ///  - [_dayTasksMap] を更新
+  ///  - [_dailyTasksMap] を更新
   ///  - ストリームに流す
-  void _streamNewDayTasks(Map<Date, List<DDayTask>> dataMap) {
+  void _streamNewDailyTasks(Map<Date, List<DDailyTask>> dataMap) {
     // 取得したデータをキャッシュの Map に組み込む
     for (var entries in dataMap.entries) {
-      _dayTasksMap[entries.key] = entries.value;
+      _dailyTasksMap[entries.key] = entries.value;
     }
     // キャッシュをストリームに流す
-    _dayTasksController.add({..._dayTasksMap});
+    _dailyTasksController.add({..._dailyTasksMap});
   }
 
   /// 指定日付の日単位タスクの中身を一部更新して、ストリームに流す一連のプロセス
-  ///  - [_dayTasksMap] を更新
+  ///  - [_dailyTasksMap] を更新
   ///  - ストリームに流す
-  void _streamUpdatedDayTasks({
+  void _streamUpdatedDailyTasks({
     required Date date,
     required int taskId,
     Object task = nonSpecified,
@@ -259,36 +259,36 @@ class DataRepositoryImpl implements DataRepository {
     final bool isNotSpecifiedLabelId = identical(labelId, nonSpecified);
     assert(
       isNotSpecifiedTask || task is String,
-      "DDayTask.task が String で指定されていません。",
+      "DDailyTask.task が String で指定されていません。",
     );
     assert(
       isNotSpecifiedIsChecked || isChecked is bool,
-      "DDayTask.isChecked が bool で指定されていません。",
+      "DDailyTask.isChecked が bool で指定されていません。",
     );
     assert(
       isNotSpecifiedLabelId || labelId == null || labelId is int,
-      "DDayTask.labelId が int? で指定されていません。",
+      "DDailyTask.labelId が int? で指定されていません。",
     );
-    if (_dayTasksMap.containsKey(date)) {
+    if (_dailyTasksMap.containsKey(date)) {
       // キャッシュの更新
-      _dayTasksMap[date] = _dayTasksMap[date]!.map((DDayTask dayTask) {
+      _dailyTasksMap[date] = _dailyTasksMap[date]!.map((DDailyTask dailyTask) {
         // 該当IDのタスクの labelId を copyWith で書き換え
-        if (dayTask.id == taskId) {
+        if (dailyTask.id == taskId) {
           // 引数で指定したプロパティを変換
-          return dayTask.copyWith(
-            task: isNotSpecifiedTask ? dayTask.task : task as String,
+          return dailyTask.copyWith(
+            task: isNotSpecifiedTask ? dailyTask.task : task as String,
             isChecked:
-                isNotSpecifiedIsChecked ? dayTask.isChecked : isChecked as bool,
-            labelId: isNotSpecifiedLabelId ? dayTask.labelId : labelId as int,
+                isNotSpecifiedIsChecked ? dailyTask.isChecked : isChecked as bool,
+            labelId: isNotSpecifiedLabelId ? dailyTask.labelId : labelId as int,
           );
         } else {
-          return dayTask;
+          return dailyTask;
         }
       }).toList();
       // ストリームに流す
-      _dayTasksController.add({..._dayTasksMap});
+      _dailyTasksController.add({..._dailyTasksMap});
     } else {
-      throw Exception("予期せぬ不具合が発生しました（_dayTasksMap[date] == null）。");
+      throw Exception("予期せぬ不具合が発生しました（_dailyTasksMap[date] == null）。");
     }
   }
 
@@ -330,15 +330,15 @@ class DataRepositoryImpl implements DataRepository {
     final bool isNotSpecifiedLabelId = identical(labelId, nonSpecified);
     assert(
       isNotSpecifiedTask || task is String,
-      "DDayTask.task が String で指定されていません。",
+      "DDailyTask.task が String で指定されていません。",
     );
     assert(
       isNotSpecifiedIsChecked || isChecked is bool,
-      "DDayTask.isChecked が bool で指定されていません。",
+      "DDailyTask.isChecked が bool で指定されていません。",
     );
     assert(
       isNotSpecifiedLabelId || labelId == null || labelId is int,
-      "DDayTask.labelId が int? で指定されていません。",
+      "DDailyTask.labelId が int? で指定されていません。",
     );
     _weeklyTasksList = _weeklyTasksList.map((DWeeklyTask weeklyTask) {
       // 該当IDのタスクの labelId を copyWith で書き換え
@@ -382,14 +382,14 @@ class DataRepositoryImpl implements DataRepository {
   }
 
   /// 日単位タスク（「今日のタスク」と「明日のタスク」）のキャッシュ初期化メソッド
-  Future<void> _initDayTasksMap() async {
+  Future<void> _initDailyTasksMap() async {
     // 今日と明日の値を要求する
     final List<Date> dateList = [
       today,
       today.nDaysLater(1),
     ];
     // DBからデータを取得する
-    fetchDayTasksMap(dateList: dateList);
+    fetchDailyTasksMap(dateList: dateList);
   }
 
   /// 週単位タスクのキャッシュ初期化メソッド
@@ -413,15 +413,15 @@ class DataRepositoryImpl implements DataRepository {
   /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
   /// にこのメソッドを呼び出す。
   @override
-  Future<void> fetchDayTasksMap({required List<Date> dateList}) async {
+  Future<void> fetchDailyTasksMap({required List<Date> dateList}) async {
     // 日付を指定して日単位タスクをフェッチ
-    final Result<Map<Date, List<DDayTask>>, Exception> result =
-        await _dataSource.getDayTasksByDate(
+    final Result<Map<Date, List<DDailyTask>>, Exception> result =
+        await _dataSource.getDailyTasksByDate(
       dateList: dateList,
     );
 
     switch (result) {
-      case Success(value: final Map<Date, List<DDayTask>> resultValue):
+      case Success(value: final Map<Date, List<DDailyTask>> resultValue):
         // データが空の日付をリストで抽出
         final List<Date> emptyDateList = resultValue.entries
             .where((entry) => entry.value.isEmpty)
@@ -436,7 +436,7 @@ class DataRepositoryImpl implements DataRepository {
         // 要求した日付のデータがDBにあった場合（キャッシュにはなかったが、DBにはあった場合）
         else {
           // ストリームにデータを流す
-          _streamNewDayTasks({...resultValue});
+          _streamNewDailyTasks({...resultValue});
         }
       case Failure(exception: Exception error):
       // todo エラーハンドリング（2026/06/03）＞＞
@@ -482,13 +482,13 @@ class DataRepositoryImpl implements DataRepository {
   // 折りたたみ用
   async {
     // DB に新しい日付の枠（レコード）を作成
-    final Result<Map<Date, List<DDayTask>>, Exception> result =
+    final Result<Map<Date, List<DDailyTask>>, Exception> result =
         await _dataSource.createDailyTaskRecord(dateList: dateList);
 
     switch (result) {
-      case Success(value: final Map<Date, List<DDayTask>> resultValue):
+      case Success(value: final Map<Date, List<DDailyTask>> resultValue):
         // ストリームにデータを流す
-        _streamNewDayTasks({...resultValue});
+        _streamNewDailyTasks({...resultValue});
       case Failure(exception: Exception error, methodName: String? methodName):
       // todo エラーハンドリング（2026/05/23）＞＞
     }
@@ -509,12 +509,12 @@ class DataRepositoryImpl implements DataRepository {
     switch (result) {
       case Success():
       // 日単位の値
-        final Map<Date, List<DDayTask>> resultDay = {};
+        final Map<Date, List<DDailyTask>> resultDay = {};
         // 週単位の値
         final List<DWeeklyTask> resultWeek = [];
         for (DTask task in newTaskList) {
           switch (task) {
-            case DDayTask():
+            case DDailyTask():
             // 対象日付の key のリストに task を追加
               resultDay.addNullable(key: task.date, value: task);
             case DWeeklyTask():
@@ -528,7 +528,7 @@ class DataRepositoryImpl implements DataRepository {
         }
         // 日単位の分があればストリームに流す
         if (resultDay.isNotEmpty) {
-          _streamNewDayTasks({...resultDay});
+          _streamNewDailyTasks({...resultDay});
         }
         // 週単位の分があればストリームに流す
         if (resultWeek.isNotEmpty) {
@@ -558,12 +558,12 @@ class DataRepositoryImpl implements DataRepository {
     switch (result) {
       case Success():
         // 日単位の値
-        final Map<Date, List<DDayTask>> resultDay = {};
+        final Map<Date, List<DDailyTask>> resultDay = {};
         // 週単位の値
         final List<DWeeklyTask> resultWeek = [];
         for (DTask task in newTaskList) {
           switch (task) {
-            case DDayTask():
+            case DDailyTask():
               // 対象日付の key のリストに task を追加
               resultDay.addNullable(key: task.date, value: task);
             case DWeeklyTask():
@@ -577,7 +577,7 @@ class DataRepositoryImpl implements DataRepository {
         }
         // 日単位の分があればストリームに流す
         if (resultDay.isNotEmpty) {
-          _streamNewDayTasks({...resultDay});
+          _streamNewDailyTasks({...resultDay});
         }
         // 週単位の分があればストリームに流す
         if (resultWeek.isNotEmpty) {
@@ -615,7 +615,7 @@ class DataRepositoryImpl implements DataRepository {
     switch (dTask) {
       // DTask.task は書き換えメソッドの整合性チェックのため、nullable だが、
       // 書き換え以外では null はない
-      case DDayTask(
+      case DDailyTask(
           task: final String? task,
           id: final int id,
         ):
@@ -628,7 +628,7 @@ class DataRepositoryImpl implements DataRepository {
             // 日単位タスクのキャッシュを更新して、ストリームに流す
             // 仕様上、必ず存在すると思われるが一応例外処理
             try {
-              _streamUpdatedDayTasks(
+              _streamUpdatedDailyTasks(
                 date: dTask.date,
                 taskId: id,
                 labelId: resultValue.labelId,
@@ -741,7 +741,7 @@ class DataRepositoryImpl implements DataRepository {
     switch (dTask) {
       // DTask.task は書き換えメソッドの整合性チェックのため、nullable だが、
       // 書き換え以外では null はない
-      case DDayTask(
+      case DDailyTask(
           id: final int id,
         ):
         // DB に既存ラベルへの登録を依頼
@@ -753,7 +753,7 @@ class DataRepositoryImpl implements DataRepository {
             // 日単位タスクのキャッシュを更新して、ストリームに流す
             // 仕様上、必ず存在すると思われるが一応例外処理
             try {
-              _streamUpdatedDayTasks(
+              _streamUpdatedDailyTasks(
                 date: dTask.date,
                 taskId: id,
                 // 新しいラベルIDをキャッシュに組み込む
@@ -857,7 +857,7 @@ class DataRepositoryImpl implements DataRepository {
     switch (dTask) {
       // DTask.task は書き換えメソッドの整合性チェックのため、nullable だが、
       // 書き換え以外では null はない
-      case DDayTask(
+      case DDailyTask(
           id: final int id,
           labelId: final int? labelId,
         ):
@@ -873,7 +873,7 @@ class DataRepositoryImpl implements DataRepository {
             // 日単位タスクのキャッシュを更新して、ストリームに流す
             // 仕様上、必ず存在すると思われるが一応例外処理
             try {
-              _streamUpdatedDayTasks(
+              _streamUpdatedDailyTasks(
                 date: dTask.date,
                 taskId: id,
                 labelId: null,

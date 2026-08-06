@@ -171,9 +171,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     }).toList();
   }
 
-  /// [DayTask]（テーブルクラス）から [DDayTask]（エンティティ）へ変換
-  DDayTask _dDayTask(DayTask rawData) {
-    return DDayTask(
+  /// [DayTask]（テーブルクラス）から [DDailyTask]（エンティティ）へ変換
+  DDailyTask _dDailyTask(DayTask rawData) {
+    return DDailyTask(
       task: rawData.task,
       // 2026/06/08 変更: カラムの型の変換に対応
       date: rawData.date.toDate(),
@@ -183,11 +183,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     );
   }
 
-  /// [DayTask]（テーブルクラス）の List から [DDayTask]（エンティティ）の
+  /// [DayTask]（テーブルクラス）の List から [DDailyTask]（エンティティ）の
   /// List へ変換
-  List<DDayTask> _dDayTaskList(List<DayTask> rawDataList) {
+  List<DDailyTask> _dDailyTaskList(List<DayTask> rawDataList) {
     return [...rawDataList]
-        .map((DayTask rawData) => _dDayTask(rawData))
+        .map((DayTask rawData) => _dDailyTask(rawData))
         .toList();
   }
 
@@ -205,7 +205,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         labelId: rawData.labelId);
   }
 
-  /// [WeeklyTask]（テーブルクラス）の List から [DDayTask]（エンティティ）の
+  /// [WeeklyTask]（テーブルクラス）の List から [DDailyTask]（エンティティ）の
   /// List へ変換
   List<DWeeklyTask> _dWeeklyTaskList(List<WeeklyTask> rawDataList) {
     return [...rawDataList]
@@ -231,13 +231,13 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   ///
   /// 要求された日付（[dateList]）に該当するデータを返す。
   @override
-  Future<Result<Map<Date, List<DDayTask>>, Exception>> getDayTasksByDate({
+  Future<Result<Map<Date, List<DDailyTask>>, Exception>> getDailyTasksByDate({
     required List<Date> dateList,
   })
   // 折りたたみ用
   async {
     try {
-      final Map<Date, List<DDayTask>> resultValue = {};
+      final Map<Date, List<DDailyTask>> resultValue = {};
       // transaction で、要求された日付のデータを一気に取得
       await transaction(() async {
         for (Date date in dateList) {
@@ -249,12 +249,12 @@ class MyDatabase extends _$MyDatabase implements DataSource {
               .get();
 
           // そのリストを、各日付を key にして Map に組み込む（リストが空の場合も）
-          resultValue[date] = [..._dDayTaskList(rawDataList)];
+          resultValue[date] = [..._dDailyTaskList(rawDataList)];
         }
       });
       return Success(resultValue);
     } catch (e) {
-      return Failure(Exception(e), methodName: "getDayTasksByDate");
+      return Failure(Exception(e), methodName: "getDailyTasksByDate");
     }
   }
 
@@ -329,14 +329,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   ///
   /// 複数の日付を指定可能。
   @override
-  Future<Result<Map<Date, List<DDayTask>>, Exception>> createDailyTaskRecord({
+  Future<Result<Map<Date, List<DDailyTask>>, Exception>> createDailyTaskRecord({
     required List<Date> dateList,
   })
   // 折りたたみ用
   async {
     try {
       // 返す Map の枠
-      final Map<Date, List<DDayTask>> dataMap = {};
+      final Map<Date, List<DDailyTask>> dataMap = {};
       // 指定した各日付のタスクのリストを取得
       await transaction(() async {
         for (Date date in dateList) {
@@ -353,7 +353,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             rawDataList.add(rawData);
           }
           // 作ったタスクリストを Map の対象日に組み込む
-          dataMap[date] = [..._dDayTaskList(rawDataList)];
+          dataMap[date] = [..._dDailyTaskList(rawDataList)];
         }
       });
       return Success({...dataMap});
@@ -371,7 +371,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   async {
     try {
       // 返す Map の枠
-      final Map<Date, List<DDayTask>> dataMap = {};
+      final Map<Date, List<DDailyTask>> dataMap = {};
       await transaction(() async {
         /// task ごとに情報を保存
         for (DTask task in newTaskList) {
@@ -398,7 +398,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   async {
     try {
       // // 返す Map の枠
-      // final Map<Date, List<DDayTask>> dataMap = {};
+      // final Map<Date, List<DDailyTask>> dataMap = {};
       await transaction(() async {
         /// task ごとに情報を保存
         for (DTask task in newTaskList) {
@@ -417,7 +417,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   Future<void> _saveDTask({required DTask newDTask}) async {
     try {
       switch (newDTask) {
-        case DDayTask(
+        case DDailyTask(
             task: final String? taskTitle,
             isChecked: final bool? isChecked,
             labelId: final int? labelId,
@@ -543,7 +543,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   Future<void> _saveDTaskTitle({required DTask newDTask}) async {
     try {
       switch (newDTask) {
-        case DDayTask(
+        case DDailyTask(
             task: final String? taskTitle,
             id: final int id,
           ):
@@ -629,7 +629,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   Future<void> _saveDTaskChecked({required DTask newDTask}) async {
     try {
       switch (newDTask) {
-        case DDayTask(
+        case DDailyTask(
             isChecked: final bool? newChecked,
             id: final int id,
           ):
@@ -664,7 +664,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             throw Exception("newChecked == null");
           }
           await managers.monthlyTasks
-              .filter((dayTask) => dayTask.id(id))
+              .filter((monthlyTask) => monthlyTask.id(id))
               .update(
                 (task) => task(
                   isChecked: Value(newChecked),
@@ -678,7 +678,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           if (newChecked == null) {
             throw Exception("newChecked == null");
           }
-          await managers.yearlyTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.yearlyTasks.filter((yearlyTask) => yearlyTask.id(id)).update(
                 (task) => task(
                   isChecked: Value(newChecked),
                 ),
@@ -692,7 +692,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // Delete（削除）
   // 指定したデータ行を削除する
   // filterでは対象のdayTaskのtaskが指定したデータベースと一致するかどうかでフィルタリングし、削除
-  Future<void> deleteDayTask(DayTask unnecessaryDayTask) {
+  Future<void> deleteDailyTask(DayTask unnecessaryDayTask) {
     // ややこしいので省略しないが、「=>』と同じ意味
     return managers.dayTasks
         .filter(

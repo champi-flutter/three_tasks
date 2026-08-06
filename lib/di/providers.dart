@@ -6,26 +6,21 @@ import 'package:three_tasks/gateways/data_source_interface/data_source.dart';
 import 'package:three_tasks/gateways/repositories/data_repository_impl.dart';
 import 'package:three_tasks/gateways/repositories/external_launch_repository_impl.dart';
 import 'package:three_tasks/use_case/event_notifier.dart';
+import 'package:three_tasks/use_case/handler/daily_tasks_cache_handler.dart';
+import 'package:three_tasks/use_case/handler/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_daily_tasks_interactor.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_publisher.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
-import 'package:three_tasks/use_case/repository_interface/external_launch_repository.dart';
-import 'package:three_tasks/use_case/services/launch_support_link_service.dart';
 import 'package:three_tasks/use_case/services/labeled_tasks_service.dart';
 import 'package:three_tasks/use_case/services/day_tasks_service.dart';
 import 'package:three_tasks/use_case/services/weekly_tasks_service.dart';
-import 'package:three_tasks/use_case/stream_handler/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/toast_count.dart';
 import 'package:three_tasks/view_models/daily_tasks_view_model/daily_tasks_presenter.dart';
 import 'package:three_tasks/view_models/daily_tasks_view_model/todays_tasks_view_model.dart';
 import 'package:three_tasks/view_models/daily_tasks_view_model/tomorrows_tasks_view_model.dart';
-import 'package:three_tasks/view_models/drawer_view_model.dart';
-import 'package:three_tasks/view_models/loading_view_model.dart';
-import 'package:three_tasks/view_models/notification_view_model.dart';
-import 'package:three_tasks/view_models/todays_view_model.dart';
 
 part 'providers.g.dart';
 
@@ -53,10 +48,13 @@ WeeklyTasksService weeklyTasksService(Ref ref) => WeeklyTasksService(ref);
 @riverpod
 LabeledTasksService labeledTasksService(Ref ref) => LabeledTasksService(ref);
 
+/// タスク書き換え処理フロー
 @riverpod
 SaveTaskChangesUseCase saveTaskChangesUseCase(Ref ref) =>
     SaveTaskChangesInteractor(
       dataRepository: ref.watch(dataRepositoryProvider),
+      dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider),
+      notificationUseCase: ref.watch(notificationUseCaseProvider),
     );
 
 /// 日単位タスクの監視フロー
@@ -72,13 +70,23 @@ WatchDailyTasksUseCase watchDailyTasksUseCase(Ref ref) {
   return instance;
 }
 
+/// 日単位タスク監視反映ポート
 @riverpod
-DailyTasksPublisher dailyTasksPublisher(Ref ref) => DailyTasksPresenter(
+DailyTasksPublisher dailyTasksPublisher(Ref ref) =>
+    DailyTasksPresenter(
       todaysTasksViewModel: ref.watch(todaysTasksViewModelProvider.notifier),
       tomorrowsTasksViewModel:
-          ref.watch(tomorrowsTasksViewModelProvider.notifier),
+      ref.watch(tomorrowsTasksViewModelProvider.notifier),
     );
 
+/// 日単位タスクのキャッシュストリームハンドラ
+@riverpod
+DailyTasksCacheHandler dailyTasksCacheHandler(Ref ref) =>
+    DailyTasksCacheHandler(
+      dailyTasksStreamHandler: ref.watch(dailyTasksStreamHandlerProvider),
+    );
+
+/// 日単位タスクのキャッシュストリームハンドラ
 @riverpod
 DailyTasksStreamHandler dailyTasksStreamHandler(Ref ref) =>
     DailyTasksStreamHandler();

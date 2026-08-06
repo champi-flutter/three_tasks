@@ -2,9 +2,10 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/entities/data_type/d_task.dart';
 import 'package:three_tasks/entities/data_type/d_labeled_task.dart';
 
+/// データ層へのアクセスポート
 abstract class DataRepository {
   /// **日単位** タスクのキャッシュが更新された際に、その情報を流すストリーム
-  Stream<Map<Date, List<DDayTask>>> get dailyTasksStream;
+  Stream<Map<Date, List<DDailyTask>>> get dailyTasksStream;
 
   /// **週単位** タスクのキャッシュが更新された際に、その情報を流すストリーム
   Stream<List<DWeeklyTask>> get weeklyTasksStream;
@@ -20,7 +21,7 @@ abstract class DataRepository {
   /// 指定日付（[dateList]）の日単位タスクをフェッチするメソッド
   ///
   /// 複数の日付を指定可能。
-  Future<void> fetchDayTasksMap({required List<Date> dateList});
+  Future<void> fetchDailyTasksMap({required List<Date> dateList});
 
   /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド
   ///

@@ -275,13 +275,18 @@ final class LabeledTasksServiceProvider extends $FunctionalProvider<
 String _$labeledTasksServiceHash() =>
     r'9e64f658f95bc9c94960866ca54913832d3927cb';
 
+/// タスク書き換え処理フロー
+
 @ProviderFor(saveTaskChangesUseCase)
 const saveTaskChangesUseCaseProvider = SaveTaskChangesUseCaseProvider._();
+
+/// タスク書き換え処理フロー
 
 final class SaveTaskChangesUseCaseProvider extends $FunctionalProvider<
     SaveTaskChangesUseCase,
     SaveTaskChangesUseCase,
     SaveTaskChangesUseCase> with $Provider<SaveTaskChangesUseCase> {
+  /// タスク書き換え処理フロー
   const SaveTaskChangesUseCaseProvider._()
       : super(
           from: null,
@@ -317,7 +322,7 @@ final class SaveTaskChangesUseCaseProvider extends $FunctionalProvider<
 }
 
 String _$saveTaskChangesUseCaseHash() =>
-    r'b99740592a88cfa0abf923ebcda9e94baa6da157';
+    r'4926af8e57c23c55037acf6c3f0833c3e3efdc1e';
 
 /// 日単位タスクの監視フロー
 
@@ -368,13 +373,18 @@ final class WatchDailyTasksUseCaseProvider extends $FunctionalProvider<
 String _$watchDailyTasksUseCaseHash() =>
     r'076dac0252d942d660e9ce2ad9ec2bc68477dfc1';
 
+/// 日単位タスク監視反映ポート
+
 @ProviderFor(dailyTasksPublisher)
 const dailyTasksPublisherProvider = DailyTasksPublisherProvider._();
+
+/// 日単位タスク監視反映ポート
 
 final class DailyTasksPublisherProvider extends $FunctionalProvider<
     DailyTasksPublisher,
     DailyTasksPublisher,
     DailyTasksPublisher> with $Provider<DailyTasksPublisher> {
+  /// 日単位タスク監視反映ポート
   const DailyTasksPublisherProvider._()
       : super(
           from: null,
@@ -412,13 +422,67 @@ final class DailyTasksPublisherProvider extends $FunctionalProvider<
 String _$dailyTasksPublisherHash() =>
     r'7146cebf6616ffabfb2320d63622f7983c929c85';
 
+/// 日単位タスクのキャッシュストリームハンドラ
+
+@ProviderFor(dailyTasksCacheHandler)
+const dailyTasksCacheHandlerProvider = DailyTasksCacheHandlerProvider._();
+
+/// 日単位タスクのキャッシュストリームハンドラ
+
+final class DailyTasksCacheHandlerProvider extends $FunctionalProvider<
+    DailyTasksCacheHandler,
+    DailyTasksCacheHandler,
+    DailyTasksCacheHandler> with $Provider<DailyTasksCacheHandler> {
+  /// 日単位タスクのキャッシュストリームハンドラ
+  const DailyTasksCacheHandlerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'dailyTasksCacheHandlerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$dailyTasksCacheHandlerHash();
+
+  @$internal
+  @override
+  $ProviderElement<DailyTasksCacheHandler> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DailyTasksCacheHandler create(Ref ref) {
+    return dailyTasksCacheHandler(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DailyTasksCacheHandler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DailyTasksCacheHandler>(value),
+    );
+  }
+}
+
+String _$dailyTasksCacheHandlerHash() =>
+    r'8a2cb3b6282c305dfc9f706acfdaeeaaf453d018';
+
+/// 日単位タスクのキャッシュストリームハンドラ
+
 @ProviderFor(dailyTasksStreamHandler)
 const dailyTasksStreamHandlerProvider = DailyTasksStreamHandlerProvider._();
+
+/// 日単位タスクのキャッシュストリームハンドラ
 
 final class DailyTasksStreamHandlerProvider extends $FunctionalProvider<
     DailyTasksStreamHandler,
     DailyTasksStreamHandler,
     DailyTasksStreamHandler> with $Provider<DailyTasksStreamHandler> {
+  /// 日単位タスクのキャッシュストリームハンドラ
   const DailyTasksStreamHandlerProvider._()
       : super(
           from: null,

@@ -22,18 +22,18 @@ class DailyTasksPresenter implements DailyTasksPublisher {
 
   /// 新しいキャッシュを受信した際のハンドラ
   @override
-  void handleDayTasksUpdating(Map<Date, List<VDayTask>> newDataMap) {
+  void handleDailyTasksUpdating(Map<Date, List<VDailyTask>> newDataMap) {
     // 当日のデータを含んでいるときのみ起動
     if (newDataMap.containsKey(today)) {
       // 当日のタスクを抽出
-      final List<VDayTask> newDataListInToday = newDataMap[today]!;
+      final List<VDailyTask> newDataListInToday = newDataMap[today]!;
 
       _todaysTasksVM.update(newDataListInToday);
     } else
     // 翌日のデータを含んでいるときのみ起動
     if (newDataMap.containsKey(tomorrow)) {
       // 翌日タスクを抽出
-      final List<VDayTask> newDataListInTomorrow = newDataMap[tomorrow]!;
+      final List<VDailyTask> newDataListInTomorrow = newDataMap[tomorrow]!;
       _tomorrowsTasksVM.update(newDataListInTomorrow);
     }
     // 当日タスクがない場合
