@@ -12,6 +12,9 @@ typedef TaskUpdateParameter = ({
 /// タスク情報の変更を保存する処理フロー
 abstract class SaveTaskChangesUseCase {
   /// タスク情報の変更を保存する処理フロー
+  ///   1. パラメータの [VTask] を [DTask] に変換する
+  ///   2. リポジトリにテータの保存を依頼する
+  ///   3. キャッシュハンドラの `update` を実行する
   ///
   /// [newTitle]、[newChecked]、[newLabelId] のいずれかと、
   /// 変更を受けるタスク（[targetVTask]）を指定する。

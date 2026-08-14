@@ -2,7 +2,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/entities/data_type/d_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
-import 'package:three_tasks/use_case/handler/daily_tasks_cache_handler.dart';
+import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
@@ -19,6 +19,7 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
   /// [DataRepository] のインスタンス
   final DataRepository _repository;
 
+  /// 日単位タスクのキャッシュハンドラのインスタンス
   final DailyTasksCacheHandler _dailyTasksCacheHandler;
 
   /// 通知送信先（[NotificationUseCase]）のインスタンス
@@ -40,6 +41,9 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
   }
 
   /// タスク情報の変更を保存する処理フロー
+  ///   1. パラメータの [VTask] を [DTask] に変換する
+  ///   2. リポジトリにテータの保存を依頼する
+  ///   3. キャッシュハンドラの `update` を実行する
   ///
   /// [newTitle]、[newChecked]、[newLabelId] のいずれかと、
   /// 変更を受けるタスク（[targetVTask]）を指定する。

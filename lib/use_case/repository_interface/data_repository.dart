@@ -21,7 +21,9 @@ abstract class DataRepository {
   /// 指定日付（[dateList]）の日単位タスクをフェッチするメソッド
   ///
   /// 複数の日付を指定可能。
-  Future<void> fetchDailyTasksMap({required List<Date> dateList});
+  Future<Result<Map<Date, List<DDailyTask>>, Exception>> fetchDailyTasks({
+    required List<Date> dateList,
+  });
 
   /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド
   ///
@@ -29,14 +31,17 @@ abstract class DataRepository {
   Future<Result<void, Exception>> fetchWeeklyTaskList(
       {required List<Date> firstDateList});
 
-  // todo 書き換え
+  /// 日単位タスクの新しい日付の枠を作成するメソッド
+  Future<Result<Map<Date, List<DDailyTask>>, Exception>> createDailyTaskRecord({
+    required List<Date> dateList,
+  });
 
+  // todo 書き換え
 
   /// タスク情報変更保存メソッド
   Future<Result<void, Exception>> saveTaskChanges({
     required List<DTask> newTaskList,
   });
-
 
   /// タスクタイトル保存メソッド
   Future<Result<void, Exception>> saveTaskTitles({

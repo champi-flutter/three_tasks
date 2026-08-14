@@ -186,7 +186,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   /// [DayTask]（テーブルクラス）の List から [DDailyTask]（エンティティ）の
   /// List へ変換
   List<DDailyTask> _dDailyTaskList(List<DayTask> rawDataList) {
-    return [...rawDataList]
+    return rawDataList
         .map((DayTask rawData) => _dDailyTask(rawData))
         .toList();
   }
@@ -208,7 +208,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   /// [WeeklyTask]（テーブルクラス）の List から [DDailyTask]（エンティティ）の
   /// List へ変換
   List<DWeeklyTask> _dWeeklyTaskList(List<WeeklyTask> rawDataList) {
-    return [...rawDataList]
+    return rawDataList
         .map((WeeklyTask rawData) => _dWeeklyTask(rawData))
         .toList();
   }
@@ -249,7 +249,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
               .get();
 
           // そのリストを、各日付を key にして Map に組み込む（リストが空の場合も）
-          resultValue[date] = [..._dDailyTaskList(rawDataList)];
+          resultValue[date] = _dDailyTaskList(rawDataList);
         }
       });
       return Success(resultValue);

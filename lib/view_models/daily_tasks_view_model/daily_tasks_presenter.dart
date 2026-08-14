@@ -5,7 +5,6 @@ import 'package:three_tasks/view_models/daily_tasks_view_model/todays_tasks_view
 import 'package:three_tasks/view_models/daily_tasks_view_model/tomorrows_tasks_view_model.dart';
 
 class DailyTasksPresenter implements DailyTasksPublisher {
-  final Date tomorrow = today.nDaysLater(1);
 
   // todo コンストラクタ
   DailyTasksPresenter({
@@ -23,22 +22,19 @@ class DailyTasksPresenter implements DailyTasksPublisher {
   /// 新しいキャッシュを受信した際のハンドラ
   @override
   void handleDailyTasksUpdating(Map<Date, List<VDailyTask>> newDataMap) {
-    // 当日のデータを含んでいるときのみ起動
-    if (newDataMap.containsKey(today)) {
-      // 当日のタスクを抽出
-      final List<VDailyTask> newDataListInToday = newDataMap[today]!;
-
-      _todaysTasksVM.update(newDataListInToday);
-    } else
-    // 翌日のデータを含んでいるときのみ起動
-    if (newDataMap.containsKey(tomorrow)) {
-      // 翌日タスクを抽出
-      final List<VDailyTask> newDataListInTomorrow = newDataMap[tomorrow]!;
-      _tomorrowsTasksVM.update(newDataListInTomorrow);
+    // 当日のタスクを抽出する
+    final List<VDailyTask>? newDataOnToday = newDataMap[today];
+    // 翌日タスクを抽出する
+    final List<VDailyTask>? newDataOnTomorrow = newDataMap[tomorrow];
+    // 当日のデータを含んでいる場合
+    if (newDataOnToday != null) {
+      // 当日のタスクの表示を更新する
+      _todaysTasksVM.update(newDataOnToday);
     }
-    // 当日タスクがない場合
-    else {
-      // todo データ未受信時のリスト要素数 0 の対策（2026/06/03）＞＞
+    // 翌日のデータを含んでいる場合
+    else if (newDataOnTomorrow != null) {
+      // 翌日タスクの表示を更新する
+      _tomorrowsTasksVM.update(newDataOnTomorrow);
     }
   }
 }

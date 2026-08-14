@@ -6,8 +6,10 @@ import 'package:three_tasks/gateways/data_source_interface/data_source.dart';
 import 'package:three_tasks/gateways/repositories/data_repository_impl.dart';
 import 'package:three_tasks/gateways/repositories/external_launch_repository_impl.dart';
 import 'package:three_tasks/use_case/event_notifier.dart';
-import 'package:three_tasks/use_case/handler/daily_tasks_cache_handler.dart';
-import 'package:three_tasks/use_case/handler/daily_tasks_stream_handler.dart';
+import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
+import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler_impl.dart';
+import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_handler.dart';
+import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_handler_impl.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes_interactor.dart';
@@ -79,17 +81,21 @@ DailyTasksPublisher dailyTasksPublisher(Ref ref) =>
       ref.watch(tomorrowsTasksViewModelProvider.notifier),
     );
 
+// キャッシュハンドラ
 /// 日単位タスクのキャッシュストリームハンドラ
 @riverpod
 DailyTasksCacheHandler dailyTasksCacheHandler(Ref ref) =>
-    DailyTasksCacheHandler(
+    DailyTasksCacheHandlerImpl(
+      capacity: ,
       dailyTasksStreamHandler: ref.watch(dailyTasksStreamHandlerProvider),
     );
+
+// ストリームハンドラ
 
 /// 日単位タスクのキャッシュストリームハンドラ
 @riverpod
 DailyTasksStreamHandler dailyTasksStreamHandler(Ref ref) =>
-    DailyTasksStreamHandler();
+    DailyTasksStreamHandlerImpl();
 
 // todo ViewModel（状態なし）
 // /// 通知管理クラス
