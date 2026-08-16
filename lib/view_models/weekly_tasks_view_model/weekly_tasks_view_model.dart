@@ -11,7 +11,7 @@ import 'package:three_tasks/use_case/services/weekly_tasks_service.dart';
 part 'weekly_tasks_view_model.g.dart';
 
 @riverpod
-class WeeklyTasksViewModel extends _$WeeklyTasksViewModel with LoadingHandler {
+class WeeklyTasksViewModel extends _$WeeklyTasksViewModel {
   // todo 初期化
   @override
   List<VWeeklyTask> build() {
@@ -47,11 +47,10 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel with LoadingHandler {
       ref.read(weeklyTasksServiceProvider);
 
   /// 通知送信先（[EventNotifier]）のインスタンス
-  EventNotifier get _readEventNotifier => ref.read(eventProvider);
+  NotificationUseCase get _notificator => ref.read(notificationUseCaseProvider);
 
   /// ローディング管理クラス
-  @override
-  LoadingViewModel get loadingVM => ref.read(loadingViewModelProvider.notifier);
+  LoadingUseCase get _loader => ref.read(loadingUseCaseProvider);
 
   // todo 通知関連
   /// エラー通知メソッド
@@ -61,7 +60,7 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel with LoadingHandler {
   })
   // 折りたたみ用
   {
-    _readEventNotifier.notifyInfo(
+    _notificator.notifyInfo(
       layer: specifiesLayer ? NotificationFrom.viewModel : null,
       type: NotificationType.error,
       notification: content,
@@ -75,7 +74,7 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel with LoadingHandler {
   })
   // 折りたたみ用
   {
-    _readEventNotifier.notifyInfo(
+    _notificator.notifyInfo(
       layer: specifiesLayer ? NotificationFrom.viewModel : null,
       type: NotificationType.success,
       notification: content,

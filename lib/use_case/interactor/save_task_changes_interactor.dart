@@ -12,15 +12,19 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
     required DataRepository dataRepository,
     required DailyTasksCacheHandler dailyTasksCacheHandler,
     required NotificationUseCase notificationUseCase,
+    required LoadingUseCase loadingUseCase,
   })  : _repository = dataRepository,
-  _dailyTasksCacheHandler = dailyTasksCacheHandler,
-        _notificationUseCase = notificationUseCase;
+        _dailyTasksCacheHandler = dailyTasksCacheHandler,
+        _notificationUseCase = notificationUseCase,
+        _loader = loadingUseCase;
 
   /// [DataRepository] のインスタンス
   final DataRepository _repository;
 
   /// 日単位タスクのキャッシュハンドラのインスタンス
   final DailyTasksCacheHandler _dailyTasksCacheHandler;
+
+  final LoadingUseCase _loader;
 
   /// 通知送信先（[NotificationUseCase]）のインスタンス
   final NotificationUseCase _notificationUseCase;
@@ -45,41 +49,44 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
   ///   2. リポジトリにテータの保存を依頼する
   ///   3. キャッシュハンドラの `update` を実行する
   ///
+  /// 変更の反映の完了まで `await` する。
+  ///
   /// [newTitle]、[newChecked]、[newLabelId] のいずれかと、
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
   Future<Result<void, Exception>> execute({
     required List<TaskUpdateParameter> taskInfo,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      if (taskInfo.isEmpty) {
-        throw Exception("無効な値です");
-      }
-      // 各パラメータペアを個別に DTask に変換する
-      final List<DTask> newTaskList = taskInfo.map(_toDTask).toList();
-      // リポジトリにデータの保存を依頼する
-      final Result<void, Exception> result =
-          await _repository.saveTaskChanges(newTaskList: newTaskList);
-      // 保存が成功した場合に、キャッシュを更新する
-      switch (result) {
-        case Success():
-          _cacheChanges(newTaskList);
-        case Failure(
-        exception: Exception error,
-        ):
-          throw error;
-      }
-      return result;
-    } catch (e) {
-      _notifyError(content: "$e", specifiesLayer: true);
-      return Failure(Exception(e));
-    }
-  }
+  }) =>
+      _loader.loadAsync<Result<void, Exception>>(() async {
+        try {
+          if (taskInfo.isEmpty) {
+            throw Exception("無効な値です");
+          }
+          // 各パラメータペアを個別に DTask に変換する
+          final List<DTask> newTaskList = taskInfo.map(_toDTask).toList();
+          // リポジトリにデータの保存を依頼する
+          final Result<void, Exception> result =
+              await _repository.saveTaskChanges(newTaskList: newTaskList);
+          // 保存が成功した場合に、キャッシュを更新する
+          switch (result) {
+            case Success():
+              await _cacheChanges(newTaskList);
+            case Failure(
+                exception: Exception error,
+              ):
+              throw error;
+          }
+          return result;
+        } catch (e) {
+          _notifyError(content: "$e", specifiesLayer: true);
+          return Failure(Exception(e));
+        }
+      });
 
   /// 変更をキャッシュするプライベートメソッド
-  void _cacheChanges(List<DTask> newTaskList){
+  ///
+  /// 変更の反映の完了まで await する。
+  Future<void> _cacheChanges(List<DTask> newTaskList) async {
     // 日単位の値
     final Map<Date, List<DDailyTask>> resultDay = {};
     // 週単位の値
@@ -87,10 +94,10 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
     for (DTask task in newTaskList) {
       switch (task) {
         case DDailyTask():
-        // 対象日付の key のリストに task を追加
+          // 対象日付の key のリストに task を追加
           resultDay.addNullable(key: task.date, value: task);
         case DWeeklyTask():
-        // 週単位の値に追加
+          // 週単位の値に追加
           resultWeek.add(task);
         case DMonthlyTask():
           _;
@@ -100,7 +107,7 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
     }
     // 日単位の分があればキャッシュを更新
     if (resultDay.isNotEmpty) {
-      _dailyTasksCacheHandler.update(resultDay);
+      await _dailyTasksCacheHandler.update(resultDay);
     }
     // todo 週、月、年単位の場合のストリーム（2026/08/06）＞＞
     // 週単位の分があればキャッシュを更新

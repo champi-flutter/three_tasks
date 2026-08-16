@@ -8,7 +8,7 @@ import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
-import 'package:three_tasks/view_models/weekly_tasks_view_model.dart';
+import 'package:three_tasks/view_models/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'history_screen.dart';
 
 // 週の初め

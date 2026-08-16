@@ -17,7 +17,7 @@ class DailyTasksCacheHandlerImpl extends DailyTasksCacheHandler{
 
   /// データ更新時のストリームへの反映
   @override
-  void output(Map<Date, List<DDailyTask>> dataMap) {
+  Future<void> output(Map<Date, List<DDailyTask>> dataMap) async {
     // キャッシュをストリームに流す
     _streamHandler.add(dataMap);
   }

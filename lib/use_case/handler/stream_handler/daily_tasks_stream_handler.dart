@@ -1,4 +1,5 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:custom_core_types/custom_core_types/custom_stream/stream_handler/stream_handler_with_initial_loading.dart';
 import 'package:three_tasks/entities/data_type/d_task.dart';
 
 /// 日単位タスクのキャッシュストリームを扱うクラス
@@ -9,6 +10,6 @@ import 'package:three_tasks/entities/data_type/d_task.dart';
 ///  - [dispose]: 購読の取り扱いを明示的に終了する。
 ///  - [add]: データをストリームに流す。
 abstract class DailyTasksStreamHandler
-    extends SingleStreamHandler<Map<Date, List<DDailyTask>>> {
+    extends StreamHandlerWithInitialLoading<Map<Date, List<DDailyTask>>> {
 }
 

@@ -17,10 +17,8 @@ class TomorrowsTasksViewModel extends _$TomorrowsTasksViewModel{
   // todo 初期化
   @override
   List<VDailyTask> build() {
-    // 古い購読を破棄
-    _disposeSubscription();
-    // 購読を開始
-    _initSubscription();
+    // 監視フローを開始する
+    _startWatching();
     // リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
     // ハンドラ（`_handleDayTasksUpdating`）が1回起動して初めて実際のデータが表示される
     return List<VDailyTask>.generate(3, (_) => VDailyTask.placeholder(date: today));
