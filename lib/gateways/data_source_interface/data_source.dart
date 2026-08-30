@@ -18,9 +18,10 @@ abstract class DataSource {
 
   /// `WeeklyTask` フェッチメソッド
   ///
-  /// 要求された日付（[firstDateList]）に該当するデータを返す。
+  /// 要求された日付（[dateList]）に該当するデータを返す。
   Future<Result<List<DWeeklyTask>, Exception>> getWeeklyTasksByDate({
-    required List<Date> firstDateList,
+    required Date targetDate,
+    required List<int> diffsOnCache,
   });
 
   // todo 書き換え
@@ -31,9 +32,21 @@ abstract class DataSource {
     required List<Date> dateList,
   });
 
+  /// 日単位タスクの新しい日付の枠を作成するメソッド
+  ///
+  /// 複数の日付を指定可能。
+  Future<Result<List<DWeeklyTask>, Exception>> createWeeklyTaskRecord({
+    required List<Date> firstDateList,
+  });
+
   /// タスク情報変更保存メソッド
   Future<Result<void, Exception>> saveTaskChanges({
     required List<DTask> newTaskList,
+  });
+
+  /// 週単位タスクの firstDate を書き換えるメソッド
+  Future<Result<void, Exception>> updateWeeklyTasksFirstDate({
+    required Map<int, Date> idFirstDateMap,
   });
 
   /// タスクタイトル保存メソッド

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
@@ -27,6 +28,37 @@ class WeeklyTasksScreen extends HookConsumerWidget {
     // VMを監視
     final List<VWeeklyTask> weeklyTaskList = ref.watch(
         weeklyTasksViewModelProvider);
+
+    Future<void> _saveTaskChanges({
+      required int position,
+      String? newTitle,
+      bool? newChecked,
+      int? newLabelId,}) async {
+      // 週タスクのコントローラを参照
+      final controller = ref.read(weeklyTasksControllerProvider);
+      // 入力値の保存を依頼
+      await controller.saveTaskChanges(taskInfo: [
+        (
+        targetVTask: weeklyTaskList[0],
+        newTitle: position == 0 ? newTitle : null,
+        newChecked: position == 0 ? newChecked : null, // 変更しない項目は null
+        newLabelId: position == 0 ? newLabelId : null,
+        ),
+        (
+        targetVTask: weeklyTaskList[1],
+        newTitle: position == 1 ? newTitle : null,
+        newChecked: position == 1 ? newChecked : null, // 変更しない項目は null
+        newLabelId: position == 1 ? newLabelId : null,
+        ),
+        (
+        targetVTask: weeklyTaskList[2],
+        newTitle: position == 2 ? newTitle : null,
+        newChecked: position == 2 ? newChecked : null, // 変更しない項目は null
+        newLabelId: position == 2 ? newLabelId : null,
+        ),
+      ],);
+    }
+
     return SingleChildScrollView(
       child: Center(
         child: Column(
@@ -38,35 +70,14 @@ class WeeklyTasksScreen extends HookConsumerWidget {
             TasksView.checkbox(
               taskList: weeklyTaskList,
               // 保存処理
-              onSaveTask: (int position, String newValue) async {
-                // VM をイベントハンドラとして参照
-                final readWeeklyTasksVM = ref.read(
-                    weeklyTasksViewModelProvider.notifier);
-                // 入力値の保存を依頼
-                await readWeeklyTasksVM.saveTask(
-                  targetTask: weeklyTaskList[position],
-                  newTitle: newValue,
-                );
-              },
-              onCheckChanged: (int position, bool newValue) async {
-                // VM をイベントハンドラとして参照
-                final readWeeklyTasksVM = ref.read(
-                    weeklyTasksViewModelProvider.notifier);
-                // チェックの保存を依頼
-                await readWeeklyTasksVM.saveCheck(
-                  targetTask: weeklyTaskList[position],
-                  newValue: newValue,
-                );
-              },
+              saveTaskAuto: (int position, String newValue) =>
+                  _saveTaskChanges(position: position, newTitle: newValue,),
+              saveCheckAuto: (int position, bool newValue)  =>
+                  _saveTaskChanges(position: position, newChecked: newValue,),
               // todo ラベル化処理（2026/06/11）＞＞
-              onLabeled: (int position, bool value) async {
-                // ラベル化タスク VM をイベントハンドラとして参照
-                final readLabeledTasksVM = ref.read(
-                    labeledTasksViewModelProvider.notifier);
-                // ラベル化の登録を依頼
-                await readLabeledTasksVM.labeling(vTask: weeklyTaskList[position]);
-              },
-              onJustEdited: ,
+              saveAdditionToLabelAuto: ,
+              saveNewLabelAuto: (int position) {  },
+              saveUnlabelAuto: (int position) {  },
             ),
 
             // 余白

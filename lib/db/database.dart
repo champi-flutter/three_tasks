@@ -263,7 +263,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   /// 要求された日付（[targetDate]）に該当するデータを返す。
   @override
   Future<Result<List<DWeeklyTask>, Exception>> getWeeklyTasksByDate({
-    required List<Date> firstDateList,
+    required Date targetDate,
+    required List<int> diffsOnCache,
   })
   // 折りたたみ用
   async {
@@ -271,19 +272,31 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       final List<DWeeklyTask> resultValue = [];
       // transaction で、要求された日付のデータを一気に取得
       await transaction(() async {
-        for (Date firstDate in firstDateList) {
-          // カラムの型の変換に対応
-          final int dateIdentifier = firstDate.toIntIdentifier();
-          // DB から該当日付のタスクを取得
+        // targetDate をカラムの型の変換に対応
+        final int targetDateInt = targetDate.toIntIdentifier();
+        // targetDate から 6 〜 0 日前が週の初めとなっているタスクを取得
+        for (int diff = 6; diff >= 0; diff--) {
+          // すでにキャッシュされている分
+          if(diffsOnCache.contains(diff)){
+            continue;
+          }
+          // 週の初めの日の int
+          final int firstDateInt = targetDateInt - diff;
+          // DB から該当日付のタスクを取得する
           final List<WeeklyTask> rawDataList = await managers.weeklyTasks
-              .filter((weeklyTask) => weeklyTask.firstDate(dateIdentifier))
+              .filter((weeklyTask) => weeklyTask.firstDate(firstDateInt))
               .get();
 
-          // そのリストを、戻り値に組み込む（リストが空の場合も）
-          resultValue.addAll([..._dWeeklyTaskList(rawDataList)]);
+          // そのリストを DTO に変換して、戻り値に組み込む（リストが空の場合も）
+          resultValue.addAll(_dWeeklyTaskList(rawDataList));
         }
       });
-      return Success(resultValue);
+      // 3つ以下の時のみ Success を返す
+      if(resultValue.length <= 3) {
+        return Success(resultValue);
+      } else {
+        throw Exception("週のタスクが 4 つ以上存在します。\nlength = ${resultValue.length} （${targetDate.toStrFormat()}）");
+      }
     } catch (e) {
       return Failure(Exception(e), methodName: "getWeeklyTasksByDate");
     }
@@ -362,6 +375,37 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     }
   }
 
+  /// 日単位タスクの新しい日付の枠を作成するメソッド
+  ///
+  /// 複数の日付を指定可能。
+  @override
+  Future<Result<List<DWeeklyTask>, Exception>> createWeeklyTaskRecord({
+    required List<Date> firstDateList,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      // 返す List の枠
+      final List<DWeeklyTask> dataList = [];
+      // 指定した各日付のタスクのリストを取得
+      await transaction(() async {
+        for (Date firstDate in firstDateList) {
+          final WeeklyTask rawData =
+          await managers.weeklyTasks.createReturning((record) => record(
+            task: "",
+            // カラムの型の変換に対応
+            firstDate: firstDate.toIntIdentifier(),
+          ));
+          // 作ったタスクを返す List に組み込む
+          dataList.add(_dWeeklyTask(rawData));
+        }
+      });
+      return Success(dataList);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "createWeeklyTaskRecord");
+    }
+  }
+
   /// タスクタイトル保存メソッド
   @override
   Future<Result<void, Exception>> saveTaskTitles({
@@ -397,8 +441,6 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      // // 返す Map の枠
-      // final Map<Date, List<DDailyTask>> dataMap = {};
       await transaction(() async {
         /// task ごとに情報を保存
         for (DTask task in newTaskList) {
@@ -408,6 +450,35 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       return Success(null);
     } catch (e) {
       return Failure(Exception(e), methodName: "saveTaskChanges");
+    }
+  }
+
+  /// 週単位タスクの firstDate を書き換えるメソッド
+  @override
+  Future<Result<void, Exception>> updateWeeklyTasksFirstDate({
+    required Map<int, Date> idFirstDateMap,
+  })
+  // 折りたたみ用
+  async{
+    try {
+      await transaction(() async {
+        // 指定 ID ごとに情報を更新する
+        for (final entry in idFirstDateMap.entries) {
+          final int targetId = entry.key;
+          final int firstDateInt = entry.value.toIntIdentifier();
+          // DBに変更を保存する
+          await managers.weeklyTasks
+              .filter((weeklyTask) => weeklyTask.id(targetId))
+              .update(
+                (task) => task(
+              firstDate: Value(firstDateInt),
+            ),
+          );
+        }
+      });
+      return Success(null);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "updateWeeklyTasksFirstDate");
     }
   }
 

@@ -12,7 +12,7 @@ import 'package:three_tasks/entities/data_type/d_task.dart';
 ///
 /// 親クラスの静的解析ツールの機能を引き継ぐためにインターフェースとして設置する。
 abstract class DailyTasksCacheHandler
-    extends LfuCacheHandler<Date, List<DDailyTask>> {
+    extends LfuListCacheHandler<Date, int, DDailyTask> {
   /// `super.capacity` を親に渡すための内部的なコンストラクタ
   /// （抽象クラスなので呼び出し不可）
   DailyTasksCacheHandler({required super.capacity});

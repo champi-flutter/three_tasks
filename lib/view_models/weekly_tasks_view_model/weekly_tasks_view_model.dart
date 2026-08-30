@@ -47,10 +47,10 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel {
       ref.read(weeklyTasksServiceProvider);
 
   /// 通知送信先（[EventNotifier]）のインスタンス
-  NotificationUseCase get _notificator => ref.read(notificationUseCaseProvider);
+  NotificationService get _notificator => ref.read(notificationServiceProvider);
 
   /// ローディング管理クラス
-  LoadingUseCase get _loader => ref.read(loadingUseCaseProvider);
+  LoadingService get _loader => ref.read(loadingServiceProvider);
 
   // todo 通知関連
   /// エラー通知メソッド
@@ -81,14 +81,13 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel {
     );
   }
 
-  // todo キャッシュ関連
-  /// キャッシュの変更の通知の購読
-  StreamSubscription<List<VWeeklyTask>>? _weeklyTaskSubscription;
-
-  /// 購読を開始
-  void _initSubscription() {
-    _weeklyTaskSubscription = _readWeeklyTasksService.weeklyTaskStream
-        .listen(_handleWeeklyTasksUpdating);
+  /// [state] （`List<VWeeklyTask>`）更新メソッド
+  void update(List<VWeeklyTask> newState) {
+    // 中身が同じなら早期リターン
+    if (newState.isUnorderedEqualTo(state)) {
+      return;
+    }
+    state = newState;
   }
 
   /// 新しいキャッシュを受信した際のハンドラ

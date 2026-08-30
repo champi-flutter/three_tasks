@@ -6,7 +6,7 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
-import 'package:three_tasks/use_case/output_boundary/daily_tasks_publisher.dart';
+import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/services/day_tasks_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

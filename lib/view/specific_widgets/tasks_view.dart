@@ -8,6 +8,8 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
+import 'package:three_tasks/view/specific_widgets/overlays/confirming_existing_label_dialog.dart';
+import 'package:three_tasks/view/specific_widgets/overlays/labeled_task_list_dialog.dart';
 import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_label_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
@@ -39,9 +41,9 @@ class TasksView extends ConsumerWidget {
         assert(
           (saveTaskAuto == null &&
                   saveCheckAuto == null &&
-              saveNewLabelAuto == null &&
-              saveAdditionToLabelAuto == null &&
-              saveUnlabelAuto == null) ||
+                  saveNewLabelAuto == null &&
+                  saveAdditionToLabelAuto == null &&
+                  saveUnlabelAuto == null) ||
               (saveTaskAuto != null &&
                   saveCheckAuto != null &&
                   saveNewLabelAuto != null &&
@@ -64,14 +66,14 @@ class TasksView extends ConsumerWidget {
         // "自動保存における編集フラグのコールバックが設定されていません。",
         // ),
         assert(
-        (saveTaskAuto == null &&
-            saveNewLabelAuto == null &&
-            saveAdditionToLabelAuto == null &&
-            saveUnlabelAuto == null) ||
-            (saveTaskAuto != null &&
-                saveNewLabelAuto != null &&
-                saveAdditionToLabelAuto != null &&
-                saveUnlabelAuto != null),
+          (saveTaskAuto == null &&
+                  saveNewLabelAuto == null &&
+                  saveAdditionToLabelAuto == null &&
+                  saveUnlabelAuto == null) ||
+              (saveTaskAuto != null &&
+                  saveNewLabelAuto != null &&
+                  saveAdditionToLabelAuto != null &&
+                  saveUnlabelAuto != null),
           "コールバックが正しく設定されていません（TasksView.icon）",
         ),
         _isAutoSave = saveTaskAuto != null;
@@ -197,9 +199,9 @@ class TasksView extends ConsumerWidget {
                 notifyLabel: (int? value) {
                   ref
                       .read(taskLabelEditingControllerProvider(
-                    taskList[0].labelId,
-                    taskList[1].labelId,
-                    taskList[2].labelId,
+                        taskList[0].labelId,
+                        taskList[1].labelId,
+                        taskList[2].labelId,
                       ).notifier)
                       .label(position, value);
                 },
@@ -222,12 +224,13 @@ class TasksView extends ConsumerWidget {
                         ? (String value) => saveTaskAuto!(position, value)
                         : null,
                     saveNewLabelAuto:
-                    _isAutoSave ? () => saveNewLabelAuto!(position) : null,
+                        _isAutoSave ? () => saveNewLabelAuto!(position) : null,
                     saveAdditionToLabelAuto: _isAutoSave
-                        ? (int value) => saveAdditionToLabelAuto!(position, value)
+                        ? (int value) =>
+                            saveAdditionToLabelAuto!(position, value)
                         : null,
                     saveUnlabelAuto:
-                    _isAutoSave ? () => saveUnlabelAuto!(position) : null,
+                        _isAutoSave ? () => saveUnlabelAuto!(position) : null,
                     notifyLabel: (int? value) {
                       ref
                           .read(taskLabelEditingControllerProvider(
@@ -436,9 +439,8 @@ class _CheckableTaskField extends HookConsumerWidget {
                 Icons.bookmark_add_outlined,
               ),
         onPressed: () async {
-          final bool newMark = !isLabeled;
-          // マークがついた場合
-          if (newMark) {
+          // マークがついていない状態で押した場合
+          if (!isLabeled) {
             // ラベルVM の state を read で参照
             final List<VLabeledTask> labelList =
                 ref.read(labeledTasksViewModelProvider);
@@ -451,7 +453,7 @@ class _CheckableTaskField extends HookConsumerWidget {
                 context: context,
                 barrierDismissible: false,
                 builder: (context) {
-                  return _ConfirmingExistingLabelDialog(labelTitle: taskTitle);
+                  return ConfirmingExistingLabelDialog(labelTitle: taskTitle);
                 },
               );
               // 「いいえ」を選択した場合は、早期リターン
@@ -492,18 +494,53 @@ class _CheckableTaskField extends HookConsumerWidget {
           }
           // マークが解除された場合
           else {
-            // ラベルの値を null に変換
-            notifyLabel(null);
-
-            // 自動保存オンの場合
-            if (saveUnlabelAuto != null) {
-              // 自動保存
-              await saveUnlabelAuto!();
+            // popup メニューを表示して、解除か変更かを選択させる
+            final bool? willUnlabel = await showMenuFromWidgetRect<bool>(
+              context,
+              menuItems: <PopupMenuEntry<bool>>[
+                PopupMenuItem(
+                  child: UtilizedText(
+                    "ラベルを変更する",
+                    fontSize: 18,
+                  ),
+                  value: true,
+                ),
+                PopupMenuItem(
+                  child: UtilizedText(
+                    "ラベルを変更する",
+                    fontSize: 18,
+                  ),
+                  value: false,
+                ),
+              ],
+            );
+            // どちらも押されずに戻った場合
+            if (willUnlabel == null) {
+              return;
             }
-            // 自動保存オフの場合
+            // 「ラベルを変更する」を選択した場合
+            else if (willUnlabel) {
+              // ラベルの値を null に変換
+              notifyLabel(null);
+
+              // 自動保存オンの場合
+              if (saveUnlabelAuto != null) {
+                // 自動保存
+                await saveUnlabelAuto!();
+              }
+              // 自動保存オフの場合
+              else {
+                // 編集未保存フラグを立てる
+                ref.read(editSavingControllerProvider.notifier).onEdited();
+              }
+            }
+            // 「ラベルを変更する」を選択した場合
             else {
-              // 編集未保存フラグを立てる
-              ref.read(editSavingControllerProvider.notifier).onEdited();
+              // 「ラベル化されたタスク一覧」ダイアログを表示
+              showLabeledTaskListDialogToSingleTask(
+                context,
+                taskTitle: taskTitle,
+              );
             }
           }
         },
@@ -585,7 +622,7 @@ class _IconTaskField extends ConsumerWidget {
                 context: context,
                 barrierDismissible: false,
                 builder: (context) {
-                  return _ConfirmingExistingLabelDialog(labelTitle: taskTitle);
+                  return ConfirmingExistingLabelDialog(labelTitle: taskTitle);
                 },
               );
               // 「いいえ」を選択した場合は、早期リターン
@@ -642,44 +679,6 @@ class _IconTaskField extends ConsumerWidget {
           }
         },
       ),
-    );
-  }
-}
-
-/// ラベル化時に同じ名前のラベルがすでにあった場合に、そこに登録するかを確認するダイアログ
-///  - 「はい」: `pop` して `true` を返す
-///  - 「いいえ」: `pop` して `false` を返す
-class _ConfirmingExistingLabelDialog extends StatelessWidget {
-  const _ConfirmingExistingLabelDialog({super.key, required this.labelTitle});
-
-  final String labelTitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedSimpleDialog.confirm(
-      title: UtilizedText(
-        "確認",
-        fontSize: 21,
-      ),
-      contentsList: [
-        UtilizedText(
-          "「$labelTitle」 はすでに存在します。",
-          fontSize: 18,
-        ),
-        UtilizedText(
-          "「$labelTitle」 に登録しますか？",
-          fontSize: 18,
-        ),
-        // todo 「以降表示しない」のチェックボックス（2026/07/01）＞＞
-      ],
-      onDecided: () {
-        // pop 時に true を返す
-        Navigator.of(context).pop(true);
-      },
-      onReturn: () {
-        // pop 時に false を返す
-        Navigator.of(context).pop(false);
-      },
     );
   }
 }

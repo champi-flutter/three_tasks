@@ -25,6 +25,17 @@ abstract class DataRepository {
     required List<Date> dateList,
   });
 
+  /// 週単位タスクフェッチメソッド
+  ///
+  /// DB からデータを取得して、ストリームに流す。
+  ///
+  /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
+  /// にこのメソッドを呼び出す。
+  Future<Result<List<DWeeklyTask>, Exception>> fetchWeeklyTasks({
+    required Date targetDate,
+    required List<UniqueWeek> cachedWeeks,
+  });
+
   /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド
   ///
   /// 複数の日付を指定可能。
@@ -36,11 +47,21 @@ abstract class DataRepository {
     required List<Date> dateList,
   });
 
+  /// 週単位タスクの新しい枠を作成するメソッド
+  Future<Result<List<DWeeklyTask>, Exception>> createWeeklyTaskRecord({
+    required List<Date> firstDateList,
+  });
+
   // todo 書き換え
 
   /// タスク情報変更保存メソッド
   Future<Result<void, Exception>> saveTaskChanges({
     required List<DTask> newTaskList,
+  });
+
+  /// 週単位タスクの firstDate を書き換えるメソッド
+  Future<Result<void, Exception>> updateWeeklyTasksFirstDate({
+    required Map<int, Date> idFirstDateMap,
   });
 
   /// タスクタイトル保存メソッド

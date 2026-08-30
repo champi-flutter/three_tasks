@@ -4,8 +4,8 @@ import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_h
 
 class DailyTasksStreamHandlerImpl extends DailyTasksStreamHandler{
 
-  DailyTasksStreamHandlerImpl({required LoadingUseCase loadingUseCase}): loader = loadingUseCase;
+  DailyTasksStreamHandlerImpl({required LoadingService loadingService}): loader = loadingService;
 
   @override
-  final LoadingUseCase loader;
+  final LoadingService loader;
 }

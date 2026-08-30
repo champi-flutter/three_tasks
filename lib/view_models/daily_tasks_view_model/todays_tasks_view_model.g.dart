@@ -42,7 +42,7 @@ final class TodaysTasksViewModelProvider
 }
 
 String _$todaysTasksViewModelHash() =>
-    r'a17fa51e5f34e577d299f7fa43cbfdacdb7ccd89';
+    r'2c61b890f0aace62cdcd9996ea86ce8d6c336df9';
 
 abstract class _$TodaysTasksViewModel extends $Notifier<List<VDailyTask>> {
   List<VDailyTask> build();

@@ -18,20 +18,31 @@ abstract class VLabeledTask with _$VLabeledTask {
     required List<int> monthlyIdList,
     required List<int> yearlyIdList,
   }) = _VLabeledTask;
+
+  /// ラベル化タスクの仮データを生成するファクトリ
+  factory VLabeledTask.placeholder() => VLabeledTask(
+        label: "",
+        labelId: 0,
+        dailyIdList: [],
+        weeklyIdList: [],
+        monthlyIdList: [],
+        yearlyIdList: [],
+      );
 }
 
 /// ラベルのリストを走査する拡張メソッド
 extension LabelListScanning on List<VLabeledTask> {
   /// 指定タイトル（[title]）と合致するラベルのID
-  /// 
+  ///
   /// ない場合は、 `null` を返す。
   int? idWithSameTitleAs(String title) {
-    for(VLabeledTask labeledTask in this){
+    for (VLabeledTask labeledTask in this) {
       // 合致するラベルのIDを返す
-      if(labeledTask.label == title){
+      if (labeledTask.label == title) {
         return labeledTask.labelId;
       }
-    };
+    }
+    ;
     return null;
   }
 }

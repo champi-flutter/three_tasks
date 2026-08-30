@@ -11,8 +11,7 @@ part 'labeled_tasks_view_model.g.dart';
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 @riverpod
-class LabeledTasksViewModel extends _$LabeledTasksViewModel
-    with LoadingHandler {
+class LabeledTasksViewModel extends _$LabeledTasksViewModel {
   // todo 依存先
   /// [LabeledTasksService] のインスタンスを参照する内部的な getter
   ///
@@ -20,15 +19,14 @@ class LabeledTasksViewModel extends _$LabeledTasksViewModel
   LabeledTasksService get _readLabeledTasksService =>
       ref.read(labeledTasksServiceProvider);
 
-  /// ローディング管理クラス
-  @override
-  LoadingViewModel get loadingVM => ref.read(loadingViewModelProvider.notifier);
+  /// ローディング機能へのアクセス
+  LoadingService get _loader => ref.read(loadingServiceProvider);
 
   // todo 初期化
   @override
   List<VLabeledTask> build() {
     _initViewModel();
-    return [];
+    return [VLabeledTask.placeholder()];
   }
 
   /// このクラスの初期化
@@ -70,9 +68,8 @@ class LabeledTasksViewModel extends _$LabeledTasksViewModel
   /// 新規ラベルの ID を返す。
   ///
   /// 例外が発生した場合は、`null` を返す。
-  Future<int?> labeling({required VTask vTask}) => loadAsync<int?>(() async {
-        return await _readLabeledTasksService.labeling(vTask: vTask);
-      });
+  Future<int?> labeling({required VTask vTask}) => _loader
+      .loadAsync<int?>(() => _readLabeledTasksService.labeling(vTask: vTask));
 
   /// タスクを既存のラベルに登録
   ///

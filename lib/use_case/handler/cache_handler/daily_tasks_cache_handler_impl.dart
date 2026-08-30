@@ -15,6 +15,11 @@ class DailyTasksCacheHandlerImpl extends DailyTasksCacheHandler{
   /// ストリームハンドラのインスタンス
   final DailyTasksStreamHandler _streamHandler;
 
+  final Map<Date, BiMap<int, int>> indexMap = {};
+
+
+  Future<void> updateElement(Map<int, DDailyTask> dataMap)async{}
+
   /// データ更新時のストリームへの反映
   @override
   Future<void> output(Map<Date, List<DDailyTask>> dataMap) async {

@@ -19,6 +19,9 @@ sealed class VTask {
   /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
+  /// データ受信済みかどうか
+  bool get isFetched;
+
   /// このタスクがラベル化されているかどうか
   bool isLabeled({required List<VLabeledTask> labeledTaskList});
 }
@@ -46,6 +49,10 @@ abstract class VDailyTask with _$VDailyTask implements VTask {
         isChecked: false,
         labelId: -1,
       );
+
+  /// データ受信済みかどうか
+  @override
+  bool get isFetched => id != -1;
 
   /// このタスクがラベル化されているかどうか
   @override
@@ -89,11 +96,34 @@ abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
     return false;
   }
 
+  /// データ受信済みかどうか
+  @override
+  bool get isFetched => id != -1;
+
   /// 週単位タスクの仮データを生成するファクトリ
   factory VWeeklyTask.placeholder() => VWeeklyTask(
         task: "",
         week: UniqueWeek.fromDate(currentDate: today, firstDate: today),
         id: -1,
+        isChecked: false,
+        labelId: -1,
+      );
+
+  /// **編集可能な** 週単位タスクの仮データかどうか
+  bool get canReplace => id == -2;
+
+  /// **編集可能な** 週単位タスクの仮データを生成するファクトリ
+  ///
+  /// 最初のフェッチを済ませた後の仮データで、[id] は `-2` 。
+  ///
+  /// （「週単位タスク」のみ最初のフェッチで何も返されない場合がある。）
+  factory VWeeklyTask.placeholder2(Date currentDate) => VWeeklyTask(
+        task: "",
+        week: UniqueWeek.fromDate(
+          currentDate: currentDate,
+          firstDate: currentDate,
+        ),
+        id: -2,
         isChecked: false,
         labelId: -1,
       );
@@ -126,6 +156,10 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
     // 最後までなかったら、false を返す
     return false;
   }
+
+  /// データ受信済みかどうか
+  @override
+  bool get isFetched => id != -1;
 
   /// 週単位タスクの仮データを生成するファクトリ
   factory VMonthlyTask.placeholder() => VMonthlyTask(
@@ -165,6 +199,10 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
     return false;
   }
 
+  /// データ受信済みかどうか
+  @override
+  bool get isFetched => id != -1;
+
   /// 週単位タスクの仮データを生成するファクトリ
   factory VYearlyTask.placeholder() => VYearlyTask(
         task: "",
@@ -173,6 +211,17 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
         isChecked: false,
         labelId: -1,
       );
+}
+
+extension VTaskListExtension on List<VTask> {
+  /// 順不同でリストの中身が等しいか判定する
+  bool isUnorderedEqualTo(List<VTask> other) {
+    const equality = UnorderedIterableEquality<VTask>();
+    return equality.equals(this, other);
+  }
+
+  /// todo データ未受信状態かどうか（2026/08/17）＞＞
+  bool get isDisabled => any((task)=> !task.isFetched);
 }
 
 // @freezed
@@ -273,11 +322,3 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
 //     return equality.equals(this, other);
 //   }
 // }
-
-extension VTaskListEquality on List<VTask> {
-  /// 順不同でリストの中身が等しいか判定する
-  bool isUnorderedEqualTo(List<VTask> other) {
-    const equality = UnorderedIterableEquality<VTask>();
-    return equality.equals(this, other);
-  }
-}

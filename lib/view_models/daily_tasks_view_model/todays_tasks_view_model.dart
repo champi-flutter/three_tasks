@@ -6,7 +6,7 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
-import 'package:three_tasks/use_case/output_boundary/daily_tasks_publisher.dart';
+import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/services/day_tasks_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -31,8 +31,8 @@ class TodaysTasksViewModel extends _$TodaysTasksViewModel {
       ref.read(watchDailyTasksUseCaseProvider);
 
   /// 通知送信先（[EventNotifier]）のインスタンス
-  NotificationUseCase get _notificationUseCase =>
-      ref.read(notificationUseCaseProvider);
+  NotificationService get _notificator =>
+      ref.read(notificationServiceProvider);
 
   /// 監視フローを開始する
   void _startWatching()=> _watchDailyTasksUseCase.initAt([today]);
@@ -54,7 +54,7 @@ class TodaysTasksViewModel extends _$TodaysTasksViewModel {
   })
   // 折りたたみ用
   {
-    _notificationUseCase.notifyInfo(
+    _notificator.notifyInfo(
       layer: specifiesLayer ? NotificationFrom.viewModel : null,
       type: NotificationType.error,
       notification: content,
@@ -68,7 +68,7 @@ class TodaysTasksViewModel extends _$TodaysTasksViewModel {
   })
   // 折りたたみ用
   {
-    _notificationUseCase.notifyInfo(
+    _notificator.notifyInfo(
       layer: specifiesLayer ? NotificationFrom.viewModel : null,
       type: NotificationType.success,
       notification: content,

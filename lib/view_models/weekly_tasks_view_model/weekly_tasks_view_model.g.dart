@@ -42,7 +42,7 @@ final class WeeklyTasksViewModelProvider
 }
 
 String _$weeklyTasksViewModelHash() =>
-    r'e6ae99f88fbcc1de7923145972b82997a6ca41a2';
+    r'b6edb516f7c8b2a160fa8faa09ed8975930d13c6';
 
 abstract class _$WeeklyTasksViewModel extends $Notifier<List<VWeeklyTask>> {
   List<VWeeklyTask> build();

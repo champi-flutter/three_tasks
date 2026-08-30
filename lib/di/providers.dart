@@ -10,17 +10,18 @@ import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_han
 import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler_impl.dart';
 import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_handler_impl.dart';
-import 'package:three_tasks/use_case/input_boundary/save_task_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
-import 'package:three_tasks/use_case/interactor/save_task_changes_interactor.dart';
+import 'package:three_tasks/use_case/interactor/save_task_changes/save_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_daily_tasks_interactor.dart';
-import 'package:three_tasks/use_case/output_boundary/daily_tasks_publisher.dart';
+import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 import 'package:three_tasks/use_case/services/labeled_tasks_service.dart';
 import 'package:three_tasks/use_case/services/day_tasks_service.dart';
 import 'package:three_tasks/use_case/services/weekly_tasks_service.dart';
 import 'package:three_tasks/use_case/toast_count.dart';
-import 'package:three_tasks/view_models/daily_tasks_view_model/daily_tasks_presenter.dart';
+import 'package:three_tasks/view_models/controller/weekly_tasks_controller.dart';
+import 'package:three_tasks/view_models/daily_tasks_view_model/daily_tasks_presenter_impl.dart';
 import 'package:three_tasks/view_models/daily_tasks_view_model/todays_tasks_view_model.dart';
 import 'package:three_tasks/view_models/daily_tasks_view_model/tomorrows_tasks_view_model.dart';
 
@@ -32,7 +33,10 @@ DataSource dataSource(Ref ref) => MyDatabase();
 
 // todo Gateway
 @riverpod
-DataRepository dataRepository(Ref ref) => DataRepositoryImpl(ref);
+DataRepository dataRepository(Ref ref) => DataRepositoryImpl(
+      dataSource: ref.watch(dataSourceProvider),
+      notificationService: ref.watch(notificationServiceProvider),
+    );
 
 // todo UseCase
 @riverpod
@@ -56,17 +60,20 @@ SaveTaskChangesUseCase saveTaskChangesUseCase(Ref ref) =>
     SaveTaskChangesInteractor(
       dataRepository: ref.watch(dataRepositoryProvider),
       dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider),
-      notificationUseCase: ref.watch(notificationUseCaseProvider),
+      notificationService: ref.watch(notificationServiceProvider),
+      loadingService: ref.watch(loadingServiceProvider),
     );
 
 /// 日単位タスクの監視フロー
 @riverpod
 WatchDailyTasksUseCase watchDailyTasksUseCase(Ref ref) {
   final instance = WatchDailyTasksInteractor(
-    dailyTasksPublisher: ref.watch(dailyTasksPublisherProvider),
+    dailyTasksPresenter: ref.watch(dailyTasksPresenterProvider),
     dailyTasksStreamHandler: ref.watch(dailyTasksStreamHandlerProvider),
-    notificationUseCase: ref.watch(notificationUseCaseProvider),
+    notificationService: ref.watch(notificationServiceProvider),
     dataRepository: ref.watch(dataRepositoryProvider),
+    dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider),
+    loadingService: ref.watch(loadingServiceProvider),
   );
   ref.onDispose(instance.dispose);
   return instance;
@@ -74,11 +81,16 @@ WatchDailyTasksUseCase watchDailyTasksUseCase(Ref ref) {
 
 /// 日単位タスク監視反映ポート
 @riverpod
-DailyTasksPublisher dailyTasksPublisher(Ref ref) =>
-    DailyTasksPresenter(
+DailyTasksPresenter dailyTasksPresenter(Ref ref) => DailyTasksPresenterImpl(
       todaysTasksViewModel: ref.watch(todaysTasksViewModelProvider.notifier),
       tomorrowsTasksViewModel:
-      ref.watch(tomorrowsTasksViewModelProvider.notifier),
+          ref.watch(tomorrowsTasksViewModelProvider.notifier),
+    );
+
+/// 週単位タスク操作クラス
+@riverpod
+WeeklyTasksController weeklyTasksController(Ref ref) => WeeklyTasksController(
+      saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),
     );
 
 // キャッシュハンドラ
@@ -86,7 +98,7 @@ DailyTasksPublisher dailyTasksPublisher(Ref ref) =>
 @riverpod
 DailyTasksCacheHandler dailyTasksCacheHandler(Ref ref) =>
     DailyTasksCacheHandlerImpl(
-      capacity: ,
+      capacity: 20,
       dailyTasksStreamHandler: ref.watch(dailyTasksStreamHandlerProvider),
     );
 
@@ -94,8 +106,13 @@ DailyTasksCacheHandler dailyTasksCacheHandler(Ref ref) =>
 
 /// 日単位タスクのキャッシュストリームハンドラ
 @riverpod
-DailyTasksStreamHandler dailyTasksStreamHandler(Ref ref) =>
-    DailyTasksStreamHandlerImpl();
+DailyTasksStreamHandler dailyTasksStreamHandler(Ref ref) {
+  final instance = DailyTasksStreamHandlerImpl(
+      loadingService: ref.watch(loadingServiceProvider));
+
+  ref.onDispose(instance.dispose);
+  return instance;
+}
 
 // todo ViewModel（状態なし）
 // /// 通知管理クラス

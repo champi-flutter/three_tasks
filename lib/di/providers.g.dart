@@ -89,7 +89,7 @@ final class DataRepositoryProvider
   }
 }
 
-String _$dataRepositoryHash() => r'03fdb1eae8ce20a08b1e58b15cc2e4ff9b94df66';
+String _$dataRepositoryHash() => r'049b5bf1b53f4b36d0c46c8646ca42dbd3c63f71';
 
 @ProviderFor(toastCount)
 const toastCountProvider = ToastCountProvider._();
@@ -322,7 +322,7 @@ final class SaveTaskChangesUseCaseProvider extends $FunctionalProvider<
 }
 
 String _$saveTaskChangesUseCaseHash() =>
-    r'4926af8e57c23c55037acf6c3f0833c3e3efdc1e';
+    r'19ae1328266d8a12465f94fcf0ba0386a548b70b';
 
 /// 日単位タスクの監視フロー
 
@@ -371,56 +371,105 @@ final class WatchDailyTasksUseCaseProvider extends $FunctionalProvider<
 }
 
 String _$watchDailyTasksUseCaseHash() =>
-    r'076dac0252d942d660e9ce2ad9ec2bc68477dfc1';
+    r'49e92339d0e71249ccb3fb6fc5284e5d4a659221';
 
 /// 日単位タスク監視反映ポート
 
-@ProviderFor(dailyTasksPublisher)
-const dailyTasksPublisherProvider = DailyTasksPublisherProvider._();
+@ProviderFor(dailyTasksPresenter)
+const dailyTasksPresenterProvider = DailyTasksPresenterProvider._();
 
 /// 日単位タスク監視反映ポート
 
-final class DailyTasksPublisherProvider extends $FunctionalProvider<
-    DailyTasksPublisher,
-    DailyTasksPublisher,
-    DailyTasksPublisher> with $Provider<DailyTasksPublisher> {
+final class DailyTasksPresenterProvider extends $FunctionalProvider<
+    DailyTasksPresenter,
+    DailyTasksPresenter,
+    DailyTasksPresenter> with $Provider<DailyTasksPresenter> {
   /// 日単位タスク監視反映ポート
-  const DailyTasksPublisherProvider._()
+  const DailyTasksPresenterProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'dailyTasksPublisherProvider',
+          name: r'dailyTasksPresenterProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$dailyTasksPublisherHash();
+  String debugGetCreateSourceHash() => _$dailyTasksPresenterHash();
 
   @$internal
   @override
-  $ProviderElement<DailyTasksPublisher> $createElement(
+  $ProviderElement<DailyTasksPresenter> $createElement(
           $ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  DailyTasksPublisher create(Ref ref) {
-    return dailyTasksPublisher(ref);
+  DailyTasksPresenter create(Ref ref) {
+    return dailyTasksPresenter(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(DailyTasksPublisher value) {
+  Override overrideWithValue(DailyTasksPresenter value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<DailyTasksPublisher>(value),
+      providerOverride: $SyncValueProvider<DailyTasksPresenter>(value),
     );
   }
 }
 
-String _$dailyTasksPublisherHash() =>
-    r'7146cebf6616ffabfb2320d63622f7983c929c85';
+String _$dailyTasksPresenterHash() =>
+    r'974fea457a223b42a968a9bf9df0f6640876b052';
+
+/// 週単位タスク操作クラス
+
+@ProviderFor(weeklyTasksController)
+const weeklyTasksControllerProvider = WeeklyTasksControllerProvider._();
+
+/// 週単位タスク操作クラス
+
+final class WeeklyTasksControllerProvider extends $FunctionalProvider<
+    WeeklyTasksController,
+    WeeklyTasksController,
+    WeeklyTasksController> with $Provider<WeeklyTasksController> {
+  /// 週単位タスク操作クラス
+  const WeeklyTasksControllerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'weeklyTasksControllerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$weeklyTasksControllerHash();
+
+  @$internal
+  @override
+  $ProviderElement<WeeklyTasksController> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WeeklyTasksController create(Ref ref) {
+    return weeklyTasksController(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WeeklyTasksController value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WeeklyTasksController>(value),
+    );
+  }
+}
+
+String _$weeklyTasksControllerHash() =>
+    r'23e62cdfeaa6045d7f0a4b1a0ee8311f2605acee';
 
 /// 日単位タスクのキャッシュストリームハンドラ
 
@@ -469,7 +518,7 @@ final class DailyTasksCacheHandlerProvider extends $FunctionalProvider<
 }
 
 String _$dailyTasksCacheHandlerHash() =>
-    r'8a2cb3b6282c305dfc9f706acfdaeeaaf453d018';
+    r'6d62c86048cfbdf3e742e30f7d40cae4bf1312eb';
 
 /// 日単位タスクのキャッシュストリームハンドラ
 
@@ -518,4 +567,4 @@ final class DailyTasksStreamHandlerProvider extends $FunctionalProvider<
 }
 
 String _$dailyTasksStreamHandlerHash() =>
-    r'9069f5ff8d96d949d073f2945bebe22456581652';
+    r'c197a9d92bdcb8dce45ec3a7a6a3f64ffbef15e8';

@@ -9,16 +9,23 @@ import 'package:three_tasks/view/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
+import 'package:three_tasks/view_models/daily_tasks_view_model/todays_tasks_view_model.dart';
 import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 
 import '../../view_models/todays_view_model.dart';
 
-class HomeScreen extends ConsumerWidget {
+class TodaysScreen extends ConsumerWidget {
   // todo build
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // VMを監視
-    final List<VDayTask> dayTaskList = ref.watch(todaysViewModelProvider);
+    final List<VDailyTask> dailyTaskList =
+        ref.watch(todaysTasksViewModelProvider);
+
+    // データが受信済みかどうか
+    final bool canEdit = ref.watch(
+      todaysTasksViewModelProvider.select((state) => state.isDisabled),
+    );
 
     return SingleChildScrollView(
       child: Center(
@@ -32,7 +39,7 @@ class HomeScreen extends ConsumerWidget {
 
                   // 「今日のタスク」欄
                   TasksView.checkbox(
-                    taskList: dayTaskList,
+                    taskList: dailyTaskList,
                     // 自動保存処理
                     saveTaskAuto: (int position, String newValue) async {
                       // VM をイベントハンドラとして参照
@@ -40,17 +47,17 @@ class HomeScreen extends ConsumerWidget {
                           ref.read(todaysViewModelProvider.notifier);
                       // 入力値の保存を依頼
                       await readTodaysVM.saveTask(
-                        targetTask: dayTaskList[position],
+                        targetTask: dailyTaskList[position],
                         newTitle: newValue,
                       );
                     },
                     saveCheckAuto: (int position, bool newValue) async {
                       // VM をイベントハンドラとして参照
-                      final readTodaysVM =
-                          ref.read(todaysViewModelProvider.notifier);
+                      final controller =
+                          ref.read();
                       // チェックの保存を依頼
                       await readTodaysVM.saveCheck(
-                        targetTask: dayTaskList[position],
+                        targetTask: dailyTaskList[position],
                         newValue: newValue,
                       );
                     },
@@ -62,7 +69,7 @@ class HomeScreen extends ConsumerWidget {
                       // ラベル化の登録を依頼
                       // 例外が発生した場合は、 0 を返す
                       return await readLabeledTasksVM.labeling(
-                              vTask: dayTaskList[position]) ??
+                              vTask: dailyTaskList[position]) ??
                           0;
                     },
                     // ラベル化処理（自動保存）
@@ -73,7 +80,7 @@ class HomeScreen extends ConsumerWidget {
                           ref.read(labeledTasksViewModelProvider.notifier);
                       // 既存のラベルに追加する処理を外注
                       await readLabeledTasksVM.addToLabel(
-                        vTask: dayTaskList[position],
+                        vTask: dailyTaskList[position],
                         labelId: newLabelId,
                       );
                     },
@@ -84,7 +91,7 @@ class HomeScreen extends ConsumerWidget {
                           ref.read(labeledTasksViewModelProvider.notifier);
                       // 既存のラベルに追加する処理を外注
                       await readLabeledTasksVM.unlabeling(
-                        vTask: dayTaskList[position],
+                        vTask: dailyTaskList[position],
                       );
                     },
                   ),
@@ -168,18 +175,18 @@ class _TaskField extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // 当日のタスク（TodaysViewModel.state）を監視
-    // VDayTask.task と VDayTask.isChecked は non-nullable
-    final VDayTask dayTask = ref.watch(
+    // VDailyTask.task と VDailyTask.isChecked は non-nullable
+    final VDailyTask dailyTask = ref.watch(
       todaysViewModelProvider.select((state) => state[position]),
     );
 
     // タスクのコントローラ
     // この text の変更はリビルドのフラグにしない（フラグはフォーカスが外れたこと）
     final TextEditingController taskController =
-        useNonReactiveTextController(text: dayTask.task);
+        useNonReactiveTextController(text: dailyTask.task);
 
     // チェックボックス
-    final isChecked = useState<bool>(dayTask.isChecked);
+    final isChecked = useState<bool>(dailyTask.isChecked);
 
     // この TextField のフォーカス
     final focusNode = useFocusNode();
@@ -190,7 +197,7 @@ class _TaskField extends HookConsumerWidget {
       if (value.trim().isEmpty) return;
       ref
           .read(todaysViewModelProvider.notifier)
-          .saveTask(targetTask: dayTask, newTitle: value);
+          .saveTask(targetTask: dailyTask, newTitle: value);
     }
 
     // focusNode の状態を監視
@@ -249,7 +256,7 @@ class _TaskField extends HookConsumerWidget {
           isChecked.value = value;
           // チェックボックスの変更をDBに保存
           ref.read(todaysViewModelProvider.notifier).saveCheck(
-                targetTask: dayTask,
+                targetTask: dailyTask,
                 newValue: value,
               );
         }

@@ -11,16 +11,19 @@ import 'package:three_tasks/gateways/data_source_interface/data_source.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 class DataRepositoryImpl implements DataRepository {
-  // todo 依存先
-  final Ref _ref;
+  // todo コンストラクタ
+  DataRepositoryImpl({
+    required DataSource dataSource,
+    required NotificationService notificationService,
+  })  : _dataSource = dataSource,
+        _notificator = notificationService;
 
-  /// [DataSource] のインスタンスを参照する内部的な getter
-  ///
-  /// このクラスはインスタンスを保有せず、毎回この getter で参照する。
-  DataSource get _dataSource => _ref.read(dataSourceProvider);
+  // todo 依存先
+  /// [DataSource] のインスタンス
+  final DataSource _dataSource;
 
   /// 通知送信先（[EventNotifier]）のインスタンス
-  EventNotifier get _readEventNotifier => _ref.read(eventProvider);
+  final NotificationService _notificator;
 
   // todo 通知関連
   /// エラー通知メソッド
@@ -31,15 +34,12 @@ class DataRepositoryImpl implements DataRepository {
   // 折りたたみ用
   {
     final String content = "$error\n（$methodName）";
-    _readEventNotifier.notifyInfo(
+    _notificator.notifyInfo(
       layer: NotificationFrom.gateway,
       type: NotificationType.error,
       notification: content,
     );
   }
-
-  // todo コンストラクタ
-  DataRepositoryImpl(this._ref) {}
 
   // todo 初期化
   /// 各種データ初期化メソッド
@@ -473,6 +473,42 @@ class DataRepositoryImpl implements DataRepository {
     return result;
   }
 
+  /// 週単位タスクフェッチメソッド
+  ///
+  /// DB からデータを取得して、ストリームに流す。
+  ///
+  /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
+  /// にこのメソッドを呼び出す。
+  @override
+  Future<Result<List<DWeeklyTask>, Exception>> fetchWeeklyTasks({
+    required Date targetDate,
+    required List<UniqueWeek> cachedWeeks,
+  })
+  // 折りたたみ用
+  async {
+    // キャッシュ済みの週のリストを、指定日と対象週の開始日との差分のリストに変換する
+    final List<int> diffs = cachedWeeks
+        .map<int>((week) => targetDate.difference(week.firstDateOfWeek).inDays)
+        .toList();
+
+    // 日付を指定して週単位タスクをフェッチ
+    final Result<List<DWeeklyTask>, Exception> result = await _dataSource
+        .getWeeklyTasksByDate(targetDate: targetDate, diffsOnCache: diffs);
+
+    switch (result) {
+      case Success():
+        return result;
+      case Failure(
+          exception: final Exception error,
+          methodName: final String? methodName
+        ):
+        return Failure(
+          _queryError(details: "$error", methodName: methodName),
+          methodName: "fetchWeeklyTasks",
+        );
+    }
+  }
+
   // todo 書き換え
   /// 日単位タスクの新しい日付の枠を作成するメソッド
   @override
@@ -495,6 +531,32 @@ class DataRepositoryImpl implements DataRepository {
         return Failure(
           _queryError(details: "$error", methodName: methodName),
           methodName: "createDailyTaskRecord",
+        );
+    }
+  }
+
+  /// 週単位タスクの新しい枠を作成するメソッド
+  @override
+  Future<Result<List<DWeeklyTask>, Exception>> createWeeklyTaskRecord({
+    required List<Date> firstDateList,
+  })
+  // 折りたたみ用
+  async {
+    final Result<List<DWeeklyTask>, Exception> created =
+        await _dataSource.createWeeklyTaskRecord(
+      firstDateList: firstDateList,
+    );
+
+    switch (created) {
+      case Success():
+        return created;
+      case Failure(
+          exception: final Exception error,
+          methodName: final String? methodName
+        ):
+        return Failure(
+          _queryError(details: "$error", methodName: methodName),
+          methodName: "createWeeklyTaskRecord",
         );
     }
   }
@@ -545,6 +607,22 @@ class DataRepositoryImpl implements DataRepository {
           _streamNewWeeklyTasks([...resultWeek]);
         }
       // todo 月、年単位の場合のストリーム（2026/06/30）＞＞
+      case Failure(exception: Exception error, methodName: String? methodName):
+      // todo エラーハンドリング（2026/05/23）＞＞
+    }
+    return result;
+  }
+
+  /// 週単位タスクの firstDate を書き換えるメソッド
+  @override
+  Future<Result<void, Exception>> updateWeeklyTasksFirstDate({
+    required Map<int, Date> idFirstDateMap,
+  }) async {
+    final Result<void, Exception> result = await _dataSource
+        .updateWeeklyTasksFirstDate(idFirstDateMap: idFirstDateMap);
+    switch (result) {
+      case Success():
+        break;
       case Failure(exception: Exception error, methodName: String? methodName):
       // todo エラーハンドリング（2026/05/23）＞＞
     }
