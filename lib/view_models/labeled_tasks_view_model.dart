@@ -29,6 +29,21 @@ class LabeledTasksViewModel extends _$LabeledTasksViewModel {
     return [VLabeledTask.placeholder()];
   }
 
+  // region idWithSameTitleAs
+  // /// 指定タイトル（[title]）と合致するラベルの ID を返す
+  // ///
+  // /// ない場合は、 `null` を返す。
+  // int? idWithSameTitleAs(String title) {
+  //   for (VLabeledTask labeledTask in state) {
+  //     // 合致するラベルのIDを返す
+  //     if (labeledTask.label == title) {
+  //       return labeledTask.labelId;
+  //     }
+  //   }
+  //   return null;
+  // }
+  // endregion
+
   /// このクラスの初期化
   void _initViewModel() {
     // 古い購読を破棄

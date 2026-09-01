@@ -6,7 +6,6 @@ import 'package:three_tasks/view_models/daily_tasks_view_model/tomorrows_tasks_v
 
 /// データ更新反映ポートの具象クラス
 class DailyTasksPresenterImpl implements DailyTasksPresenter {
-
   // todo コンストラクタ
   DailyTasksPresenterImpl({
     required TodaysTasksViewModel todaysTasksViewModel,
@@ -22,7 +21,11 @@ class DailyTasksPresenterImpl implements DailyTasksPresenter {
 
   /// 更新反映フローを実装
   @override
-  void handleDailyTasksUpdating(Map<Date, List<VDailyTask>> newDataMap) {
+  Future<void> handleDailyTasksUpdating(
+    Map<Date, List<VDailyTask>> newDataMap,
+  )
+  // 折りたたみ用
+  async {
     // 当日のタスクを抽出する
     final List<VDailyTask>? newDataOnToday = newDataMap[today];
     // 翌日タスクを抽出する

@@ -7,18 +7,12 @@ import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_h
 class DailyTasksCacheHandlerImpl extends DailyTasksCacheHandler{
   // todo コンストラクタ
   DailyTasksCacheHandlerImpl({
-    required super.capacity,
     required DailyTasksStreamHandler dailyTasksStreamHandler,
   }) : _streamHandler = dailyTasksStreamHandler;
 
   // todo 依存先
   /// ストリームハンドラのインスタンス
   final DailyTasksStreamHandler _streamHandler;
-
-  final Map<Date, BiMap<int, int>> indexMap = {};
-
-
-  Future<void> updateElement(Map<int, DDailyTask> dataMap)async{}
 
   /// データ更新時のストリームへの反映
   @override

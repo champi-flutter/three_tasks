@@ -2,7 +2,10 @@ import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/use_case/input_boundary/save_task_changes/input_parameter/task_update_parameter.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 
@@ -10,26 +13,14 @@ import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 class LabeledTaskListDialog extends ConsumerWidget {
   const LabeledTaskListDialog({
     super.key,
-    required this.taskTitleList,
-    required this.onApplyLabeledTask,
-    required this.onReplaceLabeledTask,
+    required this.taskList,
   }) : assert(
-          taskTitleList.length == 3,
-          "3つのタスクの状態値を当てはめてください（_LabeledTaskApplyingDialog.isEmpty）。",
+          taskList.length == 1 || taskList.length == 3,
+          "[LabeledTaskListDialog] 引数が不適当です。\ntaskList.length = ${taskList.length}",
         );
 
-  /// 呼び出し元の画面のタスクのタイトルのリスト
-  final List<String> taskTitleList;
-
-  /// 空欄のタスク入力欄に指定のラベル化タスクを当てはめるコールバック
-  ///  - 第1引数（[int]）: タスク入力欄のリスト番号
-  ///  - 第2引数（[VLabeledTask]）: 対象のラベル化タスク
-  final Future<void> Function(int, VLabeledTask) onApplyLabeledTask;
-
-  /// 入力済みのタスク入力欄を指定のラベル化タスクに置き換えるコールバック
-  ///  - 第1引数（[int]）: タスク入力欄のリスト番号
-  ///  - 第2引数（[VLabeledTask]）: 対象のラベル化タスク
-  final Future<void> Function(int, VLabeledTask) onReplaceLabeledTask;
+  /// 対象の [VTask] のリスト
+  final List<VTask> taskList;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -40,18 +31,18 @@ class LabeledTaskListDialog extends ConsumerWidget {
     final double screenHeight = context.screenHeight;
 
     // VM が管理するリスト（state）を監視
-    final List<VLabeledTask> taskList =
+    final List<VLabeledTask> labelList =
         ref.watch(labeledTasksViewModelProvider);
     // リストが1つ以上あるかどうか（リスト要素数 0 に対応）
-    final bool existsTask = taskList.isNotEmpty;
+    final bool existsTask = labelList.isNotEmpty;
 
     // 本体
     final Widget contents = ListView.separated(
       // `existsTask` で条件分岐して、リスト要素数 0 にしないようにする
-      itemCount: taskList.length,
+      itemCount: labelList.length,
       itemBuilder: (context, int position) {
         // タスクタイトル
-        final String taskTitle = taskList[position].label;
+        final String taskTitle = labelList[position].label;
         return ListTile(
           // dense: true,
           title: UtilizedText(
@@ -71,10 +62,8 @@ class LabeledTaskListDialog extends ConsumerWidget {
             final bool? willPop = await showDialog<bool>(
               context: context,
               builder: (_) => _LabeledTaskApplyingDialog(
-                taskTitleList: taskTitleList,
-                labeledTask: taskList[position],
-                onApplyLabeledTask: onApplyLabeledTask,
-                onReplaceLabeledTask: onReplaceLabeledTask,
+                taskList: taskList,
+                labeledTask: labelList[position],
               ),
             );
             assert(
@@ -130,20 +119,16 @@ class LabeledTaskListDialog extends ConsumerWidget {
   }
 }
 
-class _LabeledTaskApplyingDialog extends StatelessWidget {
+class _LabeledTaskApplyingDialog extends ConsumerWidget {
   const _LabeledTaskApplyingDialog({
     super.key,
-    required this.taskTitleList,
+    required this.taskList,
     required this.labeledTask,
-    required this.onApplyLabeledTask,
-    required this.onReplaceLabeledTask,
-  })
-  // todo 3つじゃない場合 = ボタン以外で呼ばれた場合（2026/08/27）＞＞
-  : assert(
-          taskTitleList.length == 1 || taskTitleList.length == 3,
-          "[_LabeledTaskApplyingDialog] 引数が不適当です。\ntaskTitleList.length = ${taskTitleList.length}",
+  })  : assert(
+          taskList.length == 1 || taskList.length == 3,
+          "[_LabeledTaskApplyingDialog] 引数が不適当です。\ntaskList.length = ${taskList.length}",
         ),
-        _isSingle = taskTitleList.length == 1;
+        _isSingle = taskList.length == 1;
 
   /// 対象タスクが1つかどうか
   ///
@@ -151,53 +136,71 @@ class _LabeledTaskApplyingDialog extends StatelessWidget {
   /// となる。
   final bool _isSingle;
 
-  /// 呼び出し元の画面のタスクのタイトルのリスト
-  final List<String> taskTitleList;
-
+  /// 指定したラベル
   final VLabeledTask labeledTask;
 
-  /// 空欄のタスク入力欄に指定のラベル化タスクを当てはめるコールバック
+  /// 対象の [VTask] のリスト
+  final List<VTask> taskList;
+
+  /// タスク入力欄に指定のラベル化タスクを当てはめるコールバック
   ///  - 第1引数（[int]）: タスク入力欄のリスト番号
   ///  - 第2引数（[VLabeledTask]）: 対象のラベル化タスク
-  final Future<void> Function(int, VLabeledTask) onApplyLabeledTask;
+  Future<void> _applyLabel(
+    WidgetRef ref, {
+    required int position,
+    required VLabeledTask label,
+  })
+  // 折りたたみ用
+  async {
+    await ref.read(tasksControllerProvider).saveTaskChanges(
+      taskInfo: [TaskUpdateParameter(
+        targetVTask: taskList[position],
+        newLabelId: label.labelId,
+        newTitle: label.label,
+      )],
+    );
+  }
 
-  /// 入力済みのタスク入力欄を指定のラベル化タスクに置き換えるコールバック
-  ///  - 第1引数（[int]）: 対象の [taskTitleList] の index
+  /// **週単位タスクの空欄** に指定のラベル化タスクを当てはめるコールバック
+  ///  - 第1引数（[int]）: タスク入力欄のリスト番号
   ///  - 第2引数（[VLabeledTask]）: 対象のラベル化タスク
-  final Future<void> Function(int, VLabeledTask) onReplaceLabeledTask;
+  Future<void> _applyLabelToWeeklyTasksPlaceHolder(
+      WidgetRef ref, {
+        required int position,
+        required VLabeledTask label,
+      })
+  // 折りたたみ用
+  async {
+    final VTask targetVTask = taskList[position];
+    if(targetVTask is VWeeklyTask) {
+      await ref.read(weeklyTasksControllerProvider).saveTaskChanges(
+        taskInfo: [WeeklyTaskUpdateParameter(
+          targetVTask: targetVTask,
+          newLabelId: label.labelId,
+          newTitle: label.label,
+        )],
+      );
+    } else {
+      // todo エラーハンドリング（2026/08/31）＞＞
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // 3 つの ListTile 要素を持つ List<Widget>
     final List<Widget> contentsList = switch (_isSingle) {
       true => [
           ListTile(
             title: UtilizedText(
-              "「${taskTitleList.single}」を置き換える",
+              "「${taskList.single.task}」を置き換える",
               fontSize: 21,
             ),
             onTap: () async {
-              await onReplaceLabeledTask(0, labeledTask);
-              if (context.mounted) {
-                // 遷移元に true を返し、全てのダイアログを閉じるよう促す
-                Navigator.of(context).popWithUnfocus(true);
-              }
-            },
-          )
-        ],
-      false => List.generate(3, (position) {
-          final bool isTaskEmpty = taskTitleList[position].isEmpty;
-          return ListTile(
-            title: UtilizedText(
-              isTaskEmpty
-                  ? "タスク${position + 1}に当てはめる"
-                  : "「${taskTitleList[position]}」を置き換える",
-              fontSize: 21,
-            ),
-            onTap: () async {
-              // タスクタイトルが空欄の場合
-              if (isTaskEmpty) {
-                await onApplyLabeledTask(position, labeledTask);
+              final VTask targetTask = taskList.single;
+              final bool isTaskEmpty = targetTask.task.isEmpty;
+              // 対象のタスクが週単位で、かつ空欄の場合
+              if (isTaskEmpty && targetTask is VWeeklyTask) {
+                await _applyLabel(ref, position: 0, label: labeledTask);
                 if (context.mounted) {
                   // 遷移元に true を返し、全てのダイアログを閉じるよう促す
                   Navigator.of(context).popWithUnfocus(true);
@@ -205,7 +208,37 @@ class _LabeledTaskApplyingDialog extends StatelessWidget {
               }
               // タスクタイトルがすでに入力済みの場合
               else {
-                await onReplaceLabeledTask(position, labeledTask);
+                await _applyLabel(ref, position: 0, label: labeledTask);
+                if (context.mounted) {
+                  // 遷移元に true を返し、全てのダイアログを閉じるよう促す
+                  Navigator.of(context).popWithUnfocus(true);
+                }
+              }
+            },
+          )
+        ],
+      false => List.generate(3, (position) {
+        final VTask targetTask = taskList[position];
+          final bool isTaskEmpty = targetTask.task.isEmpty;
+          return ListTile(
+            title: UtilizedText(
+              isTaskEmpty
+                  ? "タスク${position + 1}に当てはめる"
+                  : "「${targetTask.task}」を置き換える",
+              fontSize: 21,
+            ),
+            onTap: () async {
+              // 対象のタスクが週単位で、かつ空欄の場合
+              if (isTaskEmpty && targetTask is VWeeklyTask) {
+                await _applyLabel(ref, position: position, label: labeledTask);
+                if (context.mounted) {
+                  // 遷移元に true を返し、全てのダイアログを閉じるよう促す
+                  Navigator.of(context).popWithUnfocus(true);
+                }
+              }
+              // タスクタイトルがすでに入力済みの場合
+              else {
+                await _applyLabel(ref, position: position, label: labeledTask);
                 if (context.mounted) {
                   // 遷移元に true を返し、全てのダイアログを閉じるよう促す
                   Navigator.of(context).popWithUnfocus(true);
@@ -226,20 +259,16 @@ class _LabeledTaskApplyingDialog extends StatelessWidget {
   }
 }
 
+/// 「ラベル化されたタスク一覧」ダイアログを開くトップレベル関数
 Future<T?> showLabeledTaskListDialogToSingleTask<T>(
-  BuildContext context, {
-  required String taskTitle,
+  BuildContext context,
+  WidgetRef ref, {
+  required VTask targetVTask,
 })
 // 折りたたみ用
 async {
   return await showDialog(
     context: context,
-    builder: (dialogContext) => LabeledTaskListDialog(
-      taskTitleList: [taskTitle],
-      onApplyLabeledTask: (int position, VLabeledTask label) async{
-
-      },
-      onReplaceLabeledTask: (int p1, VLabeledTask p2) {  },
-    ),
+    builder: (dialogContext) => LabeledTaskListDialog(taskList: [targetVTask]),
   );
 }

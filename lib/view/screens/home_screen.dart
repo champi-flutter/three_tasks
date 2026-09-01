@@ -12,7 +12,6 @@ import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 import 'package:three_tasks/view_models/daily_tasks_view_model/todays_tasks_view_model.dart';
 import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
 
-import '../../view_models/todays_view_model.dart';
 
 class TodaysScreen extends ConsumerWidget {
   // todo build

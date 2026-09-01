@@ -693,6 +693,23 @@ class DataRepositoryImpl implements DataRepository {
     return result;
   }
 
+  /// 新しいラベルの枠を作成し、その ID を返す
+  @override
+  Future<Result<int, Exception>> createNewLabel({
+    required String title,
+  })
+  // 折りたたみ用
+  async{
+    final Result<int, Exception> result = await _dataSource.createNewLabel(title: title);
+
+    switch (result) {
+      case Success(value: final DLabeledTask label):
+        return label.labelId;
+      case Failure(exception: Exception error, methodName: String? methodName):
+      // todo エラーハンドリング（2026/05/23）＞＞
+    }
+  }
+
   /// タスクラベル化メソッド
   ///
   /// 新規ラベルの ID を返す。

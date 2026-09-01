@@ -9,7 +9,9 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// タスク情報の変更を保存する処理フローを実装するクラス
-class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
+class SaveTaskChangesInteractor
+    with NotificationFromUseCase
+    implements SaveTaskChangesUseCase {
   SaveTaskChangesInteractor({
     required DataRepository dataRepository,
     required DailyTasksCacheHandler dailyTasksCacheHandler,
@@ -19,8 +21,8 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
   })  : _weeklyTasksCacheHandler = weeklyTasksCacheHandler,
         _repository = dataRepository,
         _dailyTasksCacheHandler = dailyTasksCacheHandler,
-        _notificationUseCase = notificationService,
-        _loader = loadingService;
+        notificationService = notificationService,
+        _loadingService = loadingService;
 
   /// [DataRepository] のインスタンス
   final DataRepository _repository;
@@ -32,25 +34,11 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
   final WeeklyTasksCacheHandler _weeklyTasksCacheHandler;
 
   /// ローディングの呼び出し口
-  final LoadingService _loader;
+  final LoadingService _loadingService;
 
   /// 通知送信先（[NotificationUseCase]）のインスタンス
-  final NotificationService _notificationUseCase;
-
-  // todo 通知関連
-  /// エラー通知メソッド
-  void _notifyError({
-    required String content,
-    bool specifiesLayer = false,
-  })
-  // 折りたたみ用
-  {
-    _notificationUseCase.notifyInfo(
-      layer: specifiesLayer ? NotificationFrom.viewModel : null,
-      type: NotificationType.error,
-      notification: content,
-    );
-  }
+  @override
+  final NotificationService notificationService;
 
   /// タスク情報の変更を保存する処理フロー
   ///   1. パラメータの [VTask] を [DTask] に変換する
@@ -65,7 +53,7 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
   Future<Result<void, Exception>> execute({
     required List<TaskUpdateParameter> taskInfo,
   }) =>
-      _loader.loadAsync<Result<void, Exception>>(
+      _loadingService.loadAsync<Result<void, Exception>>(
         () async {
           try {
             if (taskInfo.isEmpty) {
@@ -82,13 +70,15 @@ class SaveTaskChangesInteractor implements SaveTaskChangesUseCase {
                 // 反映完了まで await
                 await _cacheChanges(newTaskList);
               case Failure(
-                  exception: Exception error,
+                  exception: final Exception exc,
+                  methodName: final String? methodName,
                 ):
-                throw error;
+                final Exception fetchExc = fetchError(methodName: methodName);
+                notifyError(content: "$exc\n$fetchExc");
             }
             return result;
           } catch (e) {
-            _notifyError(content: "$e", specifiesLayer: true);
+            notifyError(content: "$e", specifiesLayer: true);
             return Failure(Exception(e));
           }
         },

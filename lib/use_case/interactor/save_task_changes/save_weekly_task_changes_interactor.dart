@@ -9,16 +9,20 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekl
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 週単位タスク変更保存フローを実装するクラス
-class SaveWeeklyTaskChangesInteractor implements SaveWeeklyTaskChangesUseCase {
+class SaveWeeklyTaskChangesInteractor
+    with NotificationFromUseCase
+    implements SaveWeeklyTaskChangesUseCase {
   SaveWeeklyTaskChangesInteractor({
     required SaveTaskChangesUseCase saveTaskChangesUseCase,
     required WeeklyTasksCacheHandler weeklyTasksCacheHandler,
     required DataRepository dataRepository,
     required NotificationService notificationService,
+    required LoadingService loadingService,
   })  : _weeklyTasksCacheHandler = weeklyTasksCacheHandler,
         _repository = dataRepository,
         _saveTaskChangesUseCase = saveTaskChangesUseCase,
-        _notifier = notificationService;
+        notificationService = notificationService,
+        _loadingService = loadingService;
 
   /// タスク変更保存フローへのアクセス
   final SaveTaskChangesUseCase _saveTaskChangesUseCase;
@@ -29,39 +33,45 @@ class SaveWeeklyTaskChangesInteractor implements SaveWeeklyTaskChangesUseCase {
   /// [DataRepository] のインスタンス
   final DataRepository _repository;
 
+  /// ローディングの呼び出し口
+  final LoadingService _loadingService;
+
   /// 通知機能
-  final NotificationService _notifier;
+  @override
+  final NotificationService notificationService;
 
   @override
   Future<Result<void, Exception>> execute({
     required List<WeeklyTaskUpdateParameter> taskInfo,
-  }) async {
-    try {
-      // 週タスク特有の変更の検出とパラメータの事前抽出
-      final analysis = _analyzeTaskInfo(taskInfo);
-      List<WeeklyTaskUpdateParameter> updatedTaskInfo = analysis.updatedTaskInfo;
+  }) =>
+      _loadingService.loadAsync<Result<void, Exception>>(() async {
+        try {
+          // 週タスク特有の変更の検出とパラメータの事前抽出
+          final analysis = _analyzeTaskInfo(taskInfo);
+          List<WeeklyTaskUpdateParameter> updatedTaskInfo =
+              analysis.updatedTaskInfo;
 
-      // 開始日の変更を保存し、キャッシュを更新する
-      await _applyFirstDateChanges(
-        saveMap: analysis.firstDateChangeSaveMap,
-        cacheMap: analysis.firstDateChangeCacheMap,
-      );
+          // 開始日の変更を保存し、キャッシュを更新する
+          await _applyFirstDateChanges(
+            saveMap: analysis.firstDateChangeSaveMap,
+            cacheMap: analysis.firstDateChangeCacheMap,
+          );
 
-      // placeholder2 に入れられた値を反映させる（週タスクは TasksView に「空き」ができる）
-      updatedTaskInfo = await _applyPlaceholderChanges(
-        taskInfo: updatedTaskInfo,
-        valuedPlaceholder: analysis.valuedPlaceholder,
-      );
+          // placeholder2 に入れられた値を反映させる（週タスクは TasksView に「空き」ができる）
+          updatedTaskInfo = await _applyPlaceholderChanges(
+            taskInfo: updatedTaskInfo,
+            valuedPlaceholder: analysis.valuedPlaceholder,
+          );
 
-      // パラメータを変換して SaveTaskChangesUseCase を実行する
-      await _saveTaskChanges(updatedTaskInfo);
+          // パラメータを変換して SaveTaskChangesUseCase を実行する
+          await _saveTaskChanges(updatedTaskInfo);
 
-      return Success(null);
-    } catch (e) {
-      // todo エラーハンドリング（2026/08/28）＞＞
-      return Failure();
-    }
-  }
+          return Success(null);
+        } catch (e) {
+          notifyError(content: "[SaveWeeklyTaskChangesUseCase.execute]\n$e");
+          return Failure(Exception("$e"));
+        }
+      });
 
   /// [taskInfo] を探索し、週タスク特有の変更があったかを調べる。
   ({
@@ -164,11 +174,11 @@ class SaveWeeklyTaskChangesInteractor implements SaveWeeklyTaskChangesUseCase {
           );
         }
       case Failure(
-          exception: final Exception exception,
-          methodName: final String? methodName
+          exception: final Exception exc,
+          methodName: final String? methodName,
         ):
-        // todo エラーハンドリング（2026/08/28）＞＞
-        throw exception;
+        final Exception fetchExc = fetchError(methodName: methodName);
+        notifyError(content: "$exc\n$fetchExc");
     }
   }
 
@@ -199,8 +209,12 @@ class SaveWeeklyTaskChangesInteractor implements SaveWeeklyTaskChangesUseCase {
             id: newDTaskList[linkedIndex].id,
           );
         }
-      case Failure():
-      // todo エラーハンドリング（2026/08/28）＞＞
+      case Failure(
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
+        final Exception saveExc = saveError(methodName: methodName);
+        notifyError(content: "$exc\n$saveExc");
     }
 
     return updatedTaskInfo;
@@ -243,8 +257,8 @@ class SaveWeeklyTaskChangesInteractor implements SaveWeeklyTaskChangesUseCase {
   /// 週タスク固有のパラメータ（[WeeklyTaskUpdateParameter]）から汎用パラメータ
   /// （[TaskUpdateParameter]）に変換し、[SaveTaskChangesUseCase] を実行する
   Future<void> _saveTaskChanges(
-      List<WeeklyTaskUpdateParameter> taskInfo,
-      )
+    List<WeeklyTaskUpdateParameter> taskInfo,
+  )
   // 折りたたみ用
   async {
     // パラメータを、 SaveTaskChangesUseCase に対応する型に変換する

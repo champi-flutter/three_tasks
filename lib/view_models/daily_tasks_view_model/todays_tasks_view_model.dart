@@ -13,7 +13,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'todays_tasks_view_model.g.dart';
 
 @riverpod
-class TodaysTasksViewModel extends _$TodaysTasksViewModel {
+class TodaysTasksViewModel extends _$TodaysTasksViewModel with NotificationFromViewModel{
   // todo 初期化
   @override
   List<VDailyTask> build() {
@@ -30,8 +30,9 @@ class TodaysTasksViewModel extends _$TodaysTasksViewModel {
   WatchDailyTasksUseCase get _watchDailyTasksUseCase =>
       ref.read(watchDailyTasksUseCaseProvider);
 
-  /// 通知送信先（[EventNotifier]）のインスタンス
-  NotificationService get _notificator =>
+  /// 通知機能の呼び出し口
+  @override
+  NotificationService get notificationService =>
       ref.read(notificationServiceProvider);
 
   /// 監視フローを開始する
@@ -44,35 +45,6 @@ class TodaysTasksViewModel extends _$TodaysTasksViewModel {
       return;
     }
     state = newState;
-  }
-
-  // todo 通知関連
-  /// エラー通知メソッド
-  void _notifyError({
-    required String content,
-    bool specifiesLayer = false,
-  })
-  // 折りたたみ用
-  {
-    _notificator.notifyInfo(
-      layer: specifiesLayer ? NotificationFrom.viewModel : null,
-      type: NotificationType.error,
-      notification: content,
-    );
-  }
-
-  /// 書き換え完了通知メソッド
-  void _notifySuccess({
-    required String content,
-    bool specifiesLayer = false,
-  })
-  // 折りたたみ用
-  {
-    _notificator.notifyInfo(
-      layer: specifiesLayer ? NotificationFrom.viewModel : null,
-      type: NotificationType.success,
-      notification: content,
-    );
   }
 }
 

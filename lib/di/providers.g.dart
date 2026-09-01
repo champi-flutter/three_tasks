@@ -322,7 +322,57 @@ final class SaveTaskChangesUseCaseProvider extends $FunctionalProvider<
 }
 
 String _$saveTaskChangesUseCaseHash() =>
-    r'19ae1328266d8a12465f94fcf0ba0386a548b70b';
+    r'83ab502e83158a45deed30e596fe782a42bbf44f';
+
+/// 週単位タスク書き換え処理フロー
+
+@ProviderFor(saveWeeklyTaskChangesUseCase)
+const saveWeeklyTaskChangesUseCaseProvider =
+    SaveWeeklyTaskChangesUseCaseProvider._();
+
+/// 週単位タスク書き換え処理フロー
+
+final class SaveWeeklyTaskChangesUseCaseProvider extends $FunctionalProvider<
+    SaveWeeklyTaskChangesUseCase,
+    SaveWeeklyTaskChangesUseCase,
+    SaveWeeklyTaskChangesUseCase> with $Provider<SaveWeeklyTaskChangesUseCase> {
+  /// 週単位タスク書き換え処理フロー
+  const SaveWeeklyTaskChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'saveWeeklyTaskChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$saveWeeklyTaskChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SaveWeeklyTaskChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SaveWeeklyTaskChangesUseCase create(Ref ref) {
+    return saveWeeklyTaskChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SaveWeeklyTaskChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SaveWeeklyTaskChangesUseCase>(value),
+    );
+  }
+}
+
+String _$saveWeeklyTaskChangesUseCaseHash() =>
+    r'e7c66365676e1dbc08121024cc4ff94f03181a4c';
 
 /// 日単位タスクの監視フロー
 
@@ -424,6 +474,51 @@ String _$dailyTasksPresenterHash() =>
 
 /// 週単位タスク操作クラス
 
+@ProviderFor(tasksController)
+const tasksControllerProvider = TasksControllerProvider._();
+
+/// 週単位タスク操作クラス
+
+final class TasksControllerProvider extends $FunctionalProvider<TasksController,
+    TasksController, TasksController> with $Provider<TasksController> {
+  /// 週単位タスク操作クラス
+  const TasksControllerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'tasksControllerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tasksControllerHash();
+
+  @$internal
+  @override
+  $ProviderElement<TasksController> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  TasksController create(Ref ref) {
+    return tasksController(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TasksController value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TasksController>(value),
+    );
+  }
+}
+
+String _$tasksControllerHash() => r'ce07ff4359e25ac767f462a8fcf770f6ca929505';
+
+/// 週単位タスク操作クラス
+
 @ProviderFor(weeklyTasksController)
 const weeklyTasksControllerProvider = WeeklyTasksControllerProvider._();
 
@@ -518,7 +613,56 @@ final class DailyTasksCacheHandlerProvider extends $FunctionalProvider<
 }
 
 String _$dailyTasksCacheHandlerHash() =>
-    r'6d62c86048cfbdf3e742e30f7d40cae4bf1312eb';
+    r'bdde9d76b158e4b0deec858520668dbe629f5d38';
+
+/// 週単位タスクのキャッシュストリームハンドラ
+
+@ProviderFor(weeklyTasksCacheHandler)
+const weeklyTasksCacheHandlerProvider = WeeklyTasksCacheHandlerProvider._();
+
+/// 週単位タスクのキャッシュストリームハンドラ
+
+final class WeeklyTasksCacheHandlerProvider extends $FunctionalProvider<
+    WeeklyTasksCacheHandler,
+    WeeklyTasksCacheHandler,
+    WeeklyTasksCacheHandler> with $Provider<WeeklyTasksCacheHandler> {
+  /// 週単位タスクのキャッシュストリームハンドラ
+  const WeeklyTasksCacheHandlerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'weeklyTasksCacheHandlerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$weeklyTasksCacheHandlerHash();
+
+  @$internal
+  @override
+  $ProviderElement<WeeklyTasksCacheHandler> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WeeklyTasksCacheHandler create(Ref ref) {
+    return weeklyTasksCacheHandler(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WeeklyTasksCacheHandler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WeeklyTasksCacheHandler>(value),
+    );
+  }
+}
+
+String _$weeklyTasksCacheHandlerHash() =>
+    r'123ad4f8b3f30d85e8d8b61461cfc5f6f2b413d6';
 
 /// 日単位タスクのキャッシュストリームハンドラ
 
@@ -568,3 +712,52 @@ final class DailyTasksStreamHandlerProvider extends $FunctionalProvider<
 
 String _$dailyTasksStreamHandlerHash() =>
     r'c197a9d92bdcb8dce45ec3a7a6a3f64ffbef15e8';
+
+/// 日単位タスクのキャッシュストリームハンドラ
+
+@ProviderFor(weeklyTasksStreamHandler)
+const weeklyTasksStreamHandlerProvider = WeeklyTasksStreamHandlerProvider._();
+
+/// 日単位タスクのキャッシュストリームハンドラ
+
+final class WeeklyTasksStreamHandlerProvider extends $FunctionalProvider<
+    WeeklyTasksStreamHandler,
+    WeeklyTasksStreamHandler,
+    WeeklyTasksStreamHandler> with $Provider<WeeklyTasksStreamHandler> {
+  /// 日単位タスクのキャッシュストリームハンドラ
+  const WeeklyTasksStreamHandlerProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'weeklyTasksStreamHandlerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$weeklyTasksStreamHandlerHash();
+
+  @$internal
+  @override
+  $ProviderElement<WeeklyTasksStreamHandler> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WeeklyTasksStreamHandler create(Ref ref) {
+    return weeklyTasksStreamHandler(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WeeklyTasksStreamHandler value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WeeklyTasksStreamHandler>(value),
+    );
+  }
+}
+
+String _$weeklyTasksStreamHandlerHash() =>
+    r'0233ee968a0145fd2ffbfb429931b2c4b31b75e4';

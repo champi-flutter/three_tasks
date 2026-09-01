@@ -72,6 +72,11 @@ abstract class DataRepository {
   /// タスクのチェック変更保存メソッド
   Future<Result<void, Exception>> saveCheck({required DTask newTask});
 
+  /// 新しいラベルの枠を作成し、その ID を返す
+  Future<Result<int, Exception>> createNewLabel({
+    required String title,
+  });
+
   /// タスクラベル化メソッド
   ///
   /// 新規ラベルの ID を返す。

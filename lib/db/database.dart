@@ -485,6 +485,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   /// タイプ（日単位、週単位、など）別でタスク情報の変更を保存するメソッド
   ///
   /// sealed class の網羅性を使って条件分岐する。
+  ///
+  /// drift の [Value.absentIfNull] を用いて、指定されなかったカラムは更新せず、
+  /// 元の値のままにする。
   Future<void> _saveDTask({required DTask newDTask}) async {
     try {
       switch (newDTask) {
@@ -1062,6 +1065,26 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           (f) => f.task(unnecessaryYearlyTask.task),
         )
         .delete();
+  }
+
+  /// 新しいラベルの枠を作成し、その ID を返す
+  @override
+  Future<Result<int, Exception>> createNewLabel({
+    required String title,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      // LabeledTasks に新しいレコードを作成
+      final int createdId = await managers.labeledTasks.create(
+            (record) => record(
+          label: title,
+        ),
+      );
+      return Success(createdId);
+    } catch (e) {
+      return Failure(Exception(e), methodName: "createNewLabel");
+    }
   }
 
   /// 日単位タスクをラベリング

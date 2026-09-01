@@ -59,6 +59,11 @@ abstract class DataSource {
     required DTask newTask,
   });
 
+  /// 新しいラベルの枠を作成し、その ID を返す
+  Future<Result<int, Exception>> createNewLabel({
+    required String title,
+  });
+
   /// 日単位タスクをラベリング
   ///
   /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
