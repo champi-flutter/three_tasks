@@ -4,7 +4,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/use_case/services/weekly_tasks_service.dart';
 

@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/view_type/v_label/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/services/labeled_tasks_service.dart';
 
 part 'labeled_tasks_view_model.g.dart';

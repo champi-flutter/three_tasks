@@ -1,5 +1,5 @@
 
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 
 /// 新規ラベル登録フロー
 abstract class RegisterNewLabelUseCase {

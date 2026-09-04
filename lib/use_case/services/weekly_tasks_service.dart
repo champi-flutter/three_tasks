@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/data_type/d_task.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 当日のタスクのサービスクラス

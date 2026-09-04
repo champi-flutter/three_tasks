@@ -1,5 +1,5 @@
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/weekly_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/discard_draft_use_case.dart';

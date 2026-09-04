@@ -4,10 +4,10 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/data_type/d_labeled_task.dart';
-import 'package:three_tasks/entities/data_type/d_task.dart';
-import 'package:three_tasks/entities/view_type/v_labeled_task.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/data_type/d_label/d_labeled_task.dart';
+import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
+import 'package:three_tasks/entities/view_type/v_label/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 「ラベル化したタスク」サービスクラス

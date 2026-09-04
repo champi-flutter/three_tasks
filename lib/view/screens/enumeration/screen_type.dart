@@ -7,13 +7,13 @@ import 'package:three_tasks/view/screens/yearly_tasks_screen.dart';
 
 /// スワイプで遷移する画面の列挙型
 enum ScreenType {
-  today(appBarTitle: "今日のタスク", chipsName: "今日のタスク"),
-  tomorrow(appBarTitle: "明日のタスク", chipsName: "明日のタスク"),
-  week(appBarTitle: "今週のタスク", chipsName: "週タスク"),
-  month(appBarTitle: "今月のタスク", chipsName: "月タスク"),
-  year(appBarTitle: "今年のタスク", chipsName: "年タスク");
+  today._(appBarTitle: "今日のタスク", chipsName: "今日のタスク"),
+  tomorrow._(appBarTitle: "明日のタスク", chipsName: "明日のタスク"),
+  week._(appBarTitle: "今週のタスク", chipsName: "週タスク"),
+  month._(appBarTitle: "今月のタスク", chipsName: "月タスク"),
+  year._(appBarTitle: "今年のタスク", chipsName: "年タスク");
 
-  const ScreenType({required this.appBarTitle, required this.chipsName});
+  const ScreenType._({required this.appBarTitle, required this.chipsName});
 
   /// AppBar のタイトル
   final String appBarTitle;

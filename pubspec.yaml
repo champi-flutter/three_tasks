@@ -71,6 +71,10 @@ dependencies:
     git:
       url: https://github.com/champi-flutter/riverpod_wrapper.git
       ref: main
+  data_converter:
+    git:
+      url: https://github.com/champi-flutter/data_converter.git
+      ref: main
 
 dev_dependencies:
 

@@ -1,5 +1,5 @@
 import 'package:custom_core_types/custom_core_types.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/input_parameter/task_update_parameter.dart';
 
 /// タスク情報の変更を下書きとして保有する処理フロー

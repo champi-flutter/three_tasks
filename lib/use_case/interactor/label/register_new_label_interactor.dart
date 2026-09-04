@@ -1,7 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/view_type/v_task.dart';
-import 'package:three_tasks/use_case/input_boundary/label/add_in_label_use_case.dart';
+import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
+import 'package:three_tasks/use_case/input_boundary/label/add_to_label_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/label/register_new_label_use_case.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
