@@ -1,6 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
+import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/weekly_tasks_cache_handler.dart';
@@ -12,7 +13,9 @@ import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 日単位タスクの監視フローを実装するクラス
-class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
+class WatchWeeklyTasksInteractor
+    with NotificationFromUseCase
+    implements WatchWeeklyTasksUseCase {
   // todo コンストラクタ
   WatchWeeklyTasksInteractor({
     required WeeklyTasksPresenter weeklyTasksPresenter,
@@ -24,7 +27,7 @@ class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
         _cacheHandler = weeklyTasksCacheHandler,
         _streamHandler = weeklyTasksStreamHandler,
         _repository = dataRepository,
-        _notificator = notificationService;
+        notificationService = notificationService;
 
   // todo 依存先
   /// 受信データを反映させるポートのインスタンス
@@ -40,29 +43,8 @@ class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
   final DataRepository _repository;
 
   /// 通知送信先（[NotificationService]）のインスタンス
-  final NotificationService _notificator;
-
-  // todo 通知関連
-  /// エラー通知メソッド
-  void _notifyError({
-    required String content,
-    bool specifiesLayer = false,
-  })
-  // 折りたたみ用
-  {
-    _notificator.notifyInfo(
-      layer: specifiesLayer ? NotificationFrom.useCase : null,
-      type: NotificationType.error,
-      notification: content,
-    );
-  }
-
-  /// リポジトリからのフェッチのエラーの [Exception] のテンプレート
-  Exception _fetchError({
-    String? details,
-    required String? methodName,
-  }) =>
-      Exception("FETCH_ERROR: DataRepository.${methodName ?? "??"}\n$details");
+  @override
+  final NotificationService notificationService;
 
   /// このクラスがすでに起動済みかどうか
   bool _isInitialized = false;
@@ -84,7 +66,9 @@ class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
       // 対象の日付のタスクデータの監視を開始する。
       _startWatching(date);
       _isInitialized = true;
-    } catch (_) {
+    } catch (e, st) {
+      // エラーを通知
+      notifyError(content: "$e\n$st", specifiesLayer: true);
       _isInitialized = false;
     }
   }
@@ -96,37 +80,27 @@ class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
         onData: _onData,
       );
     } catch (_) {
-      rethrow;
+      throw Exception("購読エラー: WatchWeeklyTasksUseCase._initSubscription");
     }
   }
 
   /// 対象日付（[targetDate]）を含む週の監視を開始するプライベートメソッド
   Future<void> _startWatching(Date targetDate) async {
-    try {
-      // すでにキャッシュされている週を取得する
-      final List<UniqueWeek> cachedWeeks =
-          _cacheHandler.getCachedWeeks(targetDate);
-      // 当日を含む週の週単位タスクのフェッチを依頼し、データを受け取る
-      final Result<List<DWeeklyTask>, Exception> fetched = await _repository
-          .fetchWeeklyTasks(targetDate: targetDate, cachedWeeks: cachedWeeks);
-
-      switch (fetched) {
-        case Success(value: final List<DWeeklyTask> fetchedValueList):
-        // 要求した日付のうち、データがDBにあった分をキャッシュする
-          for (final value in fetchedValueList) {
-            final UniqueWeek uniqueWeek = value.week;
-            _cacheHandler.addEl(key: uniqueWeek, value: value);
-          }
-        case Failure(
-            exception: final Exception error,
-            methodName: final String? methodName,
-          ):
-          throw _fetchError(details: "$error", methodName: methodName);
-      }
-    } catch (e) {
-      // エラーを通知
-      _notifyError(content: "$e");
-      rethrow;
+    // すでにキャッシュされている週を取得する
+    final List<UniqueWeek> cachedWeeks =
+        _cacheHandler.getCachedWeeks(targetDate);
+    // 当日を含む週の週単位タスクのフェッチを依頼し、データを受け取る
+    final Result<void, Exception> fetchResult =
+        await _repository.fetchWeeklyTasks(targetDate: targetDate);
+    switch (fetchResult) {
+      case Success():
+        return;
+      case Failure(
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
+        final fetchExc = fetchError(methodName: methodName);
+        throw Exception("$exc\n$fetchExc");
     }
   }
 
@@ -148,7 +122,8 @@ class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
       // 変換後のデータを反映させる
       _publishWeeklyTasks(convertedMap);
     } catch (e) {
-      _notifyError(content: "$e", specifiesLayer: true);
+      // プライベートだが、誰もキャッチできないので...
+      notifyError(content: "データ受信時の処理のエラー: $e", specifiesLayer: true);
     }
   }
 
@@ -191,7 +166,11 @@ class WatchWeeklyTasksInteractor implements WatchWeeklyTasksUseCase {
   }
 
   /// データを反映させるプライベートメソッド
-  void _publishWeeklyTasks(Map<UniqueWeek, VWeeklyTask> newDataMap) {
-    _presenter.handleWeeklyTasksUpdating(newDataMap);
+  void _publishWeeklyTasks(Map<UniqueWeek, EWeeklyTask> newDataMap) {
+    try {
+      _presenter.handleWeeklyTasksUpdating(newDataMap);
+    } catch(e, st){
+      throw Exception("データ反映時...\n$e\n$st");
+    }
   }
 }

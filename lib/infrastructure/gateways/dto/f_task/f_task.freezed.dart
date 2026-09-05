@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FDailyTask {
   String get title;
-  Date get date;
+  int get dateInt;
   int get id;
   bool get isChecked;
   int get labelId;
@@ -33,7 +33,7 @@ mixin _$FDailyTask {
         (other.runtimeType == runtimeType &&
             other is FDailyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.date, date) || other.date == date) &&
+            (identical(other.dateInt, dateInt) || other.dateInt == dateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -42,11 +42,11 @@ mixin _$FDailyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId);
+      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'FDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'FDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -56,7 +56,7 @@ abstract mixin class $FDailyTaskCopyWith<$Res> {
           FDailyTask value, $Res Function(FDailyTask) _then) =
       _$FDailyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, Date date, int id, bool isChecked, int labelId});
+  $Res call({String title, int dateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -72,7 +72,7 @@ class _$FDailyTaskCopyWithImpl<$Res> implements $FDailyTaskCopyWith<$Res> {
   @override
   $Res call({
     Object? title = null,
-    Object? date = null,
+    Object? dateInt = null,
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
@@ -82,10 +82,10 @@ class _$FDailyTaskCopyWithImpl<$Res> implements $FDailyTaskCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as Date,
+      dateInt: null == dateInt
+          ? _self.dateInt
+          : dateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -196,15 +196,15 @@ extension FDailyTaskPatterns on FDailyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String title, Date date, int id, bool isChecked, int labelId)?
+            String title, int dateInt, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _FDailyTask() when $default != null:
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         return orElse();
     }
@@ -226,14 +226,14 @@ extension FDailyTaskPatterns on FDailyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String title, Date date, int id, bool isChecked, int labelId)
+            String title, int dateInt, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FDailyTask():
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -254,14 +254,14 @@ extension FDailyTaskPatterns on FDailyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String title, Date date, int id, bool isChecked, int labelId)?
+            String title, int dateInt, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FDailyTask() when $default != null:
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         return null;
     }
@@ -273,7 +273,7 @@ extension FDailyTaskPatterns on FDailyTask {
 class _FDailyTask extends FDailyTask {
   const _FDailyTask(
       {required this.title,
-      required this.date,
+      required this.dateInt,
       required this.id,
       required this.isChecked,
       required this.labelId})
@@ -282,7 +282,7 @@ class _FDailyTask extends FDailyTask {
   @override
   final String title;
   @override
-  final Date date;
+  final int dateInt;
   @override
   final int id;
   @override
@@ -304,7 +304,7 @@ class _FDailyTask extends FDailyTask {
         (other.runtimeType == runtimeType &&
             other is _FDailyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.date, date) || other.date == date) &&
+            (identical(other.dateInt, dateInt) || other.dateInt == dateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -313,11 +313,11 @@ class _FDailyTask extends FDailyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId);
+      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'FDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'FDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -329,7 +329,7 @@ abstract mixin class _$FDailyTaskCopyWith<$Res>
       __$FDailyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, Date date, int id, bool isChecked, int labelId});
+  $Res call({String title, int dateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -345,7 +345,7 @@ class __$FDailyTaskCopyWithImpl<$Res> implements _$FDailyTaskCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? title = null,
-    Object? date = null,
+    Object? dateInt = null,
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
@@ -355,10 +355,10 @@ class __$FDailyTaskCopyWithImpl<$Res> implements _$FDailyTaskCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as Date,
+      dateInt: null == dateInt
+          ? _self.dateInt
+          : dateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -378,7 +378,7 @@ class __$FDailyTaskCopyWithImpl<$Res> implements _$FDailyTaskCopyWith<$Res> {
 /// @nodoc
 mixin _$FWeeklyTask {
   String get title;
-  UniqueWeek get week;
+  int get firstDateInt;
   int get id;
   bool get isChecked;
   int get labelId;
@@ -396,7 +396,8 @@ mixin _$FWeeklyTask {
         (other.runtimeType == runtimeType &&
             other is FWeeklyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.week, week) || other.week == week) &&
+            (identical(other.firstDateInt, firstDateInt) ||
+                other.firstDateInt == firstDateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -405,11 +406,11 @@ mixin _$FWeeklyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, week, id, isChecked, labelId);
+      Object.hash(runtimeType, title, firstDateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'FWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'FWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -420,7 +421,7 @@ abstract mixin class $FWeeklyTaskCopyWith<$Res> {
       _$FWeeklyTaskCopyWithImpl;
   @useResult
   $Res call(
-      {String title, UniqueWeek week, int id, bool isChecked, int labelId});
+      {String title, int firstDateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -436,7 +437,7 @@ class _$FWeeklyTaskCopyWithImpl<$Res> implements $FWeeklyTaskCopyWith<$Res> {
   @override
   $Res call({
     Object? title = null,
-    Object? week = null,
+    Object? firstDateInt = null,
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
@@ -446,10 +447,10 @@ class _$FWeeklyTaskCopyWithImpl<$Res> implements $FWeeklyTaskCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      week: null == week
-          ? _self.week
-          : week // ignore: cast_nullable_to_non_nullable
-              as UniqueWeek,
+      firstDateInt: null == firstDateInt
+          ? _self.firstDateInt
+          : firstDateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -559,16 +560,16 @@ extension FWeeklyTaskPatterns on FWeeklyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, UniqueWeek week, int id, bool isChecked, int labelId)?
+    TResult Function(String title, int firstDateInt, int id, bool isChecked,
+            int labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _FWeeklyTask() when $default != null:
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.firstDateInt, _that.id,
+            _that.isChecked, _that.labelId);
       case _:
         return orElse();
     }
@@ -590,14 +591,14 @@ extension FWeeklyTaskPatterns on FWeeklyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String title, UniqueWeek week, int id, bool isChecked, int labelId)
+            String title, int firstDateInt, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FWeeklyTask():
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.firstDateInt, _that.id,
+            _that.isChecked, _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -617,15 +618,15 @@ extension FWeeklyTaskPatterns on FWeeklyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, UniqueWeek week, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, int firstDateInt, int id, bool isChecked,
+            int labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FWeeklyTask() when $default != null:
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.firstDateInt, _that.id,
+            _that.isChecked, _that.labelId);
       case _:
         return null;
     }
@@ -637,7 +638,7 @@ extension FWeeklyTaskPatterns on FWeeklyTask {
 class _FWeeklyTask extends FWeeklyTask {
   const _FWeeklyTask(
       {required this.title,
-      required this.week,
+      required this.firstDateInt,
       required this.id,
       required this.isChecked,
       required this.labelId})
@@ -646,7 +647,7 @@ class _FWeeklyTask extends FWeeklyTask {
   @override
   final String title;
   @override
-  final UniqueWeek week;
+  final int firstDateInt;
   @override
   final int id;
   @override
@@ -668,7 +669,8 @@ class _FWeeklyTask extends FWeeklyTask {
         (other.runtimeType == runtimeType &&
             other is _FWeeklyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.week, week) || other.week == week) &&
+            (identical(other.firstDateInt, firstDateInt) ||
+                other.firstDateInt == firstDateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -677,11 +679,11 @@ class _FWeeklyTask extends FWeeklyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, week, id, isChecked, labelId);
+      Object.hash(runtimeType, title, firstDateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'FWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'FWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -694,7 +696,7 @@ abstract mixin class _$FWeeklyTaskCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String title, UniqueWeek week, int id, bool isChecked, int labelId});
+      {String title, int firstDateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -710,7 +712,7 @@ class __$FWeeklyTaskCopyWithImpl<$Res> implements _$FWeeklyTaskCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   $Res call({
     Object? title = null,
-    Object? week = null,
+    Object? firstDateInt = null,
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
@@ -720,10 +722,10 @@ class __$FWeeklyTaskCopyWithImpl<$Res> implements _$FWeeklyTaskCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      week: null == week
-          ? _self.week
-          : week // ignore: cast_nullable_to_non_nullable
-              as UniqueWeek,
+      firstDateInt: null == firstDateInt
+          ? _self.firstDateInt
+          : firstDateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable

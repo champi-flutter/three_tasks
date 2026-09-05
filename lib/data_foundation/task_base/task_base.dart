@@ -7,25 +7,25 @@ import 'package:three_tasks/enum/task_recurrence.dart';
 abstract class TaskBase {
 
   /// タスクタイトル
-  String get title;
+  String? get title;
 
   /// 一意の識別子
   int get id;
 
   /// チェックされているかどうか
-  bool get isChecked;
+  bool? get isChecked;
 
   /// 登録されているラベルの ID
   ///
   /// ラベル未登録の状態を null => -1 に変更
-  int get labelId;
+  int? get labelId;
 
   /// タスクの期間の単位
   TaskRec get rec;
 }
 
 /// 日単位タスクのデータ構造
-abstract class DailyTaskBase implements TaskBase {
+abstract mixin class DailyTaskBase implements TaskBase {
   Date get date;
 
   /// タスクの期間の単位
@@ -34,7 +34,7 @@ abstract class DailyTaskBase implements TaskBase {
 }
 
 /// 週単位タスクのデータ構造
-abstract class WeeklyTaskBase implements TaskBase {
+abstract mixin class WeeklyTaskBase implements TaskBase {
   UniqueWeek get week;
 
   /// タスクの期間の単位
@@ -43,7 +43,7 @@ abstract class WeeklyTaskBase implements TaskBase {
 }
 
 /// 月単位タスクのデータ構造
-abstract class MonthlyTaskBase implements TaskBase {
+abstract mixin class MonthlyTaskBase implements TaskBase {
   Month get month;
 
   /// タスクの期間の単位
@@ -52,7 +52,7 @@ abstract class MonthlyTaskBase implements TaskBase {
 }
 
 /// 年単位タスクのデータ構造
-abstract class YearlyTaskBase implements TaskBase {
+abstract mixin class YearlyTaskBase implements TaskBase {
   int get year;
 
   /// タスクの期間の単位

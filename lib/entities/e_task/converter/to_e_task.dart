@@ -1,9 +1,9 @@
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
-import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
+import 'package:three_tasks/entities/e_task/e_task.dart';
 
-/// [VTask] への変換器
-class ToVTask {
-  static VDailyTask toVDailyTask<DailyTask extends DailyTaskBase>(
+/// [ETask] への変換器
+class ToETask {
+  static EDailyTask toEDailyTask<DailyTask extends DailyTaskBase>(
       DailyTask dailyTask,
       )
   {
@@ -11,7 +11,7 @@ class ToVTask {
     final isChecked = dailyTask.isChecked;
     final labelId = dailyTask.labelId;
     if (title != null && isChecked != null && labelId != null) {
-      return VDailyTask(
+      return EDailyTask(
         id: dailyTask.id,
         title: title,
         isChecked: isChecked,
@@ -22,18 +22,18 @@ class ToVTask {
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは VTask に変換できません。（${dailyTask.runtimeType}）\n[ToVTask.toVDailyTask]",
+        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${dailyTask.runtimeType}）\n[ToETask.toEDailyTask]",
       );
     }
   }
 
-  static VWeeklyTask toVWeeklyTask<WeeklyTask extends WeeklyTaskBase>(
-          WeeklyTask weeklyTask) {
+  static EWeeklyTask toEWeeklyTask<WeeklyTask extends WeeklyTaskBase>(
+      WeeklyTask weeklyTask) {
     final title = weeklyTask.title;
     final isChecked = weeklyTask.isChecked;
     final labelId = weeklyTask.labelId;
     if (title != null && isChecked != null && labelId != null) {
-      return VWeeklyTask(
+      return EWeeklyTask(
         id: weeklyTask.id,
         title: title,
         isChecked: isChecked,
@@ -44,19 +44,19 @@ class ToVTask {
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは VTask に変換できません。（${weeklyTask.runtimeType}）\n[ToVTask.toVWeeklyTask]",
+        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${weeklyTask.runtimeType}）\n[ToETask.toEWeeklyTask]",
       );
     }
   }
 
-  static VMonthlyTask toVMonthlyTask<MonthlyTask extends MonthlyTaskBase>(
-          MonthlyTask monthlyTask)
+  static EMonthlyTask toEMonthlyTask<MonthlyTask extends MonthlyTaskBase>(
+      MonthlyTask monthlyTask)
   {
     final title = monthlyTask.title;
     final isChecked = monthlyTask.isChecked;
     final labelId = monthlyTask.labelId;
     if (title != null && isChecked != null && labelId != null) {
-      return VMonthlyTask(
+      return EMonthlyTask(
         id: monthlyTask.id,
         title: title,
         isChecked: isChecked,
@@ -67,19 +67,19 @@ class ToVTask {
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは VTask に変換できません。（${monthlyTask.runtimeType}）\n[ToVTask.toVMonthlyTask]",
+        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${monthlyTask.runtimeType}）\n[ToETask.toEMonthlyTask]",
       );
     }
   }
 
 
-  static VYearlyTask toVYearlyTask<YearlyTask extends YearlyTaskBase>(
-          YearlyTask yearlyTask) {
+  static EYearlyTask toEYearlyTask<YearlyTask extends YearlyTaskBase>(
+      YearlyTask yearlyTask) {
     final title = yearlyTask.title;
     final isChecked = yearlyTask.isChecked;
     final labelId = yearlyTask.labelId;
     if (title != null && isChecked != null && labelId != null) {
-      return VYearlyTask(
+      return EYearlyTask(
         id: yearlyTask.id,
         title: title,
         isChecked: isChecked,
@@ -90,13 +90,9 @@ class ToVTask {
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは VTask に変換できません。（${yearlyTask.runtimeType}）\n[ToVTask.toVYearlyTask]",
+        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${yearlyTask.runtimeType}）\n[ToETask.toEYearlyTask]",
       );
     }
   }
 
 }
-
-// extension VTaskCaster on List<VTask>{
-//   List<P> pass<P extends VTask>()=>cast<P>();
-// }

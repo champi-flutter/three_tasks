@@ -1,7 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/cache/cache_handler/weekly_tasks_cache_handler.dart';
-import 'package:three_tasks/use_case/handler/stream_handler/weekly_tasks_stream_handler.dart';
+import 'package:three_tasks/use_case/stream_handler_interface/weekly_tasks_stream_handler.dart';
 
 /// 週単位タスクのキャッシュハンドラを実装するクラス
 class WeeklyTasksCacheHandlerImpl extends WeeklyTasksCacheHandler{

@@ -13,7 +13,7 @@ import 'package:three_tasks/entities/e_task/e_task.dart';
 ///
 /// 親クラスの静的解析ツールの機能を引き継ぐためにインターフェースとして設置する。
 abstract class TasksCacheHandlerBase<K, Task extends ETask>
-    extends LfuListCacheHandler<K, int, Task> {
+    extends LfuFloatingListCacheHandler<K, int, Task> {
   /// `super.capacity` を親に渡すための内部的なコンストラクタ
   /// （抽象クラスなので呼び出し不可）
   TasksCacheHandlerBase(): super(capacity: 30);

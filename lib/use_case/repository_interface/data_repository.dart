@@ -5,10 +5,6 @@ import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart'
 /// データ層へのアクセスポート
 abstract class DataRepository {
 
-  // todo 初期化
-  /// 週単位タスクのキャッシュ初期化メソッド
-  Future<Result<void, Exception>> initWeeklyTaskList();
-
   // todo フェッチ
   /// 指定日付（[dateList]）の日単位タスクをフェッチするメソッド
   ///
@@ -23,9 +19,8 @@ abstract class DataRepository {
   ///
   /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
   /// にこのメソッドを呼び出す。
-  Future<Result<List<EWeeklyTask>, Exception>> fetchWeeklyTasks({
+  Future<Result<void, Exception>> fetchWeeklyTasks({
     required Date targetDate,
-    required List<UniqueWeek> cachedWeeks,
   });
 
   /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド

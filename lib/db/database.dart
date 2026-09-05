@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart';
 import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
 import 'package:three_tasks/entities/dto/d_label/d_labeled_task.dart';
 import 'package:three_tasks/gateways/data_source_interface/data_source.dart';
+import 'package:three_tasks/infrastructure/gateways/data_source_interface/data_source.dart';
+import 'package:three_tasks/infrastructure/gateways/dto/f_task/f_task.dart';
 import 'package:three_tasks/main.dart';
 
 import '../view/screens/history_screen.dart';
@@ -31,6 +33,7 @@ class DayTasks extends Table {
   TextColumn get improvement => text().nullable()();
 
   // 2026/06/30 追加: ラベルID（ラベル化の際に追加）
+  // todo non-nullable に（2026/09/05）＞＞
   IntColumn get labelId => integer().nullable()();
 
   @override
@@ -130,7 +133,7 @@ class LabeledTasks extends Table {
   YearlyTasks,
   LabeledTasks,
 ])
-class MyDatabase extends _$MyDatabase implements DataSource {
+class MyDatabase extends _$MyDatabase implements DataSource{
   // データベースをどこに保存するかをDriftに伝えるリダイレクトコンストラクタ
   MyDatabase() : super(_openConnection());
 
@@ -172,9 +175,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   }
 
   /// [DayTask]（テーブルクラス）から [DDailyTask]（エンティティ）へ変換
-  DDailyTask _dDailyTask(DayTask rawData) {
-    return DDailyTask(
-      task: rawData.task,
+  FDailyTask _toFDailyTask(DayTask rawData) {
+    return FDailyTask(
+      title: rawData.task,
       // 2026/06/08 変更: カラムの型の変換に対応
       date: rawData.date.toDate(),
       id: rawData.id,
@@ -260,22 +263,22 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   ///
   /// 要求された日付（[targetDate]）に該当するデータを返す。
   @override
-  Future<Result<List<DWeeklyTask>, Exception>> getWeeklyTasksByDate({
+  Future<Result<List<FWeeklyTask>, Exception>> getWeeklyTasksByDate({
     required Date targetDate,
-    required List<int> diffsOnCache,
+    required List<int> exclusionDiffs,
   })
   // 折りたたみ用
   async {
     try {
-      final List<DWeeklyTask> resultValue = [];
+      final List<FWeeklyTask> resultValue = [];
       // transaction で、要求された日付のデータを一気に取得
       await transaction(() async {
         // targetDate をカラムの型の変換に対応
         final int targetDateInt = targetDate.toIntIdentifier();
         // targetDate から 6 〜 0 日前が週の初めとなっているタスクを取得
         for (int diff = 6; diff >= 0; diff--) {
-          // すでにキャッシュされている分
-          if (diffsOnCache.contains(diff)) {
+          // 引数で指定された、除外する開始日
+          if (exclusionDiffs.contains(diff)) {
             continue;
           }
           // 週の初めの日の int

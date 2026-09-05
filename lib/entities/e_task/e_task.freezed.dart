@@ -381,8 +381,6 @@ mixin _$EWeeklyTask {
   UniqueWeek get week;
   int get id;
   bool get isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
   /// Create a copy of EWeeklyTask
@@ -653,8 +651,6 @@ class _EWeeklyTask extends EWeeklyTask {
   final int id;
   @override
   final bool isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
   final int labelId;
 

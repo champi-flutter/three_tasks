@@ -1,12 +1,13 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
 part 'e_task.freezed.dart';
 
 /// タスクのエンティティの sealed class
-sealed class ETask {
+sealed class ETask extends TaskBase{
 
   /// タスクタイトル
   String get title;
@@ -28,7 +29,7 @@ sealed class ETask {
 
 /// 日単位のタスククラス
 @freezed
-abstract class EDailyTask with _$EDailyTask implements ETask {
+abstract class EDailyTask with _$EDailyTask, DailyTaskBase implements ETask {
   const EDailyTask._();
 
   const factory EDailyTask({
@@ -38,15 +39,11 @@ abstract class EDailyTask with _$EDailyTask implements ETask {
     required bool isChecked,
     required int labelId,
   }) = _EDailyTask;
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.day;
 }
 
 /// 週単位のタスククラス
 @freezed
-abstract class EWeeklyTask with _$EWeeklyTask implements ETask {
+abstract class EWeeklyTask with WeeklyTaskBase, _$EWeeklyTask implements ETask {
   const EWeeklyTask._();
 
   const factory EWeeklyTask({
@@ -54,14 +51,8 @@ abstract class EWeeklyTask with _$EWeeklyTask implements ETask {
     required UniqueWeek week,
     required int id,
     required bool isChecked,
-
-    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
     required int labelId,
   }) = _EWeeklyTask;
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.week;
 
   /// **編集可能な** 週単位タスクの仮データかどうか
   bool get canReplace => id == -2;
@@ -69,7 +60,7 @@ abstract class EWeeklyTask with _$EWeeklyTask implements ETask {
 
 /// 月単位のタスククラス
 @freezed
-abstract class EMonthlyTask with _$EMonthlyTask implements ETask {
+abstract class EMonthlyTask with MonthlyTaskBase, _$EMonthlyTask implements ETask {
   const EMonthlyTask._();
 
   const factory EMonthlyTask({
@@ -79,15 +70,11 @@ abstract class EMonthlyTask with _$EMonthlyTask implements ETask {
     required bool isChecked,
     required int labelId,
   }) = _EMonthlyTask;
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.month;
 }
 
 /// 年単位のタスククラス
 @freezed
-abstract class EYearlyTask with _$EYearlyTask implements ETask {
+abstract class EYearlyTask with YearlyTaskBase, _$EYearlyTask implements ETask {
   const EYearlyTask._();
 
   const factory EYearlyTask({
@@ -97,10 +84,6 @@ abstract class EYearlyTask with _$EYearlyTask implements ETask {
     required bool isChecked,
     required int labelId,
   }) = _EYearlyTask;
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.year;
 }
 
 extension ETaskListExtension on List<ETask> {

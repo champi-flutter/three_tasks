@@ -1,4 +1,5 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
 import 'package:three_tasks/view_models/weekly_tasks_view_model/weekly_tasks_view_model.dart';
@@ -15,7 +16,7 @@ class WeeklyTasksPresenterImpl implements WeeklyTasksPresenter {
 
   /// 更新反映フローを実装
   @override
-  void handleWeeklyTasksUpdating(Map<UniqueWeek, VWeeklyTask> newDataMap) {
+  void handleWeeklyTasksUpdating(Map<UniqueWeek, EWeeklyTask> newDataMap) {
     try {
       // 当日のエントリを抽出する
       final todaysEntries = newDataMap.entries

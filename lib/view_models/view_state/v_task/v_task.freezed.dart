@@ -18,8 +18,6 @@ mixin _$VDailyTask {
   Date get date;
   int get id;
   bool get isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
   /// Create a copy of VDailyTask
@@ -289,8 +287,6 @@ class _VDailyTask extends VDailyTask {
   final int id;
   @override
   final bool isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
   final int labelId;
 
@@ -385,8 +381,6 @@ mixin _$VWeeklyTask {
   UniqueWeek get week;
   int get id;
   bool get isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
   /// Create a copy of VWeeklyTask
@@ -657,8 +651,6 @@ class _VWeeklyTask extends VWeeklyTask {
   final int id;
   @override
   final bool isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
   final int labelId;
 
@@ -754,8 +746,6 @@ mixin _$VMonthlyTask {
   Month get month;
   int get id;
   bool get isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
   /// Create a copy of VMonthlyTask
@@ -1026,8 +1016,6 @@ class _VMonthlyTask extends VMonthlyTask {
   final int id;
   @override
   final bool isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
   final int labelId;
 
@@ -1123,8 +1111,6 @@ mixin _$VYearlyTask {
   int get year;
   int get id;
   bool get isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
   /// Create a copy of VYearlyTask
@@ -1394,8 +1380,6 @@ class _VYearlyTask extends VYearlyTask {
   final int id;
   @override
   final bool isChecked;
-
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   @override
   final int labelId;
 

@@ -1,6 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
 import 'package:three_tasks/entities/data_type/d_label/d_labeled_task.dart';
+import 'package:three_tasks/infrastructure/gateways/dto/f_task/f_task.dart';
 
 abstract class DataSource {
   // todo フェッチ
@@ -19,9 +20,9 @@ abstract class DataSource {
   /// `WeeklyTask` フェッチメソッド
   ///
   /// 要求された日付（[dateList]）に該当するデータを返す。
-  Future<Result<List<DWeeklyTask>, Exception>> getWeeklyTasksByDate({
+  Future<Result<List<FWeeklyTask>, Exception>> getWeeklyTasksByDate({
     required Date targetDate,
-    required List<int> diffsOnCache,
+    required List<int> exclusionDiffs,
   });
 
   // todo 書き換え

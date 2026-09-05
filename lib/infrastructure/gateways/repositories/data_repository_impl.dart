@@ -5,22 +5,18 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
-import 'package:three_tasks/entities/data_type/d_label/d_labeled_task.dart';
+import 'package:three_tasks/entities/e_task/converter/to_e_task.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
-import 'package:three_tasks/gateways/data_source_interface/data_source.dart';
 import 'package:three_tasks/infrastructure/cache/cache_handler/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/cache/cache_handler/weekly_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateways/data_source_interface/data_source.dart';
-import 'package:three_tasks/infrastructure/gateways/dto/d_task/converter/to_s_task.dart';
-import 'package:three_tasks/infrastructure/gateways/dto/d_task/s_task.dart';
 import 'package:three_tasks/infrastructure/gateways/dto/f_task/f_task.dart';
 import 'package:three_tasks/infrastructure/gateways/dto/s_task/converter/to_s_task.dart';
 import 'package:three_tasks/infrastructure/gateways/dto/s_task/s_task.dart';
 import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
-class DataRepositoryImpl implements DataRepository {
+class DataRepositoryImpl with NotificationFromGateway implements DataRepository {
   // todo コンストラクタ
   DataRepositoryImpl({
     required DataSource dataSource,
@@ -238,151 +234,6 @@ class DataRepositoryImpl implements DataRepository {
     _labeledTasksController.add([..._allLabeledTasks]);
   }
 
-  // region 日単位タスクキャッシュ管理元の変更後
-  // /// 日単位タスクのキャッシュ
-  // Map<Date, List<DDailyTask>> _dailyTasksMap = {};
-  //
-  // /// 日単位タスクのキャッシュを管理するコントローラ
-  // final StreamController<Map<Date, List<DDailyTask>>> _dailyTasksController =
-  //     BehaviorSubject<Map<Date, List<DDailyTask>>>();
-  //
-  // /// 日単位タスクのキャッシュが更新された際に、その情報を流すストリーム
-  // @override
-  // Stream<Map<Date, List<DDailyTask>>> get dailyTasksStream =>
-  //     _dailyTasksController.stream;
-  //
-  // /// 指定日付の日単位タスクをまるごと置き換えて、ストリームに流す一連のプロセス
-  // ///  - [_dailyTasksMap] を更新
-  // ///  - ストリームに流す
-  // void _streamNewDailyTasks(Map<Date, List<DDailyTask>> dataMap) {
-  //   // 取得したデータをキャッシュの Map に組み込む
-  //   for (var entries in dataMap.entries) {
-  //     _dailyTasksMap[entries.key] = entries.value;
-  //   }
-  //   // キャッシュをストリームに流す
-  //   _dailyTasksController.add({..._dailyTasksMap});
-  // }
-  //
-  // /// 指定日付の日単位タスクの中身を一部更新して、ストリームに流す一連のプロセス
-  // ///  - [_dailyTasksMap] を更新
-  // ///  - ストリームに流す
-  // void _streamUpdatedDailyTasks({
-  //   required Date date,
-  //   required int taskId,
-  //   Object task = nonSpecified,
-  //   Object isChecked = nonSpecified,
-  //   Object? labelId = nonSpecified,
-  // })
-  // // 折りたたみ用
-  // {
-  //   final bool isNotSpecifiedTask = identical(task, nonSpecified);
-  //   final bool isNotSpecifiedIsChecked = identical(isChecked, nonSpecified);
-  //   final bool isNotSpecifiedLabelId = identical(labelId, nonSpecified);
-  //   assert(
-  //     isNotSpecifiedTask || task is String,
-  //     "DDailyTask.task が String で指定されていません。",
-  //   );
-  //   assert(
-  //     isNotSpecifiedIsChecked || isChecked is bool,
-  //     "DDailyTask.isChecked が bool で指定されていません。",
-  //   );
-  //   assert(
-  //     isNotSpecifiedLabelId || labelId == null || labelId is int,
-  //     "DDailyTask.labelId が int? で指定されていません。",
-  //   );
-  //   if (_dailyTasksMap.containsKey(date)) {
-  //     // キャッシュの更新
-  //     _dailyTasksMap[date] = _dailyTasksMap[date]!.map((DDailyTask dailyTask) {
-  //       // 該当IDのタスクの labelId を copyWith で書き換え
-  //       if (dailyTask.id == taskId) {
-  //         // 引数で指定したプロパティを変換
-  //         return dailyTask.copyWith(
-  //           task: isNotSpecifiedTask ? dailyTask.task : task as String,
-  //           isChecked:
-  //               isNotSpecifiedIsChecked ? dailyTask.isChecked : isChecked as bool,
-  //           labelId: isNotSpecifiedLabelId ? dailyTask.labelId : labelId as int,
-  //         );
-  //       } else {
-  //         return dailyTask;
-  //       }
-  //     }).toList();
-  //     // ストリームに流す
-  //     _dailyTasksController.add({..._dailyTasksMap});
-  //   } else {
-  //     throw Exception("予期せぬ不具合が発生しました（_dailyTasksMap[date] == null）。");
-  //   }
-  // }
-  // endregion
-
-  // region 週単位タスクキャッシュ管理元の変更後
-  // /// 週単位タスクのキャッシュ
-  // List<DWeeklyTask> _weeklyTasksList = [];
-  //
-  // /// 週単位タスクのキャッシュを管理するコントローラ
-  // final StreamController<List<DWeeklyTask>> _weeklyTasksController =
-  //     BehaviorSubject<List<DWeeklyTask>>();
-  //
-  // /// 週単位タスクのキャッシュが更新された際に、その情報を流すストリーム
-  // @override
-  // Stream<List<DWeeklyTask>> get weeklyTasksStream =>
-  //     _weeklyTasksController.stream;
-  //
-  // /// 週単位タスクの Map をストリームに流す一連のプロセス
-  // ///  - [_weeklyTasksMap] を更新
-  // ///  - ストリームに流す
-  // void _streamNewWeeklyTasks(List<DWeeklyTask> dataList) {
-  //   // 取得したデータをキャッシュに組み込む
-  //   _weeklyTasksList.addAll([...dataList]);
-  //   // キャッシュをストリームに流す
-  //   _weeklyTasksController.add([..._weeklyTasksList]);
-  // }
-  //
-  // /// 週単位タスクの中身を更新して、ストリームに流す一連のプロセス
-  // ///  - [_weeklyTasksList] を更新
-  // ///  - ストリームに流す
-  // void _streamUpdatedWeeklyTasks({
-  //   required int taskId,
-  //   Object task = nonSpecified,
-  //   Object isChecked = nonSpecified,
-  //   Object? labelId = nonSpecified,
-  // })
-  // // 折りたたみ用
-  // {
-  //   final bool isNotSpecifiedTask = identical(task, nonSpecified);
-  //   final bool isNotSpecifiedIsChecked = identical(isChecked, nonSpecified);
-  //   final bool isNotSpecifiedLabelId = identical(labelId, nonSpecified);
-  //   assert(
-  //     isNotSpecifiedTask || task is String,
-  //     "DDailyTask.task が String で指定されていません。",
-  //   );
-  //   assert(
-  //     isNotSpecifiedIsChecked || isChecked is bool,
-  //     "DDailyTask.isChecked が bool で指定されていません。",
-  //   );
-  //   assert(
-  //     isNotSpecifiedLabelId || labelId == null || labelId is int,
-  //     "DDailyTask.labelId が int? で指定されていません。",
-  //   );
-  //   _weeklyTasksList = _weeklyTasksList.map((DWeeklyTask weeklyTask) {
-  //     // 該当IDのタスクの labelId を copyWith で書き換え
-  //     if (weeklyTask.id == taskId) {
-  //       // 引数で指定したプロパティを変換
-  //       return weeklyTask.copyWith(
-  //         task: isNotSpecifiedTask ? weeklyTask.task : task as String,
-  //         isChecked: isNotSpecifiedIsChecked
-  //             ? weeklyTask.isChecked
-  //             : isChecked as bool,
-  //         labelId: isNotSpecifiedLabelId ? weeklyTask.labelId : labelId as int,
-  //       );
-  //     } else {
-  //       return weeklyTask;
-  //     }
-  //   }).toList();
-  //   // ストリームに流す
-  //   _weeklyTasksController.add([..._weeklyTasksList]);
-  // }
-  // endregion
-
   // todo フェッチ
   /// 「ラベル化したタスク」のキャッシュ初期化メソッド
   Future<void> _initLabeledTasks() async {
@@ -405,39 +256,14 @@ class DataRepositoryImpl implements DataRepository {
     }
   }
 
-  /// 日単位タスク（「今日のタスク」と「明日のタスク」）のキャッシュ初期化メソッド
-  Future<void> _initDailyTasksMap() async {
-    // 今日と明日の値を要求する
-    final List<Date> dateList = [
-      today,
-      today.nDaysLater(1),
-    ];
-    // DBからデータを取得する
-    fetchDailyTasks(dateList: dateList);
-  }
-
-  /// 週単位タスクのキャッシュ初期化メソッド
-  @override
-  Future<Result<void, Exception>> initWeeklyTaskList() async {
-    try {
-      // 当日から1週間前まで（当日を含む週の開始日になりうる日付）の値を要求する
-      final List<Date> firstDateList =
-          List<Date>.generate(7, (int index) => today.nDaysAgo(index));
-      // DBからデータを取得する
-      return await fetchWeeklyTaskList(firstDateList: firstDateList);
-    } catch (e) {
-      return Failure(Exception(e));
-    }
-  }
-
-  /// 日単位タスクフェッチメソッド
+  /// todo 日単位タスクフェッチメソッド（2026/09/05）＞＞
   ///
   /// DB からデータを取得して、ストリームに流す。
   ///
   /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
   /// にこのメソッドを呼び出す。
   @override
-  Future<Result<Map<Date, List<EDailyTask>>, Exception>> fetchDailyTasks({
+  Future<Result<void, Exception>> fetchDailyTasks({
     required List<Date> dateList,
   })
   // 折りたたみ用
@@ -449,8 +275,14 @@ class DataRepositoryImpl implements DataRepository {
     );
 
     switch (result) {
-      case Success():
-        return result;
+      case Success(value: final Map<Date, List<FDailyTask>> resultMap):
+        final converted = resultMap.map<Date, List<EDailyTask>>(
+            (date, fTaskList) => MapEntry(
+                date,
+                fTaskList
+                    .map<EDailyTask>(ToETask.toEDailyTask<FDailyTask>)
+                    .toList()));
+        return Success(converted);
       case Failure(
           exception: final Exception error,
           methodName: final String? methodName
@@ -462,36 +294,36 @@ class DataRepositoryImpl implements DataRepository {
     }
   }
 
-  /// 週単位タスクフェッチメソッド
-  ///
-  /// DB からデータを取得して、ストリームに流す。
-  ///
-  /// 基本はキャッシュを参照するが、参照したい日付（[firstDateList]）がキャッシュにない場合
-  /// にこのメソッドを呼び出す。
-  @override
-  Future<Result<void, Exception>> fetchWeeklyTaskList({
-    required List<Date> firstDateList,
-  })
-  // 折りたたみ用
-  async {
-    // 日付を指定して週単位タスクをフェッチ
-    final Result<List<DWeeklyTask>, Exception> result =
-        await _dataSource.getWeeklyTasksByDate(firstDateList: firstDateList);
-
-    switch (result) {
-      case Success(value: final List<DWeeklyTask> resultValue):
-        // ストリームにデータを流す（週タスクは空を許容）
-        _streamNewWeeklyTasks(resultValue);
-
-      // エラーハンドリング
-      case Failure(
-          exception: final Exception error,
-          methodName: final String? methodName
-        ):
-        _notifyQueryError(error: error, methodName: methodName);
-    }
-    return result;
-  }
+  // /// 週単位タスクフェッチメソッド
+  // ///
+  // /// DB からデータを取得して、ストリームに流す。
+  // ///
+  // /// 基本はキャッシュを参照するが、参照したい日付（[firstDateList]）がキャッシュにない場合
+  // /// にこのメソッドを呼び出す。
+  // @override
+  // Future<Result<void, Exception>> fetchWeeklyTaskList({
+  //   required List<Date> firstDateList,
+  // })
+  // // 折りたたみ用
+  // async {
+  //   // 日付を指定して週単位タスクをフェッチ
+  //   final Result<List<DWeeklyTask>, Exception> result =
+  //       await _dataSource.getWeeklyTasksByDate(firstDateList: firstDateList);
+  //
+  //   switch (result) {
+  //     case Success(value: final List<DWeeklyTask> resultValue):
+  //       // ストリームにデータを流す（週タスクは空を許容）
+  //       _streamNewWeeklyTasks(resultValue);
+  //
+  //     // エラーハンドリング
+  //     case Failure(
+  //         exception: final Exception error,
+  //         methodName: final String? methodName
+  //       ):
+  //       _notifyQueryError(error: error, methodName: methodName);
+  //   }
+  //   return result;
+  // }
 
   /// 週単位タスクフェッチメソッド
   ///
@@ -500,32 +332,73 @@ class DataRepositoryImpl implements DataRepository {
   /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
   /// にこのメソッドを呼び出す。
   @override
-  Future<Result<List<DWeeklyTask>, Exception>> fetchWeeklyTasks({
+  Future<Result<void, Exception>> fetchWeeklyTasks({
     required Date targetDate,
-    required List<UniqueWeek> cachedWeeks,
   })
   // 折りたたみ用
   async {
-    // キャッシュ済みの週のリストを、指定日と対象週の開始日との差分のリストに変換する
-    final List<int> diffs = cachedWeeks
-        .map<int>((week) => targetDate.difference(week.firstDateOfWeek).inDays)
-        .toList();
+    try {
+      // すでにキャッシュされている週を取得する
+      final List<UniqueWeek> cachedWeeks = _weeklyTasksCacheHandler
+          .getCachedWeeks(targetDate,);
+      // キャッシュ済みの週のリストを、指定日と対象週の開始日との差分のリストに変換する
+      final List<int> exclusionDiffs = cachedWeeks
+          .map<int>((week) =>
+      targetDate
+          .difference(week.firstDateOfWeek)
+          .inDays)
+          .toList();
 
-    // 日付を指定して週単位タスクをフェッチ
-    final Result<List<DWeeklyTask>, Exception> result = await _dataSource
-        .getWeeklyTasksByDate(targetDate: targetDate, diffsOnCache: diffs);
+      // キャッシュにない分の週単位タスクをデータソースから取得する
+      final Result<List<FWeeklyTask>, Exception> result = await _dataSource
+          .getWeeklyTasksByDate(
+        targetDate: targetDate,
+        exclusionDiffs: exclusionDiffs,
+      );
 
-    switch (result) {
-      case Success():
-        return result;
-      case Failure(
-          exception: final Exception error,
-          methodName: final String? methodName
+      // 取得した分のデータを加えたキャッシュを更新する
+      switch (result) { // region
+        case Success(value: final List<FWeeklyTask> resultValueList):
+        // キャッシュハンドラに渡す Map （UniqueWeek に対応する DataEntry を格納する）
+          final Map<UniqueWeek, List<DataEntry<int, EWeeklyTask>>> updateMap = {
+          };
+          // 要求した日付のうち、データがDBにあった分をキャッシュする
+          for (final FWeeklyTask fTask in resultValueList) {
+            final UniqueWeek uniqueWeek = fTask.week;
+            // ID と ETask のセット
+            final DataEntry<int, EWeeklyTask> dataEntry = (id: fTask
+                .id, value: ToETask.toEWeeklyTask<FWeeklyTask>(fTask), );
+            // キャッシュハンドラに渡す Map に上の DataEntry を追加する
+            updateMap.addNullable(key: uniqueWeek, value: dataEntry);
+          }
+          // 対象 UniqueWeek に
+          // （for 文の入れ子になっているが、対象 UniqueWeek が数個、それぞれの値が最大で
+          // 3つなので実質的な計算量は少なめ）
+          for (final updateEntry in updateMap.entries) {
+            final updateKey = updateEntry.key;
+            final updateDataEntryList = updateEntry.value;
+            // _weeklyTasksCacheHandler.update の valueMap に入れる Map
+            final Map<int, DataEntry<int, EWeeklyTask>> valueMap = {};
+            // 探索するリストの要素を追加する valueMap の key
+            // （キャッシュのグループにおける index）
+            // グループにおける index はわからないので負の値を指定する
+            int tempKey = -1;
+            for (final updateDataEntry in updateDataEntryList) {
+              valueMap[tempKey] = updateDataEntry;
+              tempKey--;
+            }
+            _weeklyTasksCacheHandler.update(key: updateKey, valueMap: valueMap);
+          }
+          return Success(null);
+        case Failure(
+        exception: final Exception exc,
+        methodName: final String? methodName,
         ):
-        return Failure(
-          _queryError(details: "$error", methodName: methodName),
-          methodName: "fetchWeeklyTasks",
-        );
+          throw queryError(details: "$exc", methodName: methodName);
+      // endregion
+      }
+    } catch (e, st){
+      return Failure(Exception("$e\n$st"));
     }
   }
 

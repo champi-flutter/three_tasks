@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
 part 'v_task.freezed.dart';
@@ -9,7 +10,7 @@ part 'v_task.freezed.dart';
 ///
 /// 2026/06/04 変更: sealedクラス自体を freezed で定義すると、riverpod_generator
 /// との兼ね合いが悪いので、継承先を freezed で個別に生成
-sealed class VTask {
+sealed class VTask extends TaskBase{
 
   /// タスクの期間の単位
   TaskRec get rec;
@@ -20,7 +21,6 @@ sealed class VTask {
 
   bool get isChecked;
 
-  /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
   /// データ受信済みかどうか
@@ -29,11 +29,7 @@ sealed class VTask {
 
 /// 日単位のタスククラス
 @freezed
-abstract class VDailyTask with _$VDailyTask implements VTask {
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.day;
+abstract class VDailyTask with DailyTaskBase, _$VDailyTask implements VTask {
 
   const VDailyTask._();
 
@@ -61,11 +57,7 @@ abstract class VDailyTask with _$VDailyTask implements VTask {
 
 /// 週単位のタスククラス
 @freezed
-abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.week;
+abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
 
   const VWeeklyTask._();
 
@@ -112,11 +104,7 @@ abstract class VWeeklyTask with _$VWeeklyTask implements VTask {
 
 /// 月単位のタスククラス
 @freezed
-abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.month;
+abstract class VMonthlyTask with MonthlyTaskBase, _$VMonthlyTask implements VTask {
 
   const VMonthlyTask._();
 
@@ -126,7 +114,6 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
     required int id,
     required bool isChecked,
 
-    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
     required int labelId,
   }) = _VMonthlyTask;
 
@@ -146,11 +133,7 @@ abstract class VMonthlyTask with _$VMonthlyTask implements VTask {
 
 /// 年単位のタスククラス
 @freezed
-abstract class VYearlyTask with _$VYearlyTask implements VTask {
-
-  /// タスクの期間の単位
-  @override
-  TaskRec get rec => TaskRec.year;
+abstract class VYearlyTask with YearlyTaskBase, _$VYearlyTask implements VTask {
 
   const VYearlyTask._();
 
@@ -160,7 +143,6 @@ abstract class VYearlyTask with _$VYearlyTask implements VTask {
     required int id,
     required bool isChecked,
 
-    /// todo 2026/08/02 変更: ラベル未登録の状態を null => -1 に変更
     required int labelId,
   }) = _VYearlyTask;
 
