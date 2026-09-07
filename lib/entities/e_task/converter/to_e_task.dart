@@ -3,6 +3,33 @@ import 'package:three_tasks/entities/e_task/e_task.dart';
 
 /// [ETask] への変換器
 class ToETask {
+  static ETask toETask<Task extends TaskBase>(
+      Task task,
+      )
+  {
+    final title = task.title;
+    final isChecked = task.isChecked;
+    final labelId = task.labelId;
+    if (title != null && isChecked != null && labelId != null) {
+      return switch (task){
+        DailyTaskBase() => toEDailyTask(task),
+        WeeklyTaskBase() => toEWeeklyTask(task),
+        MonthlyTaskBase() => toEMonthlyTask(task),
+        YearlyTaskBase() => toEYearlyTask(task),
+        TaskBase() => throw Exception(
+          "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${task.runtimeType}）\n[ToETask.toETask]",
+        ),
+      };
+    }
+    // null のパラメータを含む場合は例外を投げる
+    else {
+      throw Exception(
+        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${task.runtimeType}）\n[ToETask.toETask]",
+      );
+    }
+  }
+
+  /// [EDailyTask] へ変換
   static EDailyTask toEDailyTask<DailyTask extends DailyTaskBase>(
       DailyTask dailyTask,
       )

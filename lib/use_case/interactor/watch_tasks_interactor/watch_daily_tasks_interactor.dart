@@ -3,7 +3,7 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
-import 'package:three_tasks/infrastructure/cache/cache_handler/daily_tasks_cache_handler.dart';
+import 'package:three_tasks/infrastructure/cache/cache_handler/cache_handler_interface/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
@@ -53,14 +53,23 @@ class WatchDailyTasksInteractor
   /// このクラスがすでに起動済みかどうか
   bool _isInitialized = false;
 
-  /// 監視を開始
+  /// 対象日付（[targetDate]）のデータの監視フローを開始する
   ///
-  /// 【データ受信時の処理フロー】
-  ///   1. データの型を変換する
-  ///   2. 変換後のデータを反映させる
+  /// - [initAt] 初起動時に、ストリームハンドラに購読の開始を依頼し、
+  /// リスナー（[_onData]）を登録する
+  ///
+  /// - [_onData]: データ受信時の処理フロー
+  ///     - データの型を変換する
+  ///     - 変換後のデータを反映させる
+  ///
+  /// - [targetDate]の監視を開始する
+  ///     - [targetDate] の日単位タスクのフェッチする
+  ///     - フェッチされたデータはキャッシュハンドラによってストリームに流され、 [_onData]
+  /// が起動する
   ///
   @override
-  Future<void> initAt(List<Date> dateList) =>
+  Future<void> initAt(Date targetDate) =>
+      // 最初のデータの受信が完了するまでローディングを起動する
       _loadingService.loadAsync(() async {
         try {
           // 初めての起動の場合
@@ -69,10 +78,12 @@ class WatchDailyTasksInteractor
             _initSubscription();
           }
           // 対象の日付のタスクデータの監視を開始する。
-          await _initWatching(dateList);
+          await _initWatching(targetDate: targetDate);
           _isInitialized = true;
-        } catch (_) {
+        } catch (e, st) {
           _isInitialized = false;
+          // エラーを通知
+          notifyError(content: "$e\n$st");
         }
       });
 
@@ -87,60 +98,30 @@ class WatchDailyTasksInteractor
     }
   }
 
-  /// 対象日付（[dateList]）の監視を開始するプライベートメソッド
-  Future<void> _initWatching(List<Date> dateList) async {
+  /// 対象日付（[targetDate]）の監視を開始するプライベートメソッド
+  /// - [targetDate] の日単位タスクのフェッチする
+  /// - フェッチされたデータはキャッシュハンドラによってストリームに流され、 [_onData]
+  /// が起動する
+  Future<void> _initWatching({required Date targetDate}) async {
     try {
-      // 当日の日単位タスクのフェッチを依頼し、データを受け取る
-      final Result<Map<Date, List<EDailyTask>>, Exception> result =
-          await _repository.fetchDailyTasks(dateList: dateList);
-
+      // 当日の日単位タスクのフェッチする
+      // （フェッチされたデータはキャッシュハンドラの output によってストリームに流され、
+      // 下の _onData が起動する）
+      final Result<void, Exception> result =
+          await _repository.fetchDailyTasks(targetDate: targetDate);
       switch (result) {
-        case Success(value: final Map<Date, List<EDailyTask>> existingValue):
-          // 取得したマップからデータがない日付のエントリを除外し、その日付をリストに格納する
-          final List<Date> emptyDateList = [];
-          existingValue.removeWhere((date, value) {
-            final bool isEmpty = value.isEmpty;
-            if (isEmpty) {
-              emptyDateList.add(date);
-            }
-            return isEmpty;
-          });
-
-          // データがまだなかった場合（キャッシュにもDBにもデータがなかった場合）
-          if (emptyDateList.isNotEmpty) {
-            // 新しい日付の枠（空のタスク）を作る
-            final Result<Map<Date, List<EDailyTask>>, Exception> newDateData =
-                await _repository.createDailyTaskRecord(
-                    dateList: emptyDateList);
-
-            // 正常にフェッチできた場合、新しい日付の枠に作った空のタスクをストリームに流す
-            switch (newDateData) {
-              case Success(
-                  value: final Map<Date, List<EDailyTask>> newDateValue
-                ):
-                await _cacheHandler.update(newDateValue);
-              case Failure(
-                  exception: final Exception exc,
-                  methodName: final String? methodName,
-                ):
-                final Exception fetchExc = fetchError(methodName: methodName);
-                notifyError(content: "$exc\n$fetchExc");
-            }
-          }
-          // 要求した日付のうち、データがDBにあった分をキャッシュする
-          if (existingValue.isNotEmpty) {
-            await _cacheHandler.update(existingValue);
-          }
+        // region
+        case Success():
+          break;
         case Failure(
             exception: final Exception exc,
             methodName: final String? methodName,
           ):
           final Exception fetchExc = fetchError(methodName: methodName);
-          notifyError(content: "$exc\n$fetchExc");
+          throw Exception("$exc\n$fetchExc");
+        // endregion
       }
     } catch (e, st) {
-      // エラーを通知
-      notifyError(content: "$e\n$st");
       rethrow;
     }
   }

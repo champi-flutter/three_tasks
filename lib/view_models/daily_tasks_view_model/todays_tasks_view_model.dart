@@ -36,7 +36,7 @@ class TodaysTasksViewModel extends _$TodaysTasksViewModel with NotificationFromV
       ref.read(notificationServiceProvider);
 
   /// 監視フローを開始する
-  void _startWatching()=> _watchDailyTasksUseCase.initAt([today]);
+  void _startWatching()=> _watchDailyTasksUseCase.initAt(today);
 
   /// [state] （`List<VDailyTask>`）更新メソッド
   void update(List<VDailyTask> newState) {

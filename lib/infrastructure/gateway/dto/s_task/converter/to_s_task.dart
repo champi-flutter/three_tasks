@@ -1,6 +1,6 @@
 
 import 'package:three_tasks/entities/e_task/e_task.dart';
-import 'package:three_tasks/infrastructure/gateways/dto/s_task/s_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
 import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
 
 extension ToSTaskList on List<TaskUpdateParameter>{

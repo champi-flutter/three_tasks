@@ -1,7 +1,8 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/base/tasks_cache_handler_base_interface.dart';
 
-/// 各単位タスクのキャッシュハンドラの基となるクラス
+/// 日単位タスクのキャッシュを取り扱うクラス
 ///   - [update]: キャッシュを更新する
 ///   - [outputCurrentCache]: 更新せずに、現在のキャッシュで [output] を実行する
 ///
@@ -12,11 +13,9 @@ import 'package:three_tasks/entities/e_task/e_task.dart';
 /// VM の参照が切れた時で、参照を再開するときはもう一度 `initAt` が回って新たなキャッシュが作られる。
 ///
 /// 親クラスの静的解析ツールの機能を引き継ぐためにインターフェースとして設置する。
-abstract class TasksCacheHandlerBase<K, Task extends ETask>
-    extends LfuFloatingListCacheHandler<K, int, Task> {
-  /// `super.capacity` を親に渡すための内部的なコンストラクタ
-  /// （抽象クラスなので呼び出し不可）
-  TasksCacheHandlerBase(): super(capacity: 30);
+abstract class DailyTasksCacheHandler
+    extends TasksCacheHandlerBaseInterface<Date, EDailyTask> {
 
-  Future<void> outputCurrentCache()=>output(cacheMap.base);
+  /// 指定 [date] のデータがキャッシュされているかどうか
+  bool isCachedAt(Date date);
 }

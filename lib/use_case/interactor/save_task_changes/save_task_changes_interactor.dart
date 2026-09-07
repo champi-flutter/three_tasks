@@ -1,7 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/infrastructure/cache/cache_handler/daily_tasks_cache_handler.dart';
-import 'package:three_tasks/infrastructure/cache/cache_handler/weekly_tasks_cache_handler.dart';
+import 'package:three_tasks/infrastructure/cache/cache_handler/cache_handler_interface/daily_tasks_cache_handler.dart';
+import 'package:three_tasks/infrastructure/cache/cache_handler/cache_handler_interface/weekly_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';

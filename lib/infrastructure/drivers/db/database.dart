@@ -5,15 +5,9 @@ import 'package:data_converter/data_converter.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
-import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
-import 'package:three_tasks/entities/dto/d_label/d_labeled_task.dart';
-import 'package:three_tasks/gateways/data_source_interface/data_source.dart';
-import 'package:three_tasks/infrastructure/gateways/data_source_interface/data_source.dart';
-import 'package:three_tasks/infrastructure/gateways/dto/f_task/f_task.dart';
+import 'package:three_tasks/infrastructure/gateway/driver_interface/data_source_interface/data_source.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
 import 'package:three_tasks/main.dart';
-
-import '../view/screens/history_screen.dart';
-import '../view/screens/weekly_tasks_screen.dart';
 
 part 'database.g.dart';
 
@@ -133,7 +127,7 @@ class LabeledTasks extends Table {
   YearlyTasks,
   LabeledTasks,
 ])
-class MyDatabase extends _$MyDatabase implements DataSource{
+class MyDatabase extends _$MyDatabase implements DataSource {
   // データベースをどこに保存するかをDriftに伝えるリダイレクトコンストラクタ
   MyDatabase() : super(_openConnection());
 
@@ -179,40 +173,35 @@ class MyDatabase extends _$MyDatabase implements DataSource{
     return FDailyTask(
       title: rawData.task,
       // 2026/06/08 変更: カラムの型の変換に対応
-      date: rawData.date.toDate(),
+      dateInt: rawData.date,
       id: rawData.id,
       isChecked: rawData.isChecked,
+      // todo labelId を non-nullable に（2026/09/07）＞＞
       labelId: rawData.labelId,
     );
   }
 
   /// [DayTask]（テーブルクラス）の List から [DDailyTask]（エンティティ）の
   /// List へ変換
-  List<DDailyTask> _dDailyTaskList(List<DayTask> rawDataList) {
-    return rawDataList.map((DayTask rawData) => _dDailyTask(rawData)).toList();
-  }
+  List<FDailyTask> _toFDailyTaskList(List<DayTask> rawDataList) =>
+      rawDataList.map(_toFDailyTask).toList();
 
   /// [WeeklyTask]（テーブルクラス）から [DWeeklyTask]（エンティティ）へ変換
-  DWeeklyTask _dWeeklyTask(WeeklyTask rawData) {
-    final Date targetDate = rawData.firstDate.toDate();
-    return DWeeklyTask(
-        task: rawData.task,
-        week: UniqueWeek.fromDate(
-          currentDate: targetDate,
-          firstDate: targetDate,
-        ),
-        id: rawData.id,
-        isChecked: rawData.isChecked,
-        labelId: rawData.labelId);
+  FWeeklyTask _toFWeeklyTask(WeeklyTask rawData) {
+    return FWeeklyTask(
+      title: rawData.task,
+      firstDateInt: rawData.firstDate,
+      id: rawData.id,
+      isChecked: rawData.isChecked,
+      // todo labelId を non-nullable に（2026/09/07）＞＞
+      labelId: rawData.labelId,
+    );
   }
 
   /// [WeeklyTask]（テーブルクラス）の List から [DDailyTask]（エンティティ）の
   /// List へ変換
-  List<DWeeklyTask> _dWeeklyTaskList(List<WeeklyTask> rawDataList) {
-    return rawDataList
-        .map((WeeklyTask rawData) => _dWeeklyTask(rawData))
-        .toList();
-  }
+  List<FWeeklyTask> _toFWeeklyTaskList(List<WeeklyTask> rawDataList) =>
+      rawDataList.map(_toFWeeklyTask).toList();
 
   // todo フェッチ
   // todo LabeledTasks
@@ -232,30 +221,20 @@ class MyDatabase extends _$MyDatabase implements DataSource{
   ///
   /// 要求された日付（[dateList]）に該当するデータを返す。
   @override
-  Future<Result<Map<Date, List<DDailyTask>>, Exception>> getDailyTasksByDate({
-    required List<Date> dateList,
+  Future<Result<List<FDailyTask>, Exception>> getDailyTasksByDate({
+    required int targetDateInt,
   })
   // 折りたたみ用
   async {
     try {
-      final Map<Date, List<DDailyTask>> resultValue = {};
-      // transaction で、要求された日付のデータを一気に取得
-      await transaction(() async {
-        for (Date date in dateList) {
-          // 2026/06/08 変更: カラムの型の変換に対応
-          final int dateIdentifier = date.toIntIdentifier();
-          // DB から該当日付のタスクを取得
-          final List<DayTask> rawDataList = await managers.dayTasks
-              .filter((dayTask) => dayTask.date(dateIdentifier))
-              .get();
-
-          // そのリストを、各日付を key にして Map に組み込む（リストが空の場合も）
-          resultValue[date] = _dDailyTaskList(rawDataList);
-        }
-      });
-      return Success(resultValue);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "getDailyTasksByDate");
+      // DB から該当日付のタスクを取得
+      final List<DayTask> rawDataList = await managers.dayTasks
+          .filter((dayTask) => dayTask.date.equals(targetDateInt))
+          .get();
+      // Fetch 用 DTO に変換して返す
+      return Success(_toFDailyTaskList(rawDataList));
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "getDailyTasksByDate");
     }
   }
 
@@ -285,7 +264,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           final int firstDateInt = targetDateInt - diff;
           // DB から該当日付のタスクを取得する
           final List<WeeklyTask> rawDataList = await managers.weeklyTasks
-              .filter((weeklyTask) => weeklyTask.firstDate(firstDateInt))
+              .filter((weeklyTask) => weeklyTask.firstDate.equals(firstDateInt))
               .get();
 
           // そのリストを DTO に変換して、戻り値に組み込む（リストが空の場合も）
@@ -330,7 +309,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
 
   /// 達成されなかったタスクを抽出
   Future<List<DayTask>> get allTasksNotAchieved => managers.dayTasks
-      .filter((f) => f.isChecked(false))
+      .filter((f) => f.isChecked.equals(false))
       .orderBy((o) => o.date.asc())
       .get();
 
@@ -344,34 +323,27 @@ class MyDatabase extends _$MyDatabase implements DataSource{
   ///
   /// 複数の日付を指定可能。
   @override
-  Future<Result<Map<Date, List<DDailyTask>>, Exception>> createDailyTaskRecord({
-    required List<Date> dateList,
+  Future<Result<List<FDailyTask>, Exception>> createDailyTaskRecord({
+    required int targetDateInt,
   })
   // 折りたたみ用
   async {
     try {
-      // 返す Map の枠
-      final Map<Date, List<DDailyTask>> dataMap = {};
-      // 指定した各日付のタスクのリストを取得
-      await transaction(() async {
-        for (Date date in dateList) {
-          // 作成するタスクの枠
-          final List<DayTask> rawDataList = [];
-          // 空のタスクを3つ作る
-          for (int i = 0; i < 3; i++) {
-            final DayTask rawData =
-                await managers.dayTasks.createReturning((record) => record(
-                      task: "",
-                      // 2026/06/08 変更: カラムの型の変換に対応
-                      date: date.toIntIdentifier(),
-                    ));
-            rawDataList.add(rawData);
-          }
-          // 作ったタスクリストを Map の対象日に組み込む
-          dataMap[date] = [..._dDailyTaskList(rawDataList)];
+      // 作成するタスクの枠
+      final List<DayTask> rawDataList = [];
+      await transaction(()async{
+        // 空のタスクを3つ作る
+        for (int i = 0; i < 3; i++) {
+          final DayTask rawData =
+          await managers.dayTasks.createReturning((record) => record(
+            task: "",
+            date: targetDateInt,
+          ));
+          rawDataList.add(rawData);
         }
       });
-      return Success({...dataMap});
+      // Fetch 用の DTO に変換して返す
+      return Success(_toFDailyTaskList(rawDataList));
     } catch (e) {
       return Failure(Exception(e), methodName: "createDailyTaskRecord");
     }
@@ -470,7 +442,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           final int firstDateInt = entry.value.toIntIdentifier();
           // DBに変更を保存する
           await managers.weeklyTasks
-              .filter((weeklyTask) => weeklyTask.id(targetId))
+              .filter((weeklyTask) => weeklyTask.id.equals(targetId))
               .update(
                 (task) => task(
                   firstDate: Value(firstDateInt),
@@ -513,7 +485,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
             );
           }
           // DBに変更を保存
-          await managers.dayTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.dayTasks
+              .filter((dayTask) => dayTask.id.equals(id))
+              .update(
                 (task) => task(
                   task: Value.absentIfNull(taskTitle),
                   isChecked: Value.absentIfNull(isChecked),
@@ -541,7 +515,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           }
           // DBに変更を保存
           await managers.weeklyTasks
-              .filter((weeklyTask) => weeklyTask.id(id))
+              .filter((weeklyTask) => weeklyTask.id.equals(id))
               .update(
                 (task) => task(
                   task: Value.absentIfNull(taskTitle),
@@ -570,7 +544,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           }
           // DBに変更を保存
           await managers.monthlyTasks
-              .filter((monthlyTask) => monthlyTask.id(id))
+              .filter((monthlyTask) => monthlyTask.id.equals(id))
               .update(
                 (task) => task(
                   task: Value.absentIfNull(taskTitle),
@@ -599,7 +573,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           }
           // DBに変更を保存
           await managers.yearlyTasks
-              .filter((yearlyTask) => yearlyTask.id(id))
+              .filter((yearlyTask) => yearlyTask.id.equals(id))
               .update(
                 (task) => task(
                   task: Value.absentIfNull(taskTitle),
@@ -627,7 +601,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           if (taskTitle == null) {
             throw Exception("taskTitle == null");
           }
-          await managers.dayTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.dayTasks
+              .filter((dayTask) => dayTask.id.equals(id))
+              .update(
                 (task) => task(
                   task: Value(taskTitle),
                 ),
@@ -640,7 +616,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           if (taskTitle == null) {
             throw Exception("taskTitle == null");
           }
-          await managers.weeklyTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.weeklyTasks
+              .filter((dayTask) => dayTask.id.equals(id))
+              .update(
                 (task) => task(
                   task: Value(taskTitle),
                 ),
@@ -654,7 +632,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
             throw Exception("taskTitle == null");
           }
           await managers.monthlyTasks
-              .filter((dayTask) => dayTask.id(id))
+              .filter((dayTask) => dayTask.id.equals(id))
               .update(
                 (task) => task(
                   task: Value(taskTitle),
@@ -668,7 +646,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           if (taskTitle == null) {
             throw Exception("taskTitle == null");
           }
-          await managers.yearlyTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.yearlyTasks
+              .filter((dayTask) => dayTask.id.equals(id))
+              .update(
                 (task) => task(
                   task: Value(taskTitle),
                 ),
@@ -713,7 +693,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           if (newChecked == null) {
             throw Exception("newChecked == null");
           }
-          await managers.dayTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.dayTasks
+              .filter((dayTask) => dayTask.id.equals(id))
+              .update(
                 (task) => task(
                   isChecked: Value(newChecked),
                 ),
@@ -726,7 +708,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           if (newChecked == null) {
             throw Exception("newChecked == null");
           }
-          await managers.weeklyTasks.filter((dayTask) => dayTask.id(id)).update(
+          await managers.weeklyTasks
+              .filter((dayTask) => dayTask.id.equals(id))
+              .update(
                 (task) => task(
                   isChecked: Value(newChecked),
                 ),
@@ -740,7 +724,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
             throw Exception("newChecked == null");
           }
           await managers.monthlyTasks
-              .filter((monthlyTask) => monthlyTask.id(id))
+              .filter((monthlyTask) => monthlyTask.id.equals(id))
               .update(
                 (task) => task(
                   isChecked: Value(newChecked),
@@ -755,7 +739,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
             throw Exception("newChecked == null");
           }
           await managers.yearlyTasks
-              .filter((yearlyTask) => yearlyTask.id(id))
+              .filter((yearlyTask) => yearlyTask.id.equals(id))
               .update(
                 (task) => task(
                   isChecked: Value(newChecked),
@@ -774,299 +758,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
     // ややこしいので省略しないが、「=>』と同じ意味
     return managers.dayTasks
         .filter(
-          (f) => f.task(unnecessaryDayTask.task),
-        )
-        .delete();
-  }
-
-  // todo weeklyTasksのクエリメソッド
-  // Create（レコードの作成）
-  Future addWeeklyTask(WeeklyTask weeklyTask) =>
-      into(weeklyTasks).insert(weeklyTask);
-
-  // 複数レコードの作成
-  Future addBatchWeeklyTasks(List<WeeklyTask> weeklyTaskList) => batch(
-        (batch) => batch.insertAll(weeklyTasks, weeklyTaskList),
-      );
-
-  //ID自動生成レコードの作成
-  Future addWeeklyTaskCompanion(WeeklyTasksCompanion weeklyTasksCompanion) =>
-      into(weeklyTasks).insert(weeklyTasksCompanion);
-
-  // ID自動生成レコードの複数作成
-  Future addBatchWeeklyTaskCompanions(
-          List<WeeklyTasksCompanion> weeklyTaskCompanionList) =>
-      batch(
-        (batch) => batch.insertAll(weeklyTasks, weeklyTaskCompanionList),
-      );
-
-  // Read（抽出）
-  // managerが管理する全てのデータベース（）の中から対象のデータベース（）を取得する
-  Future<List<WeeklyTask>> get allWeeklyTasks => managers.weeklyTasks.get();
-
-  // 今週のタスクだけを抽出
-  Future<List<WeeklyTask>> get allTasksForThisWeek {
-    return managers.weeklyTasks
-        .filter((f) => f.month(now.month))
-        .filter((f) => f.firstDay.isBetween(
-              now.day - 7,
-              now.day,
-            ))
-        .get();
-  }
-
-  // 今週が先月を含む場合のタスクの抽出
-  Future<List<WeeklyTask>> get allTasksForEndingWeek {
-    // todo 月末の場合
-    return managers.weeklyTasks
-        .filter((f) => f.month(now.month - 1))
-        .filter((f) => f.firstDay.isBetween(
-              DateTime(now.year, now.month, now.day)
-                  .add(Duration(days: -7))
-                  .day,
-              DateTime(now.year, now.month, 1).add(Duration(days: -1)).day,
-            ))
-        .get();
-  }
-
-  // 先週のタスクだけを抽出
-  // firstDayがfirstDay（履歴画面）より前で、一番大きいものを抽出
-  Future<List<WeeklyTask>> get allTasksForLastWeek => managers.weeklyTasks
-      .filter((f) => f.month(now.month))
-      .filter(
-        (f) => f.firstDay.isBetween(
-          1,
-          firstDay - 1,
-        ),
-      )
-      .orderBy((o) => o.firstDay.desc())
-      .limit(3)
-      .get();
-
-  // 先々週のタスクを抽出
-  Future<List<WeeklyTask>> get allTasksForWeekBeforeLast => managers.weeklyTasks
-      .filter(
-        (f) => f.firstDay.isBetween(
-          firstDay - 16,
-          firstDay - 9,
-        ),
-      )
-      .get();
-
-  // カレンダーで選択された週のタスクを抽出
-  Future<List<WeeklyTask>> get allTasksForTheWeek {
-    print("カレンダーで選択された週のタスクを抽出: ${theDay.month}月${theDay.day}日");
-    if (theDay.day > 7) {
-      return managers.weeklyTasks
-          .filter((f) => f.month(theDay.month))
-          .filter(
-            (f) => f.firstDay.isBetween(
-              theDay.day - 7,
-              theDay.day,
-            ),
-          )
-          .get();
-    } else {
-      // 翌月（12月の翌月を考慮）
-      final followingMonth = theDay.month != 12 ? theDay.month + 1 : 1;
-      // 今月の日数
-      final numOfThisMonth =
-          DateTime(theDay.year, followingMonth, 1).add(Duration(days: -1)).day;
-      // 先月の日数
-      final int numOfLastMonth =
-          DateTime(theDay.year, theDay.month, 1).add(Duration(days: -1)).day;
-      // 先月
-      final int intLastMonth =
-          theDay.add(Duration(days: -numOfLastMonth)).month;
-      return managers.weeklyTasks.filter((f) {
-        print(
-            "(4) numOfLastMonth = ${numOfLastMonth}, f.firstDay.isBetween(1,7).isLiteral = ${f.firstDay.isBetween(1, 7).isLiteral}");
-
-        if (f.firstDay.isBetween(1, 7).isLiteral) {
-          return f.month(theDay.month);
-        } else {
-          return f.month(intLastMonth);
-        }
-
-        // if (f.month == intLastMonth) {
-        //   return f.month.equals(intLastMonth);
-        // } else if (f.month == theDay.month) {
-        //   return f.month.equals(theDay.month);
-        // }
-
-        // return f.month.isBetween(intLastMonth, theDay.month);
-      }).filter((f) {
-        print("(7) firstDayが${theDay.month}月か");
-        // firstDayが今月か先月かで場合分け
-        if (f.month == theDay.month) {
-          print(
-              "(6) はい。firstDayが今月（${intLastMonth}月)の1から${theDay.day}までか => (2)");
-          return f.firstDay.isBetween(
-            1,
-            theDay.day,
-          );
-        } else {
-          print(
-              "(5) いいえ。firstDayが先月（${intLastMonth}月)の${numOfLastMonth - 6 + theDay.day}から${numOfLastMonth}までか => (2)");
-          return f.firstDay.isBetween(
-            numOfLastMonth - 6 + theDay.day,
-            numOfLastMonth,
-          );
-        }
-      }).get();
-    }
-  }
-
-  // 達成されなかったタスクを抽出
-  Future<List<WeeklyTask>> get allWeeklyTasksNotAchieved => managers.weeklyTasks
-      .filter((f) => f.isChecked(false))
-      .orderBy((o) => o.week.asc())
-      .get();
-
-  // Update（更新）
-  // 指定したデータ行（）を古いデータと置き換える
-  Future<void> updateWeeklyTask(WeeklyTask weeklyTaskUpdated) =>
-      managers.weeklyTasks.replace(weeklyTaskUpdated);
-
-  // Delete（削除）
-  // 指定したデータ行を削除する
-  // filterでは対象のweekTaskのtaskが指定したデータベースと一致するかどうかでフィルタリングし、削除
-  Future<void> deleteWeeklyTask(WeeklyTask unnecessaryWeeklyTask) {
-    // ややこしいので省略しないが、「=>』と同じ意味
-    return managers.weeklyTasks
-        .filter(
-          (f) => f.task(unnecessaryWeeklyTask.task),
-        )
-        .delete();
-  }
-
-  // todo monthlyTasksのクエリメソッド
-  // Create（レコードの作成）
-  Future addMonthlyTask(MonthlyTask monthlyTask) =>
-      into(monthlyTasks).insert(monthlyTask);
-
-  // 複数レコードの作成
-  Future addBatchMonthlyTasks(List<MonthlyTask> monthlyTaskList) => batch(
-        (batch) => batch.insertAll(monthlyTasks, monthlyTaskList),
-      );
-
-  // ID自動生成レコードの作成
-  Future addMonthlyTaskCompanion(MonthlyTasksCompanion monthlyTasksCompanion) =>
-      into(monthlyTasks).insert(monthlyTasksCompanion);
-
-  // ID自動生成レコードの複数作成
-  Future addBatchMonthlyTaskCompanions(
-          List<MonthlyTasksCompanion> monthlyTaskCompanionList) =>
-      batch(
-        (batch) => batch.insertAll(monthlyTasks, monthlyTaskCompanionList),
-      );
-
-  // Read（抽出）
-  // managerが管理する全てのデータベース（）の中から対象のデータベース（）を取得する
-  Future<List<MonthlyTask>> get allMonthlyTasks => managers.monthlyTasks.get();
-
-  // 今月のタスクだけを抽出
-  Future<List<MonthlyTask>> get allTasksForThisMonth =>
-      managers.monthlyTasks.filter((f) => f.month(thisMonth)).get();
-
-  // 先月のタスクだけを抽出
-  Future<List<MonthlyTask>> get allTasksForLastMonth => managers.monthlyTasks
-      .filter(
-        (f) => f.month(
-          monthlyOutputFormat.format(DateTime(now.year, now.month - 1, 1)),
-        ),
-      )
-      .get();
-
-  // カレンダーで選択された日付のタスクを抽出
-  Future<List<MonthlyTask>> get allTasksForTheMonth => managers.monthlyTasks
-      .filter((f) => f.month(monthlyOutputFormat.format(theDay)))
-      .get();
-
-  // 達成されなかったタスクを抽出
-  Future<List<MonthlyTask>> get allMonthlyTasksNotAchieved =>
-      managers.monthlyTasks
-          .filter((f) => f.isChecked(false))
-          .orderBy((o) => o.month.asc())
-          .get();
-
-  // Update（更新）
-  // 指定したデータ行（）を古いデータと置き換える
-  Future<void> updateMonthlyTask(MonthlyTask monthlyTaskUpdated) =>
-      managers.monthlyTasks.replace(monthlyTaskUpdated);
-
-  // Delete（削除）
-  // 指定したデータ行を削除する
-  // filterでは対象のmonthTaskのtaskが指定したデータベースと一致するかどうかでフィルタリングし、削除
-  Future<void> deleteMonthlyTask(MonthlyTask unnecessaryMonthlyTask) {
-    // ややこしいので省略しないが、「=>』と同じ意味
-    return managers.monthlyTasks
-        .filter(
-          (f) => f.task(unnecessaryMonthlyTask.task),
-        )
-        .delete();
-  }
-
-  // todo yearlyTasksのクエリメソッド
-  // Create（レコードの作成）
-  Future addYearlyTask(YearlyTask yearlyTask) =>
-      into(yearlyTasks).insert(yearlyTask);
-
-  // 複数レコードの作成
-  Future addBatchYearlyTasks(List<YearlyTask> yearlyTaskList) => batch(
-        (batch) => batch.insertAll(yearlyTasks, yearlyTaskList),
-      );
-
-  // ID自動生成レコードの作成
-  Future addYearlyTaskCompanion(YearlyTasksCompanion yearlyTasksCompanion) =>
-      into(yearlyTasks).insert(yearlyTasksCompanion);
-
-  // ID自動生成レコードの複数作成
-  Future addBatchYearlyTaskCompanions(
-          List<YearlyTasksCompanion> yearlyTaskCompanionList) =>
-      batch(
-        (batch) => batch.insertAll(yearlyTasks, yearlyTaskCompanionList),
-      );
-
-  // Read（抽出）
-  // managerが管理する全てのデータベース（）の中から対象のデータベース（）を取得する
-  Future<List<YearlyTask>> get allYearlyTasks => managers.yearlyTasks.get();
-
-  // 今年のタスクだけを抽出
-  Future<List<YearlyTask>> get allTasksForThisYear =>
-      managers.yearlyTasks.filter((f) => f.year(thisYear)).get();
-
-  // 去年のタスクを抽出
-  Future<List<YearlyTask>> get allTasksForLastYear => managers.yearlyTasks
-      .filter(
-        (f) => f.year(yearlyOutputFormat.format(DateTime(nowDate.year - 1))),
-      )
-      .get();
-
-  // カレンダーで選択された日付のタスクを抽出
-  Future<List<YearlyTask>> get allTasksForTheYear => managers.yearlyTasks
-      .filter((f) => f.year(yearlyOutputFormat.format(theDay)))
-      .get();
-
-  // 達成されなかったタスクを抽出
-  Future<List<YearlyTask>> get allYearlyTasksNotAchieved => managers.yearlyTasks
-      .filter((f) => f.isChecked(false))
-      .orderBy((o) => o.year.asc())
-      .get();
-
-  // Update（更新）
-  // 指定したデータ行（）を古いデータと置き換える
-  Future<void> updateYearlyTask(YearlyTask yearlyTaskUpdated) =>
-      managers.yearlyTasks.replace(yearlyTaskUpdated);
-
-  // Delete（削除）
-  // 指定したデータ行を削除する
-  // filterでは対象のyearlyTaskのtaskが指定したデータベースと一致するかどうかでフィルタリングし、削除
-  Future<void> deleteYearlyTask(YearlyTask unnecessaryYearlyTask) {
-    // ややこしいので省略しないが、「=>』と同じ意味
-    return managers.yearlyTasks
-        .filter(
-          (f) => f.task(unnecessaryYearlyTask.task),
+          (f) => f.task.equals(unnecessaryDayTask.task),
         )
         .delete();
   }
@@ -1114,7 +806,9 @@ class MyDatabase extends _$MyDatabase implements DataSource{
           ),
         );
         // タスクIDに該当するタスクの labelId を更新
-        await managers.dayTasks.filter((dayTask) => dayTask.id(newId)).update(
+        await managers.dayTasks
+            .filter((dayTask) => dayTask.id.equals(newId))
+            .update(
               (dayTask) => dayTask(
                 labelId: Value(_labeledTask!.labeledId),
               ),
@@ -1157,7 +851,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
 
         // タスクIDに該当するタスクの labelId を更新
         await managers.weeklyTasks
-            .filter((weeklyTask) => weeklyTask.id(newId))
+            .filter((weeklyTask) => weeklyTask.id.equals(newId))
             .update(
               (weeklyTask) => weeklyTask(
                 labelId: Value(_labeledTask!.labeledId),
@@ -1200,7 +894,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
 
         // タスクIDに該当するタスクの labelId を更新
         await managers.monthlyTasks
-            .filter((monthlyTask) => monthlyTask.id(newId))
+            .filter((monthlyTask) => monthlyTask.id.equals(newId))
             .update(
               (monthlyTask) => monthlyTask(
                 labelId: Value(_labeledTask!.labeledId),
@@ -1244,7 +938,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
 
         // タスクIDに該当するタスクの labelId を更新
         await managers.yearlyTasks
-            .filter((yearlyTask) => yearlyTask.id(newId))
+            .filter((yearlyTask) => yearlyTask.id.equals(newId))
             .update(
               (yearlyTask) => yearlyTask(
                 labelId: Value(_labeledTask!.labeledId),
@@ -1275,7 +969,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().dailyIdList.value];
@@ -1286,7 +980,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.dayTasks
-            .filter((dayTask) => dayTask.id(targetId))
+            .filter((dayTask) => dayTask.id.equals(targetId))
             .update(
               (dayTask) => dayTask(
                 labelId: Value(null),
@@ -1311,7 +1005,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().weeklyIdList.value];
@@ -1322,7 +1016,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.weeklyTasks
-            .filter((weeklyTask) => weeklyTask.id(targetId))
+            .filter((weeklyTask) => weeklyTask.id.equals(targetId))
             .update(
               (weeklyTask) => weeklyTask(
                 labelId: Value(null),
@@ -1347,7 +1041,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().monthlyIdList.value];
@@ -1358,7 +1052,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.monthlyTasks
-            .filter((monthlyTask) => monthlyTask.id(targetId))
+            .filter((monthlyTask) => monthlyTask.id.equals(targetId))
             .update(
               (monthlyTask) => monthlyTask(
                 labelId: Value(null),
@@ -1383,7 +1077,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().yearlyIdList.value];
@@ -1436,7 +1130,8 @@ class MyDatabase extends _$MyDatabase implements DataSource{
             // 取得したレコードの dailyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.dailyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List? newBlob = (currentBlob ?? Uint8List(0)).updateWith(taskId);
+            final Uint8List? newBlob =
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater =
                 LabeledTasksCompanion(dailyIdList: Value.absentIfNull(newBlob));
@@ -1444,21 +1139,24 @@ class MyDatabase extends _$MyDatabase implements DataSource{
             // 取得したレコードの weeklyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.weeklyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List newBlob = (currentBlob ?? Uint8List(0)).updateWith(taskId);
+            final Uint8List newBlob =
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater = LabeledTasksCompanion(weeklyIdList: Value(newBlob));
           case DMonthlyTask(id: final int taskId):
             // 取得したレコードの monthlyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.monthlyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List newBlob = (currentBlob ?? Uint8List(0)).updateWith(taskId);
+            final Uint8List newBlob =
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater = LabeledTasksCompanion(monthlyIdList: Value(newBlob));
           case DYearlyTask(id: final int taskId):
             // 取得したレコードの yearlyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.yearlyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List newBlob = (currentBlob ?? Uint8List(0)).updateWith(taskId);
+            final Uint8List newBlob =
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater = LabeledTasksCompanion(yearlyIdList: Value(newBlob));
           // endregion
@@ -1491,7 +1189,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().dailyIdList.value];
@@ -1502,7 +1200,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.dayTasks
-            .filter((dayTask) => dayTask.id(targetId))
+            .filter((dayTask) => dayTask.id.equals(targetId))
             .update(
               (dayTask) => dayTask(
                 labelId: Value(labelId),
@@ -1531,7 +1229,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().weeklyIdList.value];
@@ -1542,7 +1240,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.weeklyTasks
-            .filter((weeklyTask) => weeklyTask.id(targetId))
+            .filter((weeklyTask) => weeklyTask.id.equals(targetId))
             .update(
               (weeklyTask) => weeklyTask(
                 labelId: Value(labelId),
@@ -1571,7 +1269,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().monthlyIdList.value];
@@ -1582,7 +1280,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.monthlyTasks
-            .filter((monthlyTask) => monthlyTask.id(targetId))
+            .filter((monthlyTask) => monthlyTask.id.equals(targetId))
             .update(
               (monthlyTask) => monthlyTask(
                 labelId: Value(labelId),
@@ -1611,7 +1309,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
       await transaction(() async {
         // ラベルを更新
         await managers.labeledTasks
-            .filter((label) => label.labeledId(labelId))
+            .filter((label) => label.labeledId.equals(labelId))
             .update((record) {
           // 元々保存されているIDリストを参照
           final idList = [...record().yearlyIdList.value];
@@ -1622,7 +1320,7 @@ class MyDatabase extends _$MyDatabase implements DataSource{
         });
         // タスクIDに該当するタスクの labelId を更新
         await managers.yearlyTasks
-            .filter((yearlyTask) => yearlyTask.id(targetId))
+            .filter((yearlyTask) => yearlyTask.id.equals(targetId))
             .update(
               (yearlyTask) => yearlyTask(
                 labelId: Value(labelId),

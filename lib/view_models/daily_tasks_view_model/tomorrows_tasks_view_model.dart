@@ -63,7 +63,7 @@ class TomorrowsTasksViewModel extends _$TomorrowsTasksViewModel{
   }
 
   /// 監視フローを開始する
-  void _startWatching()=> _watchDailyTasksUseCase.initAt([tomorrow]);
+  void _startWatching()=> _watchDailyTasksUseCase.initAt(tomorrow);
 
   /// [state] （`List<VDailyTask>`）更新メソッド
   void update(List<VDailyTask> newState){

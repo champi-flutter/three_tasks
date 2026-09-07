@@ -3,6 +3,8 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/disc
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/input_parameter/task_update_parameter.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/keep_as_draft_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
+import 'package:three_tasks/view_models/controller/dto/task_control_parameter/task_control_parameter.dart';
 
 class TasksController {
   TasksController({
@@ -24,8 +26,9 @@ class TasksController {
 
   /// タスク変更保存フローを開始する
   Future<void> saveTaskChanges({
-    required List<TaskUpdateParameter> taskInfo,
+    required List<TaskControlParameter> controlInfo,
   }) async {
+
     await _saveTaskChangesUseCase.execute(taskInfo: taskInfo);
   }
 
