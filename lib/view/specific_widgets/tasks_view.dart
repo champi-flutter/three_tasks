@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/view_type/v_label/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_label/v_label.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/input_parameter/task_update_parameter.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
@@ -16,7 +16,7 @@ import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_label_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
 import 'package:three_tasks/view_models/controller/tasks_controller.dart';
-import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
+import 'package:three_tasks/view_models/labels_view_model.dart';
 
 /// [TasksView] の表示形式
 ///  - [TasksViewStyle.checkbox] : チェックボックス付き

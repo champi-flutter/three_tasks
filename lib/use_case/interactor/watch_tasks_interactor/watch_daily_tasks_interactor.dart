@@ -1,11 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/data_type/s_task/s_task.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
-import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
-import 'package:three_tasks/infrastructure/cache/cache_handler/cache_handler_interface/daily_tasks_cache_handler.dart';
-import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
-import 'package:three_tasks/use_case/handler/stream_handler/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
@@ -18,13 +14,11 @@ class WatchDailyTasksInteractor
   // todo コンストラクタ
   WatchDailyTasksInteractor({
     required DailyTasksPresenter dailyTasksPresenter,
-    required DailyTasksCacheHandler dailyTasksCacheHandler,
     required DailyTasksStreamHandler dailyTasksStreamHandler,
     required DataRepository dataRepository,
     required NotificationService notificationService,
     required LoadingService loadingService,
   })  : _dailyTasksPresenter = dailyTasksPresenter,
-        _cacheHandler = dailyTasksCacheHandler,
         _streamHandler = dailyTasksStreamHandler,
         _repository = dataRepository,
         notificationService = notificationService,
@@ -33,9 +27,6 @@ class WatchDailyTasksInteractor
   // todo 依存先
   /// 受信データを反映させるポートのインスタンス
   final DailyTasksPresenter _dailyTasksPresenter;
-
-  /// 日単位タスクのキャッシュハンドラのインスタンス
-  final DailyTasksCacheHandler _cacheHandler;
 
   /// ストリームを取り扱うクラスのインスタンス
   final DailyTasksStreamHandler _streamHandler;
@@ -131,7 +122,7 @@ class WatchDailyTasksInteractor
   ///   1. データの型を変換する
   ///   2. 変換後のデータを反映させる
   ///
-  Future<void> _onData(Map<Date, List<EDailyTask>> newDataMap) =>
+  Future<void> _onData(Map<Date, TaskList<EDailyTask>> newDataMap) =>
       _loadingService.loadAsync(() async {
         try {
           // 変換後のデータを反映させる
@@ -143,7 +134,7 @@ class WatchDailyTasksInteractor
 
   /// データを反映させるプライベートメソッド
   Future<void> _publishDailyTasks(
-      Map<Date, List<EDailyTask>> newDataMap) async {
+      Map<Date, TaskList<EDailyTask>> newDataMap) async {
     await _dailyTasksPresenter.handleDailyTasksUpdating(newDataMap);
   }
 

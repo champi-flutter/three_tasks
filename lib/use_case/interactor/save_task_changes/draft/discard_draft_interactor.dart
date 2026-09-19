@@ -1,5 +1,6 @@
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
+import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/handler/cache_handler/weekly_tasks_cache_handler.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/discard_draft_use_case.dart';
@@ -23,20 +24,20 @@ class DiscardDraftInteractor implements DiscardDraftUseCase {
 
   /// 下書き破棄フローを実装
   @override
-  Future<void> execute({required VTask task}) =>
+  Future<void> execute({required TaskRec taskRec}) =>
       _loadingService.loadAsync(() async {
         // 渡された VTask に対応するキャッシュハンドラに、現在のキャッシュを流してもらう
-        switch (task) {
-          case VDailyTask():
+        switch (taskRec) {
+          case TaskRec.day:
             await _dailyTasksCacheHandler.outputCurrentCache();
 
-          case VWeeklyTask():
+          case TaskRec.week:
             await _weeklyTasksCacheHandler.outputCurrentCache();
 
-          case VMonthlyTask():
+          case TaskRec.month:
             await _monthlyTasksCacheHandler.outputCurrentCache();
 
-          case VYearlyTask():
+          case TaskRec.year:
             await _yearlyTasksCacheHandler.outputCurrentCache();
         }
       });

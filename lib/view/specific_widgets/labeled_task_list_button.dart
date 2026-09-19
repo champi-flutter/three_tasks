@@ -2,11 +2,11 @@ import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:three_tasks/entities/view_type/v_label/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_label/v_label.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/labeled_task_list_dialog.dart';
-import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
+import 'package:three_tasks/view_models/labels_view_model.dart';
 
 /// 「ラベル化されたタスク一覧」ボタンクラス
 class LabeledTaskListButton extends StatelessWidget {

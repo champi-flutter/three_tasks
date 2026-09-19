@@ -1,14 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
-part 'e_task.freezed.dart';
-
 /// タスクのエンティティの sealed class
-sealed class ETask extends TaskBase{
-
+sealed class ETask extends TaskBase {
   /// タスクタイトル
   String get title;
 
@@ -25,65 +21,112 @@ sealed class ETask extends TaskBase{
 
   /// タスクの期間の単位
   TaskRec get rec;
+
+  /// データ受信済みかどうか
+  bool get isFetched;
 }
 
-/// 日単位のタスククラス
-@freezed
-abstract class EDailyTask with _$EDailyTask, DailyTaskBase implements ETask {
-  const EDailyTask._();
+/// 日単位のタスクエンティティ
+class EDailyTask with DailyTaskBase implements ETask {
+  final int id;
 
-  const factory EDailyTask({
-    required String title,
-    required Date date,
-    required int id,
-    required bool isChecked,
-    required int labelId,
-  }) = _EDailyTask;
+  String title;
+  Date date;
+  bool isChecked;
+  int labelId;
+
+  EDailyTask({
+    required this.id,
+    required this.date,
+    required this.title,
+    required this.isChecked,
+    required this.labelId,
+  });
+
+  /// データ受信済みかどうか
+  bool get isFetched => id != -1;
 }
 
-/// 週単位のタスククラス
-@freezed
-abstract class EWeeklyTask with WeeklyTaskBase, _$EWeeklyTask implements ETask {
-  const EWeeklyTask._();
+/// 週単位のタスクエンティティ
+class EWeeklyTask with WeeklyTaskBase implements ETask {
+  final int id;
 
-  const factory EWeeklyTask({
-    required String title,
-    required UniqueWeek week,
-    required int id,
-    required bool isChecked,
-    required int labelId,
-  }) = _EWeeklyTask;
+  String title;
+  UniqueWeek week;
+  bool isChecked;
+  int labelId;
+
+  EWeeklyTask({
+    required this.id,
+    required this.week,
+    required this.title,
+    required this.isChecked,
+    required this.labelId,
+  });
+
+  /// データ受信済みかどうか
+  bool get isFetched => id != -1;
 
   /// **編集可能な** 週単位タスクの仮データかどうか
   bool get canReplace => id == -2;
+
+  /// placeholder2 を新たな ID のエンティティに置き換える
+  EWeeklyTask replacePlaceholder2(int newId) {
+    if (!canReplace) {
+      throw UnsupportedError(
+        "[EWeeklyTask.replacePlaceholder2] 仮データ以外が対象にされています。",
+      );
+    }
+    return EWeeklyTask(
+      id: newId,
+      week: week,
+      title: title,
+      isChecked: isChecked,
+      labelId: labelId,
+    );
+  }
 }
 
-/// 月単位のタスククラス
-@freezed
-abstract class EMonthlyTask with MonthlyTaskBase, _$EMonthlyTask implements ETask {
-  const EMonthlyTask._();
+/// 月単位のタスクエンティティ
+class EMonthlyTask with MonthlyTaskBase implements ETask {
+  final int id;
 
-  const factory EMonthlyTask({
-    required String title,
-    required Month month,
-    required int id,
-    required bool isChecked,
-    required int labelId,
-  }) = _EMonthlyTask;
+  String title;
+  Month month;
+  bool isChecked;
+  int labelId;
+
+  EMonthlyTask({
+    required this.id,
+    required this.month,
+    required this.title,
+    required this.isChecked,
+    required this.labelId,
+  });
+
+  /// データ受信済みかどうか
+  bool get isFetched => id != -1;
 }
 
-/// 年単位のタスククラス
-@freezed
-abstract class EYearlyTask with YearlyTaskBase, _$EYearlyTask implements ETask {
-  const EYearlyTask._();
+/// 年単位のタスクエンティティ
+class EYearlyTask with YearlyTaskBase implements ETask {
+  final int id;
 
-  const factory EYearlyTask({
-    required String title,
-    required int year,
-    required int id,
-    required bool isChecked,
-    required int labelId,
-  }) = _EYearlyTask;
+  String title;
+  int year;
+  bool isChecked;
+  int labelId;
+
+  EYearlyTask({
+    required this.id,
+    required this.year,
+    required this.title,
+    required this.isChecked,
+    required this.labelId,
+  });
+
+  /// データ受信済みかどうか
+  bool get isFetched => id != -1;
 }
 
 extension ETaskListExtension on List<ETask> {

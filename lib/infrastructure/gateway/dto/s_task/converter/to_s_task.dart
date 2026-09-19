@@ -1,18 +1,15 @@
 
 import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
-import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
+import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
 
-extension ToSTaskList on List<TaskUpdateParameter>{
-  /// [TaskUpdateParameter] のリストから [STask] のリストに変換する
-  List<STask> toSTaskList()=> map<STask>(_toSTask).toList();
-
+class ToSTask{
   /// [TaskUpdateParameter] から [STask] に変換するプライベートメソッド
-  STask _toSTask(TaskUpdateParameter parameter) {
-    final targetTask = parameter.targetTask;
-    final newTitle = parameter.newTitle;
-    final newChecked = parameter.newChecked;
-    final newLabelId = parameter.newLabelId;
+  static STask toSTask(TaskUpdateParameter parameter) {
+    final ETask targetTask = parameter.taskOrigin;
+    final String? newTitle = parameter.newTitle;
+    final bool? newChecked = parameter.newChecked;
+    final int? newLabelId = parameter.newLabelId;
     return switch (targetTask) { // region
       EDailyTask() => SDailyTask(
         title: newTitle,

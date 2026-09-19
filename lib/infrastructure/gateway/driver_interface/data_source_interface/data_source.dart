@@ -1,10 +1,14 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/f_label/f_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
 
 abstract class DataSource {
   // todo フェッチ
   /// `LabeledTask` フェッチメソッド
-  Future<Result<List<DLabeledTask>, Exception>> getAllLabeledTasks();
+  Future<Result<List<FLabel>, Exception>> getAllLabeledTasks();
 
   /// `DailyTask` フェッチメソッド
   ///
@@ -18,7 +22,7 @@ abstract class DataSource {
   /// `WeeklyTask` フェッチメソッド
   ///
   /// 要求された日付（[dateList]）に該当するデータを返す。
-  Future<Result<List<FWeeklyTask>, Exception>> getWeeklyTasksByDate({
+  Future<Result<List<QWeeklyTask>, Exception>> getWeeklyTasksByDate({
     required Date targetDate,
     required List<int> exclusionDiffs,
   });
@@ -34,13 +38,15 @@ abstract class DataSource {
   /// 日単位タスクの新しい日付の枠を作成するメソッド
   ///
   /// 複数の日付を指定可能。
-  Future<Result<List<DWeeklyTask>, Exception>> createWeeklyTaskRecord({
-    required List<Date> firstDateList,
+  Future<Result<Map<int, int>, Exception>> createWeeklyTaskRecord({
+    required List<int> indexList,
   });
 
   /// タスク情報変更保存メソッド
+  ///
+  /// [QTask] に入れられた変更後情報を保存する
   Future<Result<void, Exception>> saveTaskChanges({
-    required List<DTask> newTaskList,
+    required List<QTask> newTaskList,
   });
 
   /// 週単位タスクの firstDate を書き換えるメソッド
@@ -48,15 +54,15 @@ abstract class DataSource {
     required Map<int, Date> idFirstDateMap,
   });
 
-  /// タスクタイトル保存メソッド
-  Future<Result<void, Exception>> saveTaskTitles({
-    required List<DTask> newTaskList,
-  });
+  // /// タスクタイトル保存メソッド
+  // Future<Result<void, Exception>> saveTaskTitles({
+  //   required List<DTask> newTaskList,
+  // });
 
-  /// タスクのチェック変更保存メソッド
-  Future<Result<void, Exception>> saveCheck({
-    required DTask newTask,
-  });
+  // /// タスクのチェック変更保存メソッド
+  // Future<Result<void, Exception>> saveCheck({
+  //   required DTask newTask,
+  // });
 
   /// 新しいラベルの枠を作成し、その ID を返す
   Future<Result<int, Exception>> createNewLabel({

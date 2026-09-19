@@ -65,7 +65,7 @@ abstract class FMonthlyTask with MonthlyTaskBase, _$FMonthlyTask implements FTas
 
   const factory FMonthlyTask({
     required String title,
-    required Month month,
+    required int monthInt,
     required int id,
     required bool isChecked,
     required int labelId,

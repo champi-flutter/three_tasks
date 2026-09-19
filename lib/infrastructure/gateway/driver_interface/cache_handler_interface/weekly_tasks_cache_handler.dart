@@ -1,6 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/base/tasks_cache_handler_base_interface.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
 
 /// 週単位タスクのキャッシュを取り扱うクラス
 ///   - [update]: キャッシュを更新する
@@ -20,7 +21,7 @@ import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handle
 ///
 /// 親クラスの静的解析ツールの機能を引き継ぐためにインターフェースとして設置する。
 abstract class WeeklyTasksCacheHandler
-    extends TasksCacheHandlerBaseInterface<UniqueWeek, EWeeklyTask> {
+    extends TasksCacheHandlerBaseInterface<UniqueWeek, CWeeklyTask> {
 
   /// 指定日付を含む週のうち、すでにキャッシュに存在する週を取得する
   List<UniqueWeek> getCachedWeeks(Date date);
@@ -28,3 +29,13 @@ abstract class WeeklyTasksCacheHandler
   /// 指定週のデータがキャッシュされているかどうか
   bool containsWeek(UniqueWeek week);
 }
+
+// abstract class WeeklyTasksCacheHandler
+//     extends WeeklyTasksCacheHandlerBaseInterface {
+//
+//   /// 指定日付を含む週のうち、すでにキャッシュに存在する週を取得する
+//   List<UniqueWeek> getCachedWeeks(Date date);
+//
+//   /// 指定週のデータがキャッシュされているかどうか
+//   bool containsWeek(UniqueWeek week);
+// }

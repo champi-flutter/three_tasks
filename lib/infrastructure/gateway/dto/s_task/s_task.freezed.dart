@@ -14,11 +14,11 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$SDailyTask {
-  String? get title;
-  Date get date;
+  String get title;
+  int get dateInt;
   int get id;
-  bool? get isChecked;
-  int? get labelId;
+  bool get isChecked;
+  int get labelId;
 
   /// Create a copy of SDailyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -33,7 +33,7 @@ mixin _$SDailyTask {
         (other.runtimeType == runtimeType &&
             other is SDailyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.date, date) || other.date == date) &&
+            (identical(other.dateInt, dateInt) || other.dateInt == dateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -42,11 +42,11 @@ mixin _$SDailyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId);
+      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'SDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'SDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -56,7 +56,7 @@ abstract mixin class $SDailyTaskCopyWith<$Res> {
           SDailyTask value, $Res Function(SDailyTask) _then) =
       _$SDailyTaskCopyWithImpl;
   @useResult
-  $Res call({String? title, Date date, int id, bool? isChecked, int? labelId});
+  $Res call({String title, int dateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -71,33 +71,33 @@ class _$SDailyTaskCopyWithImpl<$Res> implements $SDailyTaskCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = freezed,
-    Object? date = null,
+    Object? title = null,
+    Object? dateInt = null,
     Object? id = null,
-    Object? isChecked = freezed,
-    Object? labelId = freezed,
+    Object? isChecked = null,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as Date,
+              as String,
+      dateInt: null == dateInt
+          ? _self.dateInt
+          : dateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      isChecked: freezed == isChecked
+      isChecked: null == isChecked
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      labelId: freezed == labelId
+              as bool,
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -196,15 +196,15 @@ extension SDailyTaskPatterns on SDailyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String? title, Date date, int id, bool? isChecked, int? labelId)?
+            String title, int dateInt, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _SDailyTask() when $default != null:
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         return orElse();
     }
@@ -226,14 +226,14 @@ extension SDailyTaskPatterns on SDailyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String? title, Date date, int id, bool? isChecked, int? labelId)
+            String title, int dateInt, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SDailyTask():
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -254,14 +254,14 @@ extension SDailyTaskPatterns on SDailyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String? title, Date date, int id, bool? isChecked, int? labelId)?
+            String title, int dateInt, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SDailyTask() when $default != null:
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         return null;
     }
@@ -273,22 +273,22 @@ extension SDailyTaskPatterns on SDailyTask {
 class _SDailyTask extends SDailyTask {
   const _SDailyTask(
       {required this.title,
-      required this.date,
+      required this.dateInt,
       required this.id,
       required this.isChecked,
       required this.labelId})
       : super._();
 
   @override
-  final String? title;
+  final String title;
   @override
-  final Date date;
+  final int dateInt;
   @override
   final int id;
   @override
-  final bool? isChecked;
+  final bool isChecked;
   @override
-  final int? labelId;
+  final int labelId;
 
   /// Create a copy of SDailyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -304,7 +304,7 @@ class _SDailyTask extends SDailyTask {
         (other.runtimeType == runtimeType &&
             other is _SDailyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.date, date) || other.date == date) &&
+            (identical(other.dateInt, dateInt) || other.dateInt == dateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -313,11 +313,11 @@ class _SDailyTask extends SDailyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId);
+      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'SDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'SDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -329,7 +329,7 @@ abstract mixin class _$SDailyTaskCopyWith<$Res>
       __$SDailyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String? title, Date date, int id, bool? isChecked, int? labelId});
+  $Res call({String title, int dateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -344,44 +344,44 @@ class __$SDailyTaskCopyWithImpl<$Res> implements _$SDailyTaskCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? title = freezed,
-    Object? date = null,
+    Object? title = null,
+    Object? dateInt = null,
     Object? id = null,
-    Object? isChecked = freezed,
-    Object? labelId = freezed,
+    Object? isChecked = null,
+    Object? labelId = null,
   }) {
     return _then(_SDailyTask(
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      date: null == date
-          ? _self.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as Date,
+              as String,
+      dateInt: null == dateInt
+          ? _self.dateInt
+          : dateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      isChecked: freezed == isChecked
+      isChecked: null == isChecked
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      labelId: freezed == labelId
+              as bool,
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
 
 /// @nodoc
 mixin _$SWeeklyTask {
-  String? get title;
-  UniqueWeek get week;
+  String get title;
+  int get firstDateInt;
   int get id;
-  bool? get isChecked;
-  int? get labelId;
+  bool get isChecked;
+  int get labelId;
 
   /// Create a copy of SWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -396,7 +396,8 @@ mixin _$SWeeklyTask {
         (other.runtimeType == runtimeType &&
             other is SWeeklyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.week, week) || other.week == week) &&
+            (identical(other.firstDateInt, firstDateInt) ||
+                other.firstDateInt == firstDateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -405,11 +406,11 @@ mixin _$SWeeklyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, week, id, isChecked, labelId);
+      Object.hash(runtimeType, title, firstDateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'SWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'SWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -420,7 +421,7 @@ abstract mixin class $SWeeklyTaskCopyWith<$Res> {
       _$SWeeklyTaskCopyWithImpl;
   @useResult
   $Res call(
-      {String? title, UniqueWeek week, int id, bool? isChecked, int? labelId});
+      {String title, int firstDateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -435,33 +436,33 @@ class _$SWeeklyTaskCopyWithImpl<$Res> implements $SWeeklyTaskCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = freezed,
-    Object? week = null,
+    Object? title = null,
+    Object? firstDateInt = null,
     Object? id = null,
-    Object? isChecked = freezed,
-    Object? labelId = freezed,
+    Object? isChecked = null,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      week: null == week
-          ? _self.week
-          : week // ignore: cast_nullable_to_non_nullable
-              as UniqueWeek,
+              as String,
+      firstDateInt: null == firstDateInt
+          ? _self.firstDateInt
+          : firstDateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      isChecked: freezed == isChecked
+      isChecked: null == isChecked
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      labelId: freezed == labelId
+              as bool,
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -559,16 +560,16 @@ extension SWeeklyTaskPatterns on SWeeklyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String? title, UniqueWeek week, int id, bool? isChecked,
-            int? labelId)?
+    TResult Function(String title, int firstDateInt, int id, bool isChecked,
+            int labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _SWeeklyTask() when $default != null:
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.firstDateInt, _that.id,
+            _that.isChecked, _that.labelId);
       case _:
         return orElse();
     }
@@ -589,15 +590,15 @@ extension SWeeklyTaskPatterns on SWeeklyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String? title, UniqueWeek week, int id, bool? isChecked,
-            int? labelId)
+    TResult Function(
+            String title, int firstDateInt, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SWeeklyTask():
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.firstDateInt, _that.id,
+            _that.isChecked, _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -617,15 +618,15 @@ extension SWeeklyTaskPatterns on SWeeklyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String? title, UniqueWeek week, int id, bool? isChecked,
-            int? labelId)?
+    TResult? Function(String title, int firstDateInt, int id, bool isChecked,
+            int labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _SWeeklyTask() when $default != null:
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.firstDateInt, _that.id,
+            _that.isChecked, _that.labelId);
       case _:
         return null;
     }
@@ -637,22 +638,22 @@ extension SWeeklyTaskPatterns on SWeeklyTask {
 class _SWeeklyTask extends SWeeklyTask {
   const _SWeeklyTask(
       {required this.title,
-      required this.week,
+      required this.firstDateInt,
       required this.id,
       required this.isChecked,
       required this.labelId})
       : super._();
 
   @override
-  final String? title;
+  final String title;
   @override
-  final UniqueWeek week;
+  final int firstDateInt;
   @override
   final int id;
   @override
-  final bool? isChecked;
+  final bool isChecked;
   @override
-  final int? labelId;
+  final int labelId;
 
   /// Create a copy of SWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -668,7 +669,8 @@ class _SWeeklyTask extends SWeeklyTask {
         (other.runtimeType == runtimeType &&
             other is _SWeeklyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.week, week) || other.week == week) &&
+            (identical(other.firstDateInt, firstDateInt) ||
+                other.firstDateInt == firstDateInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -677,11 +679,11 @@ class _SWeeklyTask extends SWeeklyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, week, id, isChecked, labelId);
+      Object.hash(runtimeType, title, firstDateInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'SWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'SWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -694,7 +696,7 @@ abstract mixin class _$SWeeklyTaskCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String? title, UniqueWeek week, int id, bool? isChecked, int? labelId});
+      {String title, int firstDateInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -709,44 +711,44 @@ class __$SWeeklyTaskCopyWithImpl<$Res> implements _$SWeeklyTaskCopyWith<$Res> {
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? title = freezed,
-    Object? week = null,
+    Object? title = null,
+    Object? firstDateInt = null,
     Object? id = null,
-    Object? isChecked = freezed,
-    Object? labelId = freezed,
+    Object? isChecked = null,
+    Object? labelId = null,
   }) {
     return _then(_SWeeklyTask(
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String?,
-      week: null == week
-          ? _self.week
-          : week // ignore: cast_nullable_to_non_nullable
-              as UniqueWeek,
+              as String,
+      firstDateInt: null == firstDateInt
+          ? _self.firstDateInt
+          : firstDateInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      isChecked: freezed == isChecked
+      isChecked: null == isChecked
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      labelId: freezed == labelId
+              as bool,
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
 
 /// @nodoc
 mixin _$SMonthlyTask {
-  String? get title;
+  String get title;
   Month get month;
   int get id;
-  bool? get isChecked;
-  int? get labelId;
+  bool get isChecked;
+  int get labelId;
 
   /// Create a copy of SMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -785,8 +787,7 @@ abstract mixin class $SMonthlyTaskCopyWith<$Res> {
           SMonthlyTask value, $Res Function(SMonthlyTask) _then) =
       _$SMonthlyTaskCopyWithImpl;
   @useResult
-  $Res call(
-      {String? title, Month month, int id, bool? isChecked, int? labelId});
+  $Res call({String title, Month month, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -801,17 +802,17 @@ class _$SMonthlyTaskCopyWithImpl<$Res> implements $SMonthlyTaskCopyWith<$Res> {
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? title = freezed,
+    Object? title = null,
     Object? month = null,
     Object? id = null,
-    Object? isChecked = freezed,
-    Object? labelId = freezed,
+    Object? isChecked = null,
+    Object? labelId = null,
   }) {
     return _then(_self.copyWith(
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       month: null == month
           ? _self.month
           : month // ignore: cast_nullable_to_non_nullable
@@ -820,14 +821,14 @@ class _$SMonthlyTaskCopyWithImpl<$Res> implements $SMonthlyTaskCopyWith<$Res> {
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      isChecked: freezed == isChecked
+      isChecked: null == isChecked
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      labelId: freezed == labelId
+              as bool,
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }
@@ -926,7 +927,7 @@ extension SMonthlyTaskPatterns on SMonthlyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String? title, Month month, int id, bool? isChecked, int? labelId)?
+            String title, Month month, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
@@ -956,7 +957,7 @@ extension SMonthlyTaskPatterns on SMonthlyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String? title, Month month, int id, bool? isChecked, int? labelId)
+            String title, Month month, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
@@ -984,7 +985,7 @@ extension SMonthlyTaskPatterns on SMonthlyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String? title, Month month, int id, bool? isChecked, int? labelId)?
+            String title, Month month, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
@@ -1010,15 +1011,15 @@ class _SMonthlyTask extends SMonthlyTask {
       : super._();
 
   @override
-  final String? title;
+  final String title;
   @override
   final Month month;
   @override
   final int id;
   @override
-  final bool? isChecked;
+  final bool isChecked;
   @override
-  final int? labelId;
+  final int labelId;
 
   /// Create a copy of SMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1059,8 +1060,7 @@ abstract mixin class _$SMonthlyTaskCopyWith<$Res>
       __$SMonthlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call(
-      {String? title, Month month, int id, bool? isChecked, int? labelId});
+  $Res call({String title, Month month, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -1076,17 +1076,17 @@ class __$SMonthlyTaskCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? title = freezed,
+    Object? title = null,
     Object? month = null,
     Object? id = null,
-    Object? isChecked = freezed,
-    Object? labelId = freezed,
+    Object? isChecked = null,
+    Object? labelId = null,
   }) {
     return _then(_SMonthlyTask(
-      title: freezed == title
+      title: null == title
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
-              as String?,
+              as String,
       month: null == month
           ? _self.month
           : month // ignore: cast_nullable_to_non_nullable
@@ -1095,14 +1095,14 @@ class __$SMonthlyTaskCopyWithImpl<$Res>
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as int,
-      isChecked: freezed == isChecked
+      isChecked: null == isChecked
           ? _self.isChecked
           : isChecked // ignore: cast_nullable_to_non_nullable
-              as bool?,
-      labelId: freezed == labelId
+              as bool,
+      labelId: null == labelId
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as int,
     ));
   }
 }

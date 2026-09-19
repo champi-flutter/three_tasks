@@ -2,14 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/view_type/v_label/v_labeled_task.dart';
+import 'package:three_tasks/entities/view_type/v_label/v_label.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_label_editing_controller.dart';
 import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
-import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
+import 'package:three_tasks/view_models/labels_view_model.dart';
 
 class DraftSavingButton extends ConsumerWidget {
   const DraftSavingButton({

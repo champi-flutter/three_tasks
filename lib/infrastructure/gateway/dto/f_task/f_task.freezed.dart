@@ -745,7 +745,7 @@ class __$FWeeklyTaskCopyWithImpl<$Res> implements _$FWeeklyTaskCopyWith<$Res> {
 /// @nodoc
 mixin _$FMonthlyTask {
   String get title;
-  Month get month;
+  int get monthInt;
   int get id;
   bool get isChecked;
   int get labelId;
@@ -764,7 +764,8 @@ mixin _$FMonthlyTask {
         (other.runtimeType == runtimeType &&
             other is FMonthlyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.month, month) || other.month == month) &&
+            (identical(other.monthInt, monthInt) ||
+                other.monthInt == monthInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -773,11 +774,11 @@ mixin _$FMonthlyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, month, id, isChecked, labelId);
+      Object.hash(runtimeType, title, monthInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'FMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'FMonthlyTask(title: $title, monthInt: $monthInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -787,7 +788,7 @@ abstract mixin class $FMonthlyTaskCopyWith<$Res> {
           FMonthlyTask value, $Res Function(FMonthlyTask) _then) =
       _$FMonthlyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, Month month, int id, bool isChecked, int labelId});
+  $Res call({String title, int monthInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -803,7 +804,7 @@ class _$FMonthlyTaskCopyWithImpl<$Res> implements $FMonthlyTaskCopyWith<$Res> {
   @override
   $Res call({
     Object? title = null,
-    Object? month = null,
+    Object? monthInt = null,
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
@@ -813,10 +814,10 @@ class _$FMonthlyTaskCopyWithImpl<$Res> implements $FMonthlyTaskCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      month: null == month
-          ? _self.month
-          : month // ignore: cast_nullable_to_non_nullable
-              as Month,
+      monthInt: null == monthInt
+          ? _self.monthInt
+          : monthInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -927,15 +928,15 @@ extension FMonthlyTaskPatterns on FMonthlyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(
-            String title, Month month, int id, bool isChecked, int labelId)?
+            String title, int monthInt, int id, bool isChecked, int labelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _FMonthlyTask() when $default != null:
-        return $default(
-            _that.title, _that.month, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.monthInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         return orElse();
     }
@@ -957,14 +958,14 @@ extension FMonthlyTaskPatterns on FMonthlyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(
-            String title, Month month, int id, bool isChecked, int labelId)
+            String title, int monthInt, int id, bool isChecked, int labelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FMonthlyTask():
-        return $default(
-            _that.title, _that.month, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.monthInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -985,14 +986,14 @@ extension FMonthlyTaskPatterns on FMonthlyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(
-            String title, Month month, int id, bool isChecked, int labelId)?
+            String title, int monthInt, int id, bool isChecked, int labelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _FMonthlyTask() when $default != null:
-        return $default(
-            _that.title, _that.month, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.monthInt, _that.id, _that.isChecked,
+            _that.labelId);
       case _:
         return null;
     }
@@ -1004,7 +1005,7 @@ extension FMonthlyTaskPatterns on FMonthlyTask {
 class _FMonthlyTask extends FMonthlyTask {
   const _FMonthlyTask(
       {required this.title,
-      required this.month,
+      required this.monthInt,
       required this.id,
       required this.isChecked,
       required this.labelId})
@@ -1013,7 +1014,7 @@ class _FMonthlyTask extends FMonthlyTask {
   @override
   final String title;
   @override
-  final Month month;
+  final int monthInt;
   @override
   final int id;
   @override
@@ -1035,7 +1036,8 @@ class _FMonthlyTask extends FMonthlyTask {
         (other.runtimeType == runtimeType &&
             other is _FMonthlyTask &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.month, month) || other.month == month) &&
+            (identical(other.monthInt, monthInt) ||
+                other.monthInt == monthInt) &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
@@ -1044,11 +1046,11 @@ class _FMonthlyTask extends FMonthlyTask {
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, month, id, isChecked, labelId);
+      Object.hash(runtimeType, title, monthInt, id, isChecked, labelId);
 
   @override
   String toString() {
-    return 'FMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'FMonthlyTask(title: $title, monthInt: $monthInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
   }
 }
 
@@ -1060,7 +1062,7 @@ abstract mixin class _$FMonthlyTaskCopyWith<$Res>
       __$FMonthlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, Month month, int id, bool isChecked, int labelId});
+  $Res call({String title, int monthInt, int id, bool isChecked, int labelId});
 }
 
 /// @nodoc
@@ -1077,7 +1079,7 @@ class __$FMonthlyTaskCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? title = null,
-    Object? month = null,
+    Object? monthInt = null,
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
@@ -1087,10 +1089,10 @@ class __$FMonthlyTaskCopyWithImpl<$Res>
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      month: null == month
-          ? _self.month
-          : month // ignore: cast_nullable_to_non_nullable
-              as Month,
+      monthInt: null == monthInt
+          ? _self.monthInt
+          : monthInt // ignore: cast_nullable_to_non_nullable
+              as int,
       id: null == id
           ? _self.id
           : id // ignore: cast_nullable_to_non_nullable

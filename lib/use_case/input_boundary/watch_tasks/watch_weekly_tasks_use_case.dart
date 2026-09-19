@@ -10,9 +10,5 @@ import 'package:custom_core_types/custom_core_types.dart';
 ///   2. 変換後のデータを反映させる
 abstract class WatchWeeklyTasksUseCase {
   /// 監視フローを開始
-  void initAt(Date date);
-
-  /// todo このクラスの dispose
-  void dispose();
-
+  Future<void> initAt(Date targetDate) ;
 }

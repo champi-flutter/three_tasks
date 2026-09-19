@@ -1,39 +1,43 @@
+import 'package:custom_core_types/custom_core_types.dart';
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
-import 'package:three_tasks/view_models/labeled_tasks_view_model.dart';
-import 'package:three_tasks/view_models/weekly_tasks_view_model/weekly_tasks_view_model.dart';
+import 'package:three_tasks/view_models/labels_view_model.dart';
+import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'history_screen.dart';
 
-// 週の初め
-int _firstDay = 0;
-
-int get firstDay => _firstDay;
-
-int _firstWeekday = 0;
-
-int get firstWeekday => _firstWeekday;
+// // 週の初め
+// int _firstDay = 0;
+//
+// int get firstDay => _firstDay;
+//
+// int _firstWeekday = 0;
+//
+// int get firstWeekday => _firstWeekday;
 
 class WeeklyTasksScreen extends HookConsumerWidget {
   // todo build
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // VMを監視
-    final List<VWeeklyTask> weeklyTaskList = ref.watch(
-        weeklyTasksViewModelProvider);
+    // VM のデータの、当日の分を監視する
+    final TaskList<VWeeklyTask> weeklyTaskList = ref.watch(
+        weeklyTasksViewModelProvider.select((state)=> state[today]));
 
     Future<void> _saveTaskChanges({
       required int position,
       String? newTitle,
       bool? newChecked,
-      int? newLabelId,}) async {
+      int? newLabelId,})
+    async {
       // 週タスクのコントローラを参照
       final controller = ref.read(weeklyTasksControllerProvider);
       // 入力値の保存を依頼

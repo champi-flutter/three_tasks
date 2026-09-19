@@ -1,9 +1,8 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/infrastructure/cache/cache_handler/cache_handler_interface/daily_tasks_cache_handler.dart';
-import 'package:three_tasks/infrastructure/cache/cache_handler/cache_handler_interface/weekly_tasks_cache_handler.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
+import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
-import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// タスク情報の変更を保存する処理フローを実装するクラス
@@ -12,23 +11,14 @@ class SaveTaskChangesInteractor
     implements SaveTaskChangesUseCase {
   SaveTaskChangesInteractor({
     required DataRepository dataRepository,
-    required DailyTasksCacheHandler dailyTasksCacheHandler,
     required NotificationService notificationService,
     required LoadingService loadingService,
-    required WeeklyTasksCacheHandler weeklyTasksCacheHandler,
-  })  : _dailyTasksCacheHandler = dailyTasksCacheHandler,_weeklyTasksCacheHandler = weeklyTasksCacheHandler,
-        _repository = dataRepository,
+  })  : _repository = dataRepository,
         notificationService = notificationService,
         _loadingService = loadingService;
 
   /// [DataRepository] のインスタンス
   final DataRepository _repository;
-
-  /// 日単位タスクのキャッシュハンドラのインスタンス
-  final DailyTasksCacheHandler _dailyTasksCacheHandler;
-
-  /// 週単位タスクのキャッシュハンドラのインスタンス
-  final WeeklyTasksCacheHandler _weeklyTasksCacheHandler;
 
   /// ローディングの呼び出し口
   final LoadingService _loadingService;
@@ -47,25 +37,22 @@ class SaveTaskChangesInteractor
   /// [newTitle]、[newChecked]、[newLabelId] のいずれかと、
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
-  Future<Result<void, Exception>> execute({
-    required List<TaskUpdateParameter> updateParameterList,
+  Future<void> execute({
+    required TaskList<ETask> updatedETaskList,
   }) =>
-      _loadingService.loadAsync<Result<void, Exception>>(
+      _loadingService.loadAsync(
         () async {
           try {
-            if (updateParameterList.isEmpty) {
+            if (updatedETaskList.isEmpty) {
               throw Exception("無効な値です");
             }
             // リポジトリにデータの保存を依頼する
             final Result<void, Exception> result =
-                await _repository.saveTaskChanges(
-              updateParameterList: updateParameterList,
-            );
+                await _repository.saveTaskChanges(updatedETaskList: updatedETaskList);
             // 保存が成功した場合に、キャッシュを更新する
             switch (result) {
               case Success():
-                // 反映完了まで await
-                await _cacheChanges(newTaskList);
+                break;
               case Failure(
                   exception: final Exception exc,
                   methodName: final String? methodName,
@@ -73,10 +60,8 @@ class SaveTaskChangesInteractor
                 final Exception fetchExc = fetchError(methodName: methodName);
                 notifyError(content: "$exc\n$fetchExc");
             }
-            return result;
           } catch (e) {
             notifyError(content: "$e", specifiesLayer: true);
-            return Failure(Exception(e));
           }
         },
       );

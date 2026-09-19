@@ -12,10 +12,10 @@ part 's_task.freezed.dart';
 /// 2026/06/04 変更: sealedクラス自体を freezed で定義すると、riverpod_generator
 /// との兼ね合いが悪いので、継承先を freezed で個別に生成
 sealed class STask extends TaskBase {
-  String? get title;
+  String get title;
   int get id;
-  bool? get isChecked;
-  int? get labelId;
+  bool get isChecked;
+  int get labelId;
 }
 
 /// Save 用 日単位タスク DTO
@@ -25,15 +25,12 @@ abstract class SDailyTask with DailyTaskBase, _$SDailyTask implements STask {
   const SDailyTask._();
 
   const factory SDailyTask({
-    required String? title,
-    required Date date,
+    required String title,
+    required int dateInt,
     required int id,
-    required bool? isChecked,
-    required int? labelId,
+    required bool isChecked,
+    required int labelId,
   }) = _SDailyTask;
-
-  /// コンストラクタの引数で、[Date] で指定した [date] を `int` で取得する
-  int get dateInt=> date.toIntIdentifier();
 }
 
 /// Save 用 週単位タスク DTO
@@ -44,17 +41,17 @@ abstract class SWeeklyTask with WeeklyTaskBase, _$SWeeklyTask implements STask {
   const SWeeklyTask._();
 
   const factory SWeeklyTask({
-    required String? title,
-    required UniqueWeek week,
+    required String title,
+    required int firstDateInt,
     required int id,
-    required bool? isChecked,
-    required int? labelId,
+    required bool isChecked,
+    required int labelId,
   }) = _SWeeklyTask;
 
-  /// コンストラクタの引数で、[UniqueWeek] で指定した [week] の開始日を `int` で取得する
-  int get firstDateInt => _firstDate.toIntIdentifier();
-
-  Date get _firstDate => week.firstDateOfWeek;
+  // /// コンストラクタの引数で、[UniqueWeek] で指定した [week] の開始日を `int` で取得する
+  // int get firstDateInt => _firstDate.toIntIdentifier();
+  //
+  // Date get _firstDate => week.firstDateOfWeek;
 }
 
 /// Save 用 月単位タスク DTO
@@ -63,11 +60,11 @@ abstract class SMonthlyTask with MonthlyTaskBase, _$SMonthlyTask implements STas
   const SMonthlyTask._();
 
   const factory SMonthlyTask({
-    required String? title,
+    required String title,
     required Month month,
     required int id,
-    required bool? isChecked,
-    required int? labelId,
+    required bool isChecked,
+    required int labelId,
   }) = _SMonthlyTask;
 }
 

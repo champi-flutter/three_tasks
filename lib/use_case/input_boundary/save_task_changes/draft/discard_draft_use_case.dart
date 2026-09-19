@@ -1,7 +1,7 @@
 
-import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
+import 'package:three_tasks/enum/task_recurrence.dart';
 
 /// 下書き破棄フロー
 abstract class DiscardDraftUseCase {
-  Future<void> execute({required VTask task})async{}
+  Future<void> execute({required TaskRec taskRec});
 }

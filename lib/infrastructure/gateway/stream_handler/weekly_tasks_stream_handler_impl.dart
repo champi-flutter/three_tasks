@@ -1,5 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/weekly_tasks_stream_handler.dart';
 
@@ -9,7 +10,7 @@ import 'package:three_tasks/use_case/stream_handler_interface/weekly_tasks_strea
 ///  完了するまでローディングする。
 class WeeklyTasksStreamHandlerImpl
     extends SingleStreamHandlerImplementationWithInitialLoading<
-        Map<UniqueWeek, List<EWeeklyTask>>>
+        Map<UniqueWeek, WeeklyTaskList<EWeeklyTask>>>
     implements WeeklyTasksStreamHandler {
   WeeklyTasksStreamHandlerImpl({required LoadingService loadingService})
       : loadingService = loadingService;

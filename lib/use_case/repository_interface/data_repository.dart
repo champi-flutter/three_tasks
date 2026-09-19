@@ -1,11 +1,16 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
-import 'package:three_tasks/use_case/input_parameter/task_update_parameter.dart';
+import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
+import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
 
 /// データ層へのアクセスポート
 abstract class DataRepository {
 
   // todo フェッチ
+  /// ラベルデータをフェッチするメソッド
+  Future<Result<void, Exception>> fetchLabel();
+
   /// 指定日付（[dateList]）の日単位タスクをフェッチするメソッド
   ///
   /// 複数の日付を指定可能。
@@ -43,7 +48,12 @@ abstract class DataRepository {
 
   /// タスク情報変更保存メソッド
   Future<Result<void, Exception>> saveTaskChanges({
-    required List<TaskUpdateParameter> updateParameterList,
+    required TaskList<ETask> updatedETaskList,
+  });
+
+  /// 週タスク固有の情報変更保存メソッド
+  Future<Result<void, Exception>> saveWeeklyTaskChanges({
+    required WeeklyTaskList<EWeeklyTask> updatedETaskList,
   });
 
   /// 週単位タスクの firstDate を書き換えるメソッド
@@ -51,13 +61,18 @@ abstract class DataRepository {
     required Map<int, Date> idFirstDateMap,
   });
 
-  /// タスクタイトル保存メソッド
-  Future<Result<void, Exception>> saveTaskTitles({
-    required List<ETask> newTaskList,
-  });
+  // /// タスクタイトル保存メソッド
+  // Future<Result<void, Exception>> saveTaskTitles({
+  //   required List<ETask> newTaskList,
+  // });
 
-  /// タスクのチェック変更保存メソッド
-  Future<Result<void, Exception>> saveCheck({required DTask newTask});
+  // /// タスクのチェック変更保存メソッド
+  // Future<Result<void, Exception>> saveCheck({required DTask newTask});
+
+  /// ラベル情報変更保存メソッド
+  Future<Result<void, Exception>> saveLabelChanges({
+    required LabelUpdateParameter updateParameter,
+  });
 
   /// 新しいラベルの枠を作成し、その ID を返す
   Future<Result<int, Exception>> createNewLabel({
