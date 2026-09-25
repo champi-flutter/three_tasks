@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:three_tasks/presentation/extended_foundation/weekly_lazy_map.dart';
+import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
-import 'package:three_tasks/view_models/extended_foundation/weekly_lazy_map.dart';
-import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
 
 part 'weekly_tasks_view_model.g.dart';
 

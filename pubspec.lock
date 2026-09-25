@@ -262,7 +262,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "0c137ea62fe0c3c1f1e0575c1f0d38cd23ff4035"
+      resolved-ref: ad82ff77b20aa458fb13c5899909ed80609463f7
       url: "https://github.com/champi-flutter/custom_core_types.git"
     source: git
     version: "1.2.5+16"
@@ -320,10 +320,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: a989a12b7357edc27a8b5b54d6da01b16e1765b0
+      resolved-ref: b72eb6f6169b5d73ebd244e2aeffb4bf05676b89
       url: "https://github.com/champi-flutter/data_converter.git"
     source: git
-    version: "1.0.0+1"
+    version: "1.0.1+2"
   drift:
     dependency: "direct main"
     description:

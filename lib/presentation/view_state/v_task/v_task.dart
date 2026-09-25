@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
 part 'v_task.freezed.dart';
@@ -94,6 +95,12 @@ abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
         canReplace: true,
       );
 }
+
+// class W{
+//   final List<WeeklyTaskList<VWeeklyTask>> weekUnitList;
+//
+//   List<VWeeklyTask> get view => [for(WeeklyTaskList<VWeeklyTask> sublist in weekUnitList)...sublist.];
+// }
 
 /// 月単位のタスククラス
 @freezed

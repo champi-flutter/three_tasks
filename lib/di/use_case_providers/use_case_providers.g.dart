@@ -8,14 +8,18 @@ part of 'use_case_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// ラベルフェッチフロー
 
 @ProviderFor(fetchLabelUseCase)
 const fetchLabelUseCaseProvider = FetchLabelUseCaseFamily._();
+
+/// ラベルフェッチフロー
 
 final class FetchLabelUseCaseProvider extends $FunctionalProvider<
     FetchLabelUseCase,
     FetchLabelUseCase,
     FetchLabelUseCase> with $Provider<FetchLabelUseCase> {
+  /// ラベルフェッチフロー
   const FetchLabelUseCaseProvider._(
       {required FetchLabelUseCaseFamily super.from,
       required Token super.argument})
@@ -71,7 +75,9 @@ final class FetchLabelUseCaseProvider extends $FunctionalProvider<
   }
 }
 
-String _$fetchLabelUseCaseHash() => r'521cea33e32644a9fbb6ef0b7f226325c4f5ba61';
+String _$fetchLabelUseCaseHash() => r'8229091f88029fdcd1c3ba08c9c2105d2c333a7c';
+
+/// ラベルフェッチフロー
 
 final class FetchLabelUseCaseFamily extends $Family
     with $FunctionalFamilyOverride<FetchLabelUseCase, Token> {
@@ -83,6 +89,8 @@ final class FetchLabelUseCaseFamily extends $Family
           $allTransitiveDependencies: null,
           isAutoDispose: true,
         );
+
+  /// ラベルフェッチフロー
 
   FetchLabelUseCaseProvider call(
     Token token,

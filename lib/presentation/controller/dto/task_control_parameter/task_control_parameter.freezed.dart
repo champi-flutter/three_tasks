@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$TaskControlParameter {
-  VTask get taskOrigin;
+  ListEntry<VTask> get taskEntry;
   String? get newTitle;
   bool? get newChecked;
   int? get newLabelId;
@@ -32,8 +32,8 @@ mixin _$TaskControlParameter {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is TaskControlParameter &&
-            const DeepCollectionEquality()
-                .equals(other.taskOrigin, taskOrigin) &&
+            (identical(other.taskEntry, taskEntry) ||
+                other.taskEntry == taskEntry) &&
             (identical(other.newTitle, newTitle) ||
                 other.newTitle == newTitle) &&
             (identical(other.newChecked, newChecked) ||
@@ -43,16 +43,12 @@ mixin _$TaskControlParameter {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(taskOrigin),
-      newTitle,
-      newChecked,
-      newLabelId);
+  int get hashCode =>
+      Object.hash(runtimeType, taskEntry, newTitle, newChecked, newLabelId);
 
   @override
   String toString() {
-    return 'TaskControlParameter(taskOrigin: $taskOrigin, newTitle: $newTitle, newChecked: $newChecked, newLabelId: $newLabelId)';
+    return 'TaskControlParameter(taskEntry: $taskEntry, newTitle: $newTitle, newChecked: $newChecked, newLabelId: $newLabelId)';
   }
 }
 
@@ -63,7 +59,10 @@ abstract mixin class $TaskControlParameterCopyWith<$Res> {
       _$TaskControlParameterCopyWithImpl;
   @useResult
   $Res call(
-      {VTask taskOrigin, String? newTitle, bool? newChecked, int? newLabelId});
+      {ListEntry<VTask> taskEntry,
+      String? newTitle,
+      bool? newChecked,
+      int? newLabelId});
 }
 
 /// @nodoc
@@ -79,16 +78,16 @@ class _$TaskControlParameterCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? taskOrigin = freezed,
+    Object? taskEntry = null,
     Object? newTitle = freezed,
     Object? newChecked = freezed,
     Object? newLabelId = freezed,
   }) {
     return _then(_self.copyWith(
-      taskOrigin: freezed == taskOrigin
-          ? _self.taskOrigin
-          : taskOrigin // ignore: cast_nullable_to_non_nullable
-              as VTask,
+      taskEntry: null == taskEntry
+          ? _self.taskEntry
+          : taskEntry // ignore: cast_nullable_to_non_nullable
+              as ListEntry<VTask>,
       newTitle: freezed == newTitle
           ? _self.newTitle
           : newTitle // ignore: cast_nullable_to_non_nullable
@@ -198,15 +197,15 @@ extension TaskControlParameterPatterns on TaskControlParameter {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(VTask taskOrigin, String? newTitle, bool? newChecked,
-            int? newLabelId)?
+    TResult Function(ListEntry<VTask> taskEntry, String? newTitle,
+            bool? newChecked, int? newLabelId)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _TaskControlParameter() when $default != null:
-        return $default(_that.taskOrigin, _that.newTitle, _that.newChecked,
+        return $default(_that.taskEntry, _that.newTitle, _that.newChecked,
             _that.newLabelId);
       case _:
         return orElse();
@@ -228,14 +227,14 @@ extension TaskControlParameterPatterns on TaskControlParameter {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(VTask taskOrigin, String? newTitle, bool? newChecked,
-            int? newLabelId)
+    TResult Function(ListEntry<VTask> taskEntry, String? newTitle,
+            bool? newChecked, int? newLabelId)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _TaskControlParameter():
-        return $default(_that.taskOrigin, _that.newTitle, _that.newChecked,
+        return $default(_that.taskEntry, _that.newTitle, _that.newChecked,
             _that.newLabelId);
       case _:
         throw StateError('Unexpected subclass');
@@ -256,14 +255,14 @@ extension TaskControlParameterPatterns on TaskControlParameter {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(VTask taskOrigin, String? newTitle, bool? newChecked,
-            int? newLabelId)?
+    TResult? Function(ListEntry<VTask> taskEntry, String? newTitle,
+            bool? newChecked, int? newLabelId)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _TaskControlParameter() when $default != null:
-        return $default(_that.taskOrigin, _that.newTitle, _that.newChecked,
+        return $default(_that.taskEntry, _that.newTitle, _that.newChecked,
             _that.newLabelId);
       case _:
         return null;
@@ -275,14 +274,14 @@ extension TaskControlParameterPatterns on TaskControlParameter {
 
 class _TaskControlParameter extends TaskControlParameter {
   const _TaskControlParameter(
-      {required this.taskOrigin,
+      {required this.taskEntry,
       this.newTitle,
       this.newChecked,
       this.newLabelId})
       : super._();
 
   @override
-  final VTask taskOrigin;
+  final ListEntry<VTask> taskEntry;
   @override
   final String? newTitle;
   @override
@@ -304,8 +303,8 @@ class _TaskControlParameter extends TaskControlParameter {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _TaskControlParameter &&
-            const DeepCollectionEquality()
-                .equals(other.taskOrigin, taskOrigin) &&
+            (identical(other.taskEntry, taskEntry) ||
+                other.taskEntry == taskEntry) &&
             (identical(other.newTitle, newTitle) ||
                 other.newTitle == newTitle) &&
             (identical(other.newChecked, newChecked) ||
@@ -315,16 +314,12 @@ class _TaskControlParameter extends TaskControlParameter {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(taskOrigin),
-      newTitle,
-      newChecked,
-      newLabelId);
+  int get hashCode =>
+      Object.hash(runtimeType, taskEntry, newTitle, newChecked, newLabelId);
 
   @override
   String toString() {
-    return 'TaskControlParameter(taskOrigin: $taskOrigin, newTitle: $newTitle, newChecked: $newChecked, newLabelId: $newLabelId)';
+    return 'TaskControlParameter(taskEntry: $taskEntry, newTitle: $newTitle, newChecked: $newChecked, newLabelId: $newLabelId)';
   }
 }
 
@@ -337,7 +332,10 @@ abstract mixin class _$TaskControlParameterCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {VTask taskOrigin, String? newTitle, bool? newChecked, int? newLabelId});
+      {ListEntry<VTask> taskEntry,
+      String? newTitle,
+      bool? newChecked,
+      int? newLabelId});
 }
 
 /// @nodoc
@@ -353,16 +351,16 @@ class __$TaskControlParameterCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? taskOrigin = freezed,
+    Object? taskEntry = null,
     Object? newTitle = freezed,
     Object? newChecked = freezed,
     Object? newLabelId = freezed,
   }) {
     return _then(_TaskControlParameter(
-      taskOrigin: freezed == taskOrigin
-          ? _self.taskOrigin
-          : taskOrigin // ignore: cast_nullable_to_non_nullable
-              as VTask,
+      taskEntry: null == taskEntry
+          ? _self.taskEntry
+          : taskEntry // ignore: cast_nullable_to_non_nullable
+              as ListEntry<VTask>,
       newTitle: freezed == newTitle
           ? _self.newTitle
           : newTitle // ignore: cast_nullable_to_non_nullable
@@ -401,8 +399,8 @@ mixin _$WeeklyTaskControlParameter {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is WeeklyTaskControlParameter &&
-            const DeepCollectionEquality()
-                .equals(other.taskOrigin, taskOrigin) &&
+            (identical(other.taskOrigin, taskOrigin) ||
+                other.taskOrigin == taskOrigin) &&
             (identical(other.newStart, newStart) ||
                 other.newStart == newStart) &&
             (identical(other.newTitle, newTitle) ||
@@ -415,12 +413,7 @@ mixin _$WeeklyTaskControlParameter {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(taskOrigin),
-      newStart,
-      newTitle,
-      newChecked,
-      newLabelId);
+      runtimeType, taskOrigin, newStart, newTitle, newChecked, newLabelId);
 
   @override
   String toString() {
@@ -440,6 +433,8 @@ abstract mixin class $WeeklyTaskControlParameterCopyWith<$Res> {
       String? newTitle,
       bool? newChecked,
       int? newLabelId});
+
+  $VWeeklyTaskCopyWith<$Res> get taskOrigin;
 }
 
 /// @nodoc
@@ -455,14 +450,14 @@ class _$WeeklyTaskControlParameterCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? taskOrigin = freezed,
+    Object? taskOrigin = null,
     Object? newStart = freezed,
     Object? newTitle = freezed,
     Object? newChecked = freezed,
     Object? newLabelId = freezed,
   }) {
     return _then(_self.copyWith(
-      taskOrigin: freezed == taskOrigin
+      taskOrigin: null == taskOrigin
           ? _self.taskOrigin
           : taskOrigin // ignore: cast_nullable_to_non_nullable
               as VWeeklyTask,
@@ -483,6 +478,16 @@ class _$WeeklyTaskControlParameterCopyWithImpl<$Res>
           : newLabelId // ignore: cast_nullable_to_non_nullable
               as int?,
     ));
+  }
+
+  /// Create a copy of WeeklyTaskControlParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $VWeeklyTaskCopyWith<$Res> get taskOrigin {
+    return $VWeeklyTaskCopyWith<$Res>(_self.taskOrigin, (value) {
+      return _then(_self.copyWith(taskOrigin: value));
+    });
   }
 }
 
@@ -688,8 +693,8 @@ class _WeeklyTaskControlParameter extends WeeklyTaskControlParameter {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _WeeklyTaskControlParameter &&
-            const DeepCollectionEquality()
-                .equals(other.taskOrigin, taskOrigin) &&
+            (identical(other.taskOrigin, taskOrigin) ||
+                other.taskOrigin == taskOrigin) &&
             (identical(other.newStart, newStart) ||
                 other.newStart == newStart) &&
             (identical(other.newTitle, newTitle) ||
@@ -702,12 +707,7 @@ class _WeeklyTaskControlParameter extends WeeklyTaskControlParameter {
 
   @override
   int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(taskOrigin),
-      newStart,
-      newTitle,
-      newChecked,
-      newLabelId);
+      runtimeType, taskOrigin, newStart, newTitle, newChecked, newLabelId);
 
   @override
   String toString() {
@@ -730,6 +730,9 @@ abstract mixin class _$WeeklyTaskControlParameterCopyWith<$Res>
       String? newTitle,
       bool? newChecked,
       int? newLabelId});
+
+  @override
+  $VWeeklyTaskCopyWith<$Res> get taskOrigin;
 }
 
 /// @nodoc
@@ -745,14 +748,14 @@ class __$WeeklyTaskControlParameterCopyWithImpl<$Res>
   @override
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? taskOrigin = freezed,
+    Object? taskOrigin = null,
     Object? newStart = freezed,
     Object? newTitle = freezed,
     Object? newChecked = freezed,
     Object? newLabelId = freezed,
   }) {
     return _then(_WeeklyTaskControlParameter(
-      taskOrigin: freezed == taskOrigin
+      taskOrigin: null == taskOrigin
           ? _self.taskOrigin
           : taskOrigin // ignore: cast_nullable_to_non_nullable
               as VWeeklyTask,
@@ -773,6 +776,16 @@ class __$WeeklyTaskControlParameterCopyWithImpl<$Res>
           : newLabelId // ignore: cast_nullable_to_non_nullable
               as int?,
     ));
+  }
+
+  /// Create a copy of WeeklyTaskControlParameter
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $VWeeklyTaskCopyWith<$Res> get taskOrigin {
+    return $VWeeklyTaskCopyWith<$Res>(_self.taskOrigin, (value) {
+      return _then(_self.copyWith(taskOrigin: value));
+    });
   }
 }
 

@@ -38,14 +38,13 @@ extension LabelListScanning on List<VLabel> {
   /// 指定タイトル（[title]）と合致するラベルのID
   ///
   /// ない場合は、 `null` を返す。
-  int? idWithSameTitleAs(String title) {
+  VLabel? asSameTitleAs(String title) {
     for (VLabel label in this) {
       // 合致するラベルのIDを返す
       if (label.title == title) {
-        return label.labelId;
+        return label;
       }
     }
-    ;
     return null;
   }
 }

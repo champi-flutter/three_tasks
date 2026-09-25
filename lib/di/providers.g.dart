@@ -89,7 +89,7 @@ final class DataRepositoryProvider
   }
 }
 
-String _$dataRepositoryHash() => r'd61a3e6a57681dba04fb7a7803b4ffc418fa9efc';
+String _$dataRepositoryHash() => r'67f6e9a48089f3ab3576736cc6bb8c11a50e16e4';
 
 @ProviderFor(toastCount)
 const toastCountProvider = ToastCountProvider._();

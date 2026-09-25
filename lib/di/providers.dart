@@ -1,6 +1,7 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/di/infrastructure_providers/cache_handler_providers.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/daily_tasks_cache_handler_impl.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/weekly_tasks_cache_handler_impl.dart';
 import 'package:three_tasks/infrastructure/drivers/db/database.dart';
@@ -14,14 +15,14 @@ import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily
 import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_daily_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/discard_draft_use_case.dart';
-import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/keep_as_draft_use_case.dart';
+import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draft_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
 import 'package:three_tasks/use_case/interactor/notify_access/notify_daily_tasks_access_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/draft/discard_draft_interactor.dart';
-import 'package:three_tasks/use_case/interactor/save_task_changes/draft/keep_as_draft_interactor.dart';
+import 'package:three_tasks/use_case/interactor/save_task_changes/draft/draft_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/save_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/save_weekly_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_daily_tasks_interactor.dart';
@@ -51,6 +52,7 @@ DataRepository dataRepository(Ref ref) => DataRepositoryImpl(
       notificationService: ref.watch(notificationServiceProvider),
       dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider),
       weeklyTasksCacheHandler: ref.watch(weeklyTasksCacheHandlerProvider),
+  labelsCacheHandler: ref.watch(labelsCacheHandlerProvider),
     );
 
 // todo UseCase
@@ -111,14 +113,6 @@ NotifyDailyTasksAccessUseCase notifyDailyTasksAccessUseCase(Ref ref) =>
     NotifyDailyTasksAccessInteractor(
         dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider));
 
-/// タスク情報の変更を下書きとして保有する処理フロー
-@riverpod
-KeepAsDraftUseCase keepAsDraftUseCase(Ref ref) => KeepAsDraftInteractor(
-      notificationService: ref.watch(notificationServiceProvider),
-      loadingService: ref.watch(loadingServiceProvider),
-      dailyTasksPresenter: ref.watch(dailyTasksPresenterProvider),
-    );
-
 /// 下書き破棄フロー
 @riverpod
 DiscardDraftUseCase discardDraftUseCase(Ref ref) => DiscardDraftInteractor();
@@ -145,13 +139,13 @@ TasksController tasksController(Ref ref) => TasksController(
       discardDraftUseCase: ref.watch(discardDraftUseCaseProvider),
     );
 
-/// 週単位タスク操作クラス
-@riverpod
-WeeklyTasksController weeklyTasksController(Ref ref) => WeeklyTasksController(
-      saveWeeklyTaskChangesUseCase:
-          ref.watch(saveWeeklyTaskChangesUseCaseProvider),
-  keepAsDraftUseCase: ref.watch(keepAsDraftUseCaseProvider),
-    );
+// /// 週単位タスク操作クラス
+// @riverpod
+// WeeklyTasksController weeklyTasksController(Ref ref) => WeeklyTasksController(
+//       saveWeeklyTaskChangesUseCase:
+//           ref.watch(saveWeeklyTaskChangesUseCaseProvider),
+//   keepAsDraftUseCase: ref.watch(keepAsDraftUseCaseProvider),
+//     );
 
 // キャッシュハンドラ
 /// 日単位タスクのキャッシュストリームハンドラ

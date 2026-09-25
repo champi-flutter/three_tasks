@@ -8,12 +8,16 @@ part of 'presenter_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// ラベルデータ反映クラス
 
 @ProviderFor(labelsPresenter)
 const labelsPresenterProvider = LabelsPresenterFamily._();
 
+/// ラベルデータ反映クラス
+
 final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
     LabelsPresenter, LabelsPresenter> with $Provider<LabelsPresenter> {
+  /// ラベルデータ反映クラス
   const LabelsPresenterProvider._(
       {required LabelsPresenterFamily super.from,
       required Token super.argument})
@@ -70,6 +74,8 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
 
 String _$labelsPresenterHash() => r'af925d4ba144970787a45120626178f39c4fd9cb';
 
+/// ラベルデータ反映クラス
+
 final class LabelsPresenterFamily extends $Family
     with $FunctionalFamilyOverride<LabelsPresenter, Token> {
   const LabelsPresenterFamily._()
@@ -80,6 +86,8 @@ final class LabelsPresenterFamily extends $Family
           $allTransitiveDependencies: null,
           isAutoDispose: true,
         );
+
+  /// ラベルデータ反映クラス
 
   LabelsPresenterProvider call(
     Token token,

@@ -1,13 +1,20 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
+import 'package:three_tasks/enum/task_recurrence.dart';
 
-sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task>{
+sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
+
+  /// タスクの種別
+  TaskRec get rec;
+
   TaskListBase.fill(super.length, super.fill) : super.fill();
-  TaskListBase.fromIterable(super.length, super.iterable): super.fromIterable();
+
+  TaskListBase.fromIterable(super.length, super.iterable)
+      : super.fromIterable();
 
   @protected
-  TaskListBase.copy(super.list): super.copy();
+  TaskListBase.copy(super.list) : super.copy();
 
   @override
   TaskListBase<Task> get deepCopy;
@@ -16,12 +23,17 @@ sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task>{
 /// タスクのリスト
 ///
 /// 要素数を 3 つに固定する。
-class TaskList<Task extends TaskBase> extends TaskListBase<Task>{
+class TaskList<Task extends TaskBase> extends TaskListBase<Task> {
+
+  /// タスクの種別
+  @override
+  final TaskRec rec;
+
   TaskList(
     Task task1,
     Task task2,
     Task task3,
-  ) : super.fill(
+  ) : rec = task1.rec, super.fill(
           3,
           (i) => switch (i) {
             0 => task1,
@@ -38,13 +50,20 @@ class TaskList<Task extends TaskBase> extends TaskListBase<Task>{
           iterable.length == 3,
           "[TaskList.fromIterable] 要素数が不適当です",
         ),
+  rec = iterable.first.rec,
         super.fromIterable(
           3,
           iterable,
         );
 
+  @override
+  @protected
+  ListEntry<Task> get single => throw UnsupportedError(
+        "[TaskList] single にアクセスされました。",
+      );
+
   /// [deepCopy] の実装のための内部的なコンストラクタ
-  TaskList._copy(super.list): super.copy();
+  TaskList._copy(super.list) : rec = list.first.value.rec, super.copy();
 
   /// 同じ情報を持つ別の新しい [TaskList]  のインスタンスを生成する
   @override
@@ -55,22 +74,27 @@ class TaskList<Task extends TaskBase> extends TaskListBase<Task>{
 ///
 /// 週タスクのみ、要素数を 3 つに固定しない。
 class WeeklyTaskList<Task extends WeeklyTaskBase> extends TaskListBase<Task> {
+
+  /// タスクの種別
+  @override
+  final TaskRec rec = TaskRec.week;
+
   WeeklyTaskList(
-      List<Task> taskList,
-      ) : super.fill(
-    taskList.length,
-    (index) => taskList[index],
-  );
+    List<Task> taskList,
+  ) : super.fill(
+          taskList.length,
+          (index) => taskList[index],
+        );
 
   /// [Iterable] から [TaskList] を生成するコンストラクタ
   WeeklyTaskList.fromIterable(Iterable<Task> iterable)
       : super.fromIterable(
-        iterable.length,
-        iterable,
-      );
+          iterable.length,
+          iterable,
+        );
 
   /// [deepCopy] の実装のための内部的なコンストラクタ
-  WeeklyTaskList._copy(super.list): super.copy();
+  WeeklyTaskList._copy(super.list) : super.copy();
 
   /// 同じ情報を持つ別の新しい [WeeklyTaskList]  のインスタンスを生成する
   @override

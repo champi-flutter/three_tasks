@@ -16,7 +16,4 @@ import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
 /// 親クラスの静的解析ツールの機能を引き継ぐためにインターフェースとして設置する。
 abstract class DailyTasksCacheHandler
     extends TasksCacheHandlerBaseInterface<Date, CDailyTask> {
-
-  /// 指定 [date] のデータがキャッシュされているかどうか
-  bool isCachedAt(Date date);
 }

@@ -2,8 +2,6 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
-import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/weekly_tasks_cache_handler.dart';
-import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
@@ -43,18 +41,18 @@ class SaveWeeklyTaskChangesInteractor
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
   Future<void> execute({
-    required WeeklyTaskList<EWeeklyTask> updatedETaskList,
+    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
   }) =>
       _loadingService.loadAsync(
         () async {
           try {
-            if (updatedETaskList.isEmpty) {
+            if (updatingETaskList.isEmpty) {
               throw Exception("無効な値です");
             }
             // リポジトリにデータの保存を依頼する
             final Result<void, Exception> result =
                 await _repository.saveWeeklyTaskChanges(
-              updatedETaskList: updatedETaskList,
+                  updatingETaskList: updatingETaskList,
             );
             // 保存が成功した場合に、キャッシュを更新する
             switch (result) {

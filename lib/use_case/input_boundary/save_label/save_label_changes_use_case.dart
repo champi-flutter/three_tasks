@@ -1,10 +1,10 @@
 
 
-import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
+import 'package:three_tasks/entities/e_label/e_label.dart';
 
 /// タスク ID をラベルに追加するフロー
 abstract class SaveLabelChangesUseCase {
   Future<void> execute({
-    required LabelUpdateParameter updateParameter,
+    required ELabel eLabel,
   });
 }

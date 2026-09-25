@@ -5,6 +5,7 @@ import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/base/tasks_cache_handler_base_implementation.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/c_task/converter/c_to_e_task.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/daily_tasks_stream_handler.dart';
 
 /// 日単位タスクのキャッシュハンドラを実装するクラス
@@ -30,15 +31,11 @@ class DailyTasksCacheHandlerImpl
       (key, List<CDailyTask> data) => MapEntry(
         key,
         data
-            .map((cTask) => ToETask.toEDailyTask<CDailyTask>(cTask))
+            .map((cTask) => CToETask.toEDailyTask(cTask))
             .toListAs<TaskList<EDailyTask>>(TaskList.fromIterable),
       ),
     );
     // キャッシュをストリームに流す
     _streamHandler.add(streamMap);
   }
-
-  /// 指定 [date] のデータがキャッシュされているかどうか
-  @override
-  bool isCachedAt(Date date) => cacheMap.containsKey(date);
 }

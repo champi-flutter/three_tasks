@@ -1,6 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_label/f_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
@@ -8,7 +9,7 @@ import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_
 abstract class DataSource {
   // todo フェッチ
   /// `LabeledTask` フェッチメソッド
-  Future<Result<List<FLabel>, Exception>> getAllLabeledTasks();
+  Future<Result<List<QLabel>, Exception>> getAllLabeledTasks();
 
   /// `DailyTask` フェッチメソッド
   ///
@@ -68,6 +69,9 @@ abstract class DataSource {
   Future<Result<int, Exception>> createNewLabel({
     required String title,
   });
+
+  /// ラベルテーブルの情報を更新する
+  Future<Result<void, Exception>> saveLabels({required QLabel qLabel});
 
   /// 日単位タスクをラベリング
   ///

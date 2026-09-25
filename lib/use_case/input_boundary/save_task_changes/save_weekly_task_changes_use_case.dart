@@ -15,6 +15,6 @@ import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_
 /// 週単位タスク変更保存フロー
 abstract class SaveWeeklyTaskChangesUseCase {
   Future<void> execute({
-    required WeeklyTaskList<EWeeklyTask> updatedETaskList,
+    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
   });
 }

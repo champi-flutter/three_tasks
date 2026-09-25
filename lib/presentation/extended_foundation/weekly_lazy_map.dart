@@ -4,7 +4,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 
 /// データを `Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>>` で持ち、大括弧で
 /// [Date] を指定すると、 `TaskList<VWeeklyTask>` を返すハッシュマップクラス
@@ -46,8 +46,6 @@ class WeeklyLazyMap {
   final Map<Date, int> _refLengthAtEachDate;
 
   // @override
-  // todo Lazyすぎて重くなる（2026/09/14）＞＞
-  // todo キャッシュを二重にする？（2026/09/14）＞＞
   TaskList<VWeeklyTask> operator [](Object? key) {
     if (key is Date) {
       // 参照前段階での有効要素数

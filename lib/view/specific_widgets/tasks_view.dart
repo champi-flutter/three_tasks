@@ -1,22 +1,21 @@
+import 'package:custom_core_types/custom_core_types.dart';
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
+import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/view_type/v_label/v_label.dart';
-import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
-import 'package:three_tasks/use_case/input_boundary/save_task_changes/input_parameter/task_update_parameter.dart';
+import 'package:three_tasks/presentation/controller/dto/label_control_parameter/label_control_parameter.dart';
+import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
+import 'package:three_tasks/presentation/controller/labels_controller.dart';
+import 'package:three_tasks/presentation/controller/tasks_controller.dart';
+import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
+import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
-import 'package:three_tasks/view/specific_widgets/overlays/confirming_existing_label_dialog.dart';
-import 'package:three_tasks/view/specific_widgets/overlays/labeled_task_list_dialog.dart';
-import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
-import 'package:three_tasks/view_controller/task_label_editing_controller.dart';
-import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
-import 'package:three_tasks/view_models/controller/tasks_controller.dart';
-import 'package:three_tasks/view_models/labels_view_model.dart';
+import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/show_label_dialog.dart';
 
 /// [TasksView] の表示形式
 ///  - [TasksViewStyle.checkbox] : チェックボックス付き
@@ -26,184 +25,95 @@ enum TasksViewStyle { checkbox, icon }
 /// チェックボックス付きタスク入力欄
 class TasksView extends ConsumerWidget {
   const TasksView.checkbox({
-    required this.taskList,
-    required this.onAutoSave,
-    required this.saveNewLabelAuto,
-    required this.saveUnlabelAuto,
-  })  : assert(
-          saveCheckAuto != null,
-          "チェックボックス更新時の処理が設定されていません。",
-        ),
-        tasksViewStyle = TasksViewStyle.checkbox,
-        // assert(
-        // saveTaskAuto != null || onJustEdited != null,
-        // "自動保存における編集フラグのコールバックが設定されていません。",
-        // ),
-        assert(
-          (saveTaskAuto == null &&
-                  saveCheckAuto == null &&
-                  saveNewLabelAuto == null &&
-                  saveAdditionToLabelAuto == null &&
-                  saveUnlabelAuto == null) ||
-              (saveTaskAuto != null &&
-                  saveCheckAuto != null &&
-                  saveNewLabelAuto != null &&
-                  saveAdditionToLabelAuto != null &&
-                  saveUnlabelAuto != null),
-          "コールバックが正しく設定されていません（TasksView.checkbox）",
-        ),
-        _isAutoSave = saveTaskAuto != null;
+    required this.taskState,
+    required this.isAutoSave,
+  }) : tasksViewStyle = TasksViewStyle.checkbox;
 
   const TasksView.icon({
-    required this.taskList,
-    required this.onAutoSave,
-    required this.saveNewLabelAuto,
-    required this.saveUnlabelAuto,
-  })  : tasksViewStyle = TasksViewStyle.icon,
-        saveCheckAuto = null,
-        // assert(
-        // saveTaskAuto != null || onJustEdited != null,
-        // "自動保存における編集フラグのコールバックが設定されていません。",
-        // ),
-        assert(
-          (saveTaskAuto == null &&
-                  saveNewLabelAuto == null &&
-                  saveAdditionToLabelAuto == null &&
-                  saveUnlabelAuto == null) ||
-              (saveTaskAuto != null &&
-                  saveNewLabelAuto != null &&
-                  saveAdditionToLabelAuto != null &&
-                  saveUnlabelAuto != null),
-          "コールバックが正しく設定されていません（TasksView.icon）",
-        ),
-        _isAutoSave = saveTaskAuto != null;
+    required this.taskState,
+    required this.isAutoSave,
+  }) : tasksViewStyle = TasksViewStyle.icon;
 
   final TasksViewStyle tasksViewStyle;
 
   /// タスクのリスト
-  final List<VTask> taskList;
-
-  /// 自動保存オン時の、各タスクの自動保存ロジック
-  final Future<void> Function(
-    int position, {
-    String? newTitle,
-    bool? newChecked,
-    int? newLabelId,
-  }) onAutoSave;
-
-  // /// 自動保存でない場合に、編集を加えたときの処理
-  // final VoidCallback? onJustEdited;
+  final TaskList<VTask> taskState;
 
   /// 自動保存かどうか
   final bool isAutoSave;
 
-  /// ラベル化処理
-  final Future<int> Function(
-    int position,
-  )? saveNewLabelAuto;
-
-  /// ラベル化解除処理
-  final Future<void> Function(
-    int position,
-  )? saveUnlabelAuto;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // // ラベル化タスクのリスト
-    // final List<VLabeledTask> labeledTaskList =
-    //     ref.watch(labeledTasksViewModelProvider);
     return ListView.builder(
       itemCount: 3,
       itemBuilder: (context, position) {
-        // 各タスクタイトルのコントローラ
-        final TextEditingController titleController = ref.watch(
-          taskTitleEditingControllerProvider(
-            title1: taskList[0].task,
-            title2: taskList[1].task,
-            title3: taskList[2].task,
-          ).select(
-            (state) => switch (position) {
-              0 => state.titleController1,
-              1 => state.titleController2,
-              2 => state.titleController3,
-              // itemCount の制限上ありえないが、網羅性のため記述
-              _ => TextEditingController(),
-            },
-          ),
-        );
-        final isLabeled = ref.watch(
-          taskLabelEditingControllerProvider(
-            taskList[0].labelId,
-            taskList[1].labelId,
-            taskList[2].labelId,
-          ).select((state) =>
-              // position に応じて、監視するプロパティを切り替える
-              switch (position) {
-                0 => state.isLabeled1,
-                1 => state.isLabeled2,
-                2 => state.isLabeled3,
-                // itemCount の制限上ありえないが、網羅性のため記述
-                _ => false,
-              }),
-        );
-        switch (tasksViewStyle) {
-          case TasksViewStyle.checkbox:
-            // チェックボックスの値をこのスコープで管理
-            final isChecked = ref.watch(
-              taskCheckEditingControllerProvider(
-                taskList[0].isChecked,
-                taskList[1].isChecked,
-                taskList[2].isChecked,
-              ).select((state) =>
-                  // position に応じて、監視するプロパティを切り替える
-                  switch (position) {
-                    0 => state.check1,
-                    1 => state.check2,
-                    2 => state.check3,
-                    // itemCount の制限上ありえないが、網羅性のため記述
-                    _ => false,
-                  }),
+
+        // todo 各コールバックのロジックをコントローラに委ねる（2026/09/25）＞＞
+        // 各タスク編集時のコールバック
+        final onControlTask = ({
+          String? newTitle,
+          bool? newChecked,
+          int? newLabelId,
+        })
+        // 折りたたみ用
+        =>
+            ref._onControlTask(
+              isAutoSave: isAutoSave,
+              taskState: taskState,
+              position: position,
+              newTitle: newTitle,
+              newChecked: newChecked,
+              newLabelId: newLabelId,
             );
 
+        // ラベルにタスク情報が加わるときのコールバック
+        final onAddTaskInLabel = ({
+          required VLabel vLabel,
+          required VTask vTask,
+        })
+        // 折りたたみ用
+        =>
+            ref._onAddTaskInLabel(
+              isAutoSave: isAutoSave,
+              vLabel: vLabel,
+              vTask: vTask,
+            );
+
+        // ラベル適用時のコールバック
+        final onSetLabel = (BuildContext context) => showLabelApplyingDialog(
+              context,
+              taskState: taskState,
+              targetPosition: position,
+              onApply: ({
+                required VLabel vLabel,
+                required VTask vTask,
+              }) async {
+                // ラベルにタスク情報を追加する
+                await onAddTaskInLabel(
+                  vLabel: vLabel,
+                  vTask: vTask,
+                );
+                // タスクのラベル情報を更新する
+                await onControlTask(
+                  newLabelId: vLabel.labelId,
+                );
+              },
+            );
+
+        // ラベル解除時のコールバック
+        final onUnlabel =
+            (BuildContext context) => onControlTask(newLabelId: -1);
+
+        switch (tasksViewStyle) {
+          case TasksViewStyle.checkbox:
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 10.0.h),
               // position ごとの入力欄
               child: _CheckableTaskField(
-                position: position,
-                targetTask: taskList[position],
-                saveTaskAuto: _isAutoSave
-                    ? (String value) => saveTaskAuto!(position, value)
-                    : null,
-                saveNewLabelAuto:
-                    _isAutoSave ? () => saveNewLabelAuto!(position) : null,
-                saveAdditionToLabelAuto: _isAutoSave
-                    ? (int value) => saveAdditionToLabelAuto!(position, value)
-                    : null,
-                saveUnlabelAuto:
-                    _isAutoSave ? () => saveUnlabelAuto!(position) : null,
-                saveCheckAuto: _isAutoSave
-                    ? (bool value) => saveCheckAuto!(position, value)
-                    : null,
-                isChecked: isChecked,
-                notifyCheck: (bool value) {
-                  ref
-                      .read(taskCheckEditingControllerProvider(
-                        taskList[0].isChecked,
-                        taskList[1].isChecked,
-                        taskList[2].isChecked,
-                      ).notifier)
-                      .check(position, value);
-                },
-                notifyLabel: (int? value) {
-                  ref
-                      .read(taskLabelEditingControllerProvider(
-                        taskList[0].labelId,
-                        taskList[1].labelId,
-                        taskList[2].labelId,
-                      ).notifier)
-                      .label(position, value);
-                },
-                titleController: titleController,
+                taskEntry: taskState[position],
+                onControlTask: onControlTask,
+                onSetLabel: onSetLabel,
+                onUnlabel: onUnlabel,
               ),
             );
 
@@ -215,30 +125,10 @@ class TasksView extends ConsumerWidget {
                   padding: EdgeInsets.symmetric(vertical: 10.0.h),
                   // position ごとの入力欄
                   child: _IconTaskField(
-                    position: position,
-                    taskTitle: taskList[position].task,
-                    isLabeled: isLabeled,
-                    saveTaskAuto: _isAutoSave
-                        ? (String value) => saveTaskAuto!(position, value)
-                        : null,
-                    saveNewLabelAuto:
-                        _isAutoSave ? () => saveNewLabelAuto!(position) : null,
-                    saveAdditionToLabelAuto: _isAutoSave
-                        ? (int value) =>
-                            saveAdditionToLabelAuto!(position, value)
-                        : null,
-                    saveUnlabelAuto:
-                        _isAutoSave ? () => saveUnlabelAuto!(position) : null,
-                    notifyLabel: (int? value) {
-                      ref
-                          .read(taskLabelEditingControllerProvider(
-                            taskList[0].labelId,
-                            taskList[1].labelId,
-                            taskList[2].labelId,
-                          ).notifier)
-                          .label(position, value);
-                    },
-                    titleController: titleController,
+                    taskEntry: taskState[position],
+                    onControlTask: onControlTask,
+                    onSetLabel: onSetLabel,
+                    onUnlabel: onUnlabel,
                   ),
                 );
               },
@@ -250,28 +140,21 @@ class TasksView extends ConsumerWidget {
 }
 
 /// 各タスク入力欄
+///
+/// custom_widgets の [useTextFocusController] を用いる。
 class _TaskField extends HookConsumerWidget {
   const _TaskField({
-    required this.position,
-    required this.taskTitle,
-    required this.onAutoSave,
-    required this.isAutoSave,
+    required this.taskEntry,
+    required this.onTextEdited,
   });
 
-  /// タスクのリスト番号
-  final int position;
-
-  /// タスクタイトル
-  final String taskTitle;
+  /// 対象の [VTask] のエントリ
+  final ListEntry<VTask> taskEntry;
 
   /// 自動保存オン時の、各タスクの入力値の自動保存ロジック
-  final Future<void> Function(
-    int position, {
+  final Future<void> Function({
     String? newTitle,
-  }) onAutoSave;
-
-  /// 自動保存がオンかオフか
-  final bool isAutoSave;
+  }) onTextEdited;
 
   // // フォーカスが外れたことをフラグに、その段階での入力値を保存する処理を起動するハンドラ
   // Future<void> _handleSave(String value) async {
@@ -279,6 +162,13 @@ class _TaskField extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // タスクの位置
+    final int position = taskEntry.index;
+    // タスク本体
+    final VTask targetTask = taskEntry.value;
+
+    // タスクタイトル
+    final String taskTitle = targetTask.title;
     // 入力欄からフォーカスが外れた際のコールバック
     Future<void> _onUnfocused(String textSnapshot) async {
       _print(
@@ -288,11 +178,8 @@ class _TaskField extends HookConsumerWidget {
       // 最後に保存した値から変化しているかどうか
       final bool isChanged = textSnapshot != taskTitle;
       // 自動保存オンのときの保存処理
-      if (isChanged && isAutoSave) {
-        // 編集未保存フラグをおろす
-        ref.read(editSavingControllerProvider.notifier).onSaved();
-        // TasksView 呼び出し元（各画面クラス）で指定した自動保存処理を実行する
-        await onAutoSave(position, newTitle: textSnapshot);
+      if (isChanged) {
+        await onTextEdited(newTitle: textSnapshot);
       }
     }
 
@@ -331,55 +218,43 @@ class _TaskField extends HookConsumerWidget {
 /// チェックボックス付きタスク入力欄
 class _CheckableTaskField extends HookConsumerWidget {
   const _CheckableTaskField({
-    required this.position,
-    required this.targetTask,
-    required this.isAutoSave,
-    required this.saveNewLabelAuto,
-    required this.saveAdditionToLabelAuto,
-    required this.saveUnlabelAuto,
+    required this.taskEntry,
+    required this.onControlTask,
+    required this.onSetLabel,
+    required this.onUnlabel,
   });
 
-  /// タスクのリスト番号
-  final int position;
+  /// 対象の [VTask] のエントリ
+  final ListEntry<VTask> taskEntry;
 
-  /// 対象の [VTask]
-  final VTask targetTask;
-
-  /// 自動保存オン時の、各タスクの自動保存ロジック
-  final Future<void> Function(
-    int position, {
+  /// 各タスク編集時のコールバック
+  final Future<void> Function({
     String? newTitle,
     bool? newChecked,
     int? newLabelId,
-  }) onAutoSave;
+  }) onControlTask;
 
-  /// 自動保存がオンかオフか
-  final bool isAutoSave;
+  /// ラベル適用時のコールバック
+  final Future<void> Function(BuildContext context) onSetLabel;
 
-  /// ラベル化処理
-  final Future<int> Function()? saveNewLabelAuto;
-
-  /// 既存のラベルに追加する処理
-  final Future<void> Function(int)? saveAdditionToLabelAuto;
-
-  /// ラベル化解除処理
-  final Future<void> Function()? saveUnlabelAuto;
+  /// ラベル解除時のコールバック
+  final Future<void> Function(BuildContext context) onUnlabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // タスク本体
+    final VTask targetTask = taskEntry.value;
     // ラベルに登録されているタスクかどうか
     final bool isLabeled = targetTask.labelId != -1;
-    // タスクタイトル（String）
-    final String taskTitle = targetTask.task;
     // チェックボックスの値
     final bool isChecked = targetTask.isChecked;
 
     return CheckboxListTile(
       title: _TaskField(
-        position: position,
-        taskTitle: targetTask.task,
-        onAutoSave: onAutoSave,
-        isAutoSave: isAutoSave,
+        taskEntry: taskEntry,
+        onTextEdited: ({String? newTitle}) => onControlTask(
+          newTitle: newTitle,
+        ),
       ),
       value: isChecked,
       // チェックボックスが leading （左）側
@@ -387,147 +262,16 @@ class _CheckableTaskField extends HookConsumerWidget {
       // チェックボックス変更時
       onChanged: (bool? value) async {
         if (isChecked != value!) {
-          // 自動保存オンの場合
-          if (isAutoSave) {
-            // 自動保存
-            await onAutoSave(position, newChecked: value);
-          }
-          // 自動保存オフの場合
-          else {
-            // 下書きとして反映させる
-            await _keepAsDraft(ref,
-              targetTask: targetTask,
-              newChecked: value,
-            );
-          }
+          await onControlTask(
+            newChecked: value,
+          );
         }
       },
       // trailing （右）側の Widget
-      secondary: IconButton(
-        // ラベル化済みなら塗りつぶし
-        icon: isLabeled
-            ? Icon(Icons.bookmark)
-            : Icon(
-                Icons.bookmark_add_outlined,
-              ),
-        // ラベルマークをタップ
-        onPressed: () async {
-          // マークがついていない状態で押した場合
-          if (!isLabeled) {
-            // このタイルのタスクのタイトルと合致するラベルがあるかどうか
-            final int? existingLabelId = ref.read(
-              labeledTasksViewModelProvider.select(
-                (state) => state.idWithSameTitleAs(
-                  taskTitle,
-                ),
-              ),
-            );
-            // 同じ名前のラベルがすでに存在する場合
-            if (existingLabelId != null) {
-              // 対象のラベルに登録するかを確認するダイアログを表示
-              final bool willLabel = await showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) {
-                  return ConfirmingExistingLabelDialog(labelTitle: taskTitle);
-                },
-              );
-              // 「いいえ」を選択した場合は、早期リターン
-              if (!willLabel) {
-                return;
-              }
-
-              // 自動保存オンの場合
-              if (saveAdditionToLabelAuto != null) {
-                // TasksView 呼び出し元（各画面クラス）で指定した自動保存処理を実行する
-                await saveAdditionToLabelAuto!(existingLabelId);
-              }
-              // 自動保存オフの場合
-              else {
-                // 下書きとして反映させる
-                await _keepAsDraft(
-                  ref,
-                  targetTask: targetTask,
-                  newLabelId: existingLabelId,
-                );
-              }
-            }
-            // （マークが 無 → 有 で且つ、）同じ名前のラベルがない場合
-            else {
-              // 自動保存オンの場合
-              if (isAutoSave) {
-                // 「ラベル化されたタスク一覧」ダイアログを表示
-                await showLabeledTaskListDialogToSingleTask(
-                  context,
-                  ref,
-                  targetVTask: targetTask,
-                );
-                // 自動保存
-                final int newId = await saveNewLabelAuto!();
-                // ラベルの値を新規ラベルの ID に変換
-                notifyLabel(newId);
-              }
-              // 自動保存オフの場合
-              else {
-                // todo （2026/09/01）＞＞
-                // 編集未保存フラグを立てる
-                ref.read(editSavingControllerProvider.notifier).onEdited();
-              }
-            }
-          }
-          // マークが解除された場合
-          else {
-            // popup メニューを表示して、解除か変更かを選択させる
-            final bool? willUnlabel = await showMenuFromWidgetRect<bool>(
-              context,
-              menuItems: <PopupMenuEntry<bool>>[
-                PopupMenuItem(
-                  child: UtilizedText(
-                    "ラベルを変更する",
-                    fontSize: 18,
-                  ),
-                  value: true,
-                ),
-                PopupMenuItem(
-                  child: UtilizedText(
-                    "ラベルを変更する",
-                    fontSize: 18,
-                  ),
-                  value: false,
-                ),
-              ],
-            );
-            // どちらも押されずに戻った場合
-            if (willUnlabel == null) {
-              return;
-            }
-            // 「ラベルを変更する」を選択した場合
-            else if (willUnlabel) {
-              // ラベルの値を null に変換
-              notifyLabel(null);
-
-              // 自動保存オンの場合
-              if (saveUnlabelAuto != null) {
-                // 自動保存
-                await saveUnlabelAuto!();
-              }
-              // 自動保存オフの場合
-              else {
-                // 編集未保存フラグを立てる
-                ref.read(editSavingControllerProvider.notifier).onEdited();
-              }
-            }
-            // 「ラベルを変更する」を選択した場合
-            else {
-              // 「ラベル化されたタスク一覧」ダイアログを表示
-              await showLabeledTaskListDialogToSingleTask(
-                context,
-                ref,
-                targetVTask: targetTask,
-              );
-            }
-          }
-        },
+      secondary: _LabelIconTrailing(
+        isLabeled: isLabeled,
+        onSetLabel: onSetLabel,
+        onUnlabel: onUnlabel,
       ),
     );
   }
@@ -535,160 +279,312 @@ class _CheckableTaskField extends HookConsumerWidget {
 
 class _IconTaskField extends ConsumerWidget {
   const _IconTaskField({
-    required this.position,
-    required this.taskTitle,
-    required this.titleController,
-    required this.isLabeled,
-    required this.notifyLabel,
-    required this.saveTaskAuto,
-    required this.saveNewLabelAuto,
-    required this.saveAdditionToLabelAuto,
-    required this.saveUnlabelAuto,
+    required this.taskEntry,
+    required this.onControlTask,
+    required this.onSetLabel,
+    required this.onUnlabel,
   });
 
-  /// タスクのリスト番号
-  final int position;
+  /// 対象の [VTask] のエントリ
+  final ListEntry<VTask> taskEntry;
 
-  /// タスクタイトル
-  final String taskTitle;
+  /// 各タスク編集時のコールバック
+  final Future<void> Function({
+    String? newTitle,
+    bool? newChecked,
+    int? newLabelId,
+  }) onControlTask;
 
-  /// ラベル化されているかどうか
-  final bool isLabeled;
+  /// ラベル適用時のコールバック
+  final Future<void> Function(BuildContext context) onSetLabel;
 
-  /// ラベル化マークの値が変わったときのコントローラの操作
-  final void Function(int?) notifyLabel;
-
-  /// タスクを自動保存する処理
-  final Future<void> Function(String)? saveTaskAuto;
-
-  /// ラベル化処理
-  final Future<int> Function()? saveNewLabelAuto;
-
-  /// 既存のラベルに追加する処理
-  final Future<void> Function(int)? saveAdditionToLabelAuto;
-
-  /// ラベル化解除処理
-  final Future<void> Function()? saveUnlabelAuto;
-
-  /// タスク入力値のコントローラ
-  final TextEditingController titleController;
+  /// ラベル解除時のコールバック
+  final Future<void> Function(BuildContext context) onUnlabel;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // // タスクの位置
+    // final int position = taskEntry.index;
+    // タスク本体
+    final VTask targetTask = taskEntry.value;
+    // ラベルに登録されているタスクかどうか
+    final bool isLabeled = targetTask.labelId != -1;
     return ListTile(
       leading: const Icon(Icons.task),
       title: _TaskField(
-        position: position,
-        taskTitle: taskTitle,
-        saveTaskAuto: saveTaskAuto,
-        titleController: titleController,
+        taskEntry: taskEntry,
+        onTextEdited: ({String? newTitle}) => onControlTask(
+          newTitle: newTitle,
+        ),
       ),
-      trailing: IconButton(
-        // ラベル化済みなら塗りつぶし
-        icon: isLabeled
-            ? Icon(Icons.bookmark)
-            : Icon(
-                Icons.bookmark_add_outlined,
-              ),
-        onPressed: () async {
-          final bool newMark = !isLabeled;
-          // マークがついた場合
-          if (newMark) {
-            // ラベルVM の state を read で参照
-            final List<VLabeledTask> labelList =
-                ref.read(labeledTasksViewModelProvider);
-            // このタイルのタスクのタイトルと合致するラベルがあるかどうか
-            final int? existingLabelId = labelList.idWithSameTitleAs(taskTitle);
-            // 同じ名前のラベルがすでに存在する場合
-            if (existingLabelId != null) {
-              // 対象のラベルに登録するかを確認するダイアログを表示
-              final bool willLabel = await showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) {
-                  return ConfirmingExistingLabelDialog(labelTitle: taskTitle);
-                },
-              );
-              // 「いいえ」を選択した場合は、早期リターン
-              if (!willLabel) {
-                return;
-              }
-              // ラベルの値を変換
-              notifyLabel(existingLabelId);
-
-              // 自動保存オンの場合
-              if (saveAdditionToLabelAuto != null) {
-                // 自動保存
-                await saveAdditionToLabelAuto!(existingLabelId);
-              }
-              // 自動保存オフの場合
-              else {
-                // 編集未保存フラグを立てる
-                ref.read(editSavingControllerProvider.notifier).onEdited();
-              }
-            }
-            // （マークがついて且つ、）同じ名前のラベルがない場合
-            else {
-              // 自動保存オンの場合
-              if (saveNewLabelAuto != null) {
-                // 自動保存
-                final int newId = await saveNewLabelAuto!();
-                // ラベルの値を新規ラベルの ID に変換
-                notifyLabel(newId);
-              }
-              // 自動保存オフの場合
-              else {
-                // ラベルの値を新規ラベルの -1 に変換
-                notifyLabel(-1);
-                // 編集未保存フラグを立てる
-                ref.read(editSavingControllerProvider.notifier).onEdited();
-              }
-            }
-          }
-          // マークが解除された場合
-          else {
-            // ラベルの値を null に変換
-            notifyLabel(null);
-
-            // 自動保存オンの場合
-            if (saveUnlabelAuto != null) {
-              // 自動保存
-              await saveUnlabelAuto!();
-            }
-            // 自動保存オフの場合
-            else {
-              // 編集未保存フラグを立てる
-              ref.read(editSavingControllerProvider.notifier).onEdited();
-            }
-          }
-        },
+      trailing: _LabelIconTrailing(
+        isLabeled: isLabeled,
+        onSetLabel: onSetLabel,
+        onUnlabel: onUnlabel,
       ),
     );
   }
 }
 
-/// 下書きを反映する処理を呼び出すトップレベル関数（プライベート）
-///  - 編集未保存フラグを立てる
-///  - [TasksController] の下書き反映処理を呼び出す
-Future<void> _keepAsDraft(
-  WidgetRef ref, {
-  required VTask targetTask,
-  String? newTitle,
-  bool? newChecked,
-  int? newLabelId,
-}) async {
-  // 編集未保存フラグを立てる
-  ref.read(editSavingControllerProvider.notifier).onEdited();
-  // [TasksController] の下書き反映処理を呼び出す
-  await ref.read(tasksControllerProvider).keepAsDraft(
-      taskInfo: [
-        TaskUpdateParameter(
-            targetVTask: targetTask,
-            newTitle: newTitle,
-            newChecked: newChecked,
-            newLabelId: newLabelId),
-      ],
+class _LabelIconTrailing extends StatelessWidget {
+  const _LabelIconTrailing({
+    super.key,
+    required this.isLabeled,
+    required this.onSetLabel,
+    required this.onUnlabel,
+  });
+
+  /// ラベル化されているかどうか
+  final bool isLabeled;
+
+  /// ラベル適用時のコールバック
+  final Future<void> Function(BuildContext context) onSetLabel;
+
+  /// ラベル解除時のコールバック
+  final Future<void> Function(BuildContext context) onUnlabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      // ラベル化済みなら塗りつぶし
+      icon: isLabeled
+          ? Icon(Icons.bookmark)
+          : Icon(
+              Icons.bookmark_add_outlined,
+            ),
+      // ラベルマークをタップ
+      onPressed: () async {
+        // マークがついていない状態で押した場合
+        if (!isLabeled) {
+          await onSetLabel(context);
+        }
+        // マークが解除された場合
+        else {
+          // popup メニューを表示して、解除か変更かを選択させる
+          final bool? willUnlabel = await showMenuFromWidgetRect<bool>(
+            context,
+            menuItems: <PopupMenuEntry<bool>>[
+              PopupMenuItem(
+                child: UtilizedText(
+                  "ラベルを削除する",
+                  fontSize: 18,
+                ),
+                value: true,
+              ),
+              PopupMenuItem(
+                child: UtilizedText(
+                  "ラベルを変更する",
+                  fontSize: 18,
+                ),
+                value: false,
+              ),
+            ],
+          );
+          // どちらも押されずに戻った場合
+          if (willUnlabel == null) {
+            return;
+          }
+          // 「ラベルを削除する」を選択した場合
+          else if (willUnlabel) {
+            await onUnlabel(context);
+          }
+          // 「ラベルを変更する」を選択した場合
+          else {
+            // 「ラベル化されたタスク一覧」ダイアログを表示
+            await onSetLabel(context);
+          }
+        }
+      },
     );
+  }
+}
+
+extension ControlActionOnTasksView on WidgetRef {
+  /// タスク操作時のコールバック
+  Future<void> _onControlTask({
+    required bool isAutoSave,
+    required TaskList<VTask> taskState,
+    required int position,
+    String? newTitle,
+    bool? newChecked,
+    int? newLabelId,
+  })
+      // 折りたたみ用
+      =>
+      isAutoSave
+          ? _saveTask(
+              taskState: taskState,
+              position: position,
+              newTitle: newTitle,
+              newChecked: newChecked,
+              newLabelId: newLabelId,
+            )
+          : _draftTask(
+              taskState: taskState,
+              position: position,
+              newTitle: newTitle,
+              newChecked: newChecked,
+              newLabelId: newLabelId,
+            );
+
+  /// タスク情報保存処理を呼び出すトップレベル関数（プライベート）
+  ///  - 保存フラグを立てる
+  ///  - [TasksController] の保存処理を呼び出す
+  Future<void> _saveTask({
+    required TaskList<VTask> taskState,
+    required int position,
+    String? newTitle,
+    bool? newChecked,
+    int? newLabelId,
+  })
+  // 折りたたみ用
+  async {
+    final parameter = TaskControlParameter(
+      newTitle: newTitle,
+      newChecked: newChecked,
+      newLabelId: newLabelId,
+    );
+    // 編集未保存フラグをおろす
+    read(editSavingControllerProvider.notifier).onSaved();
+    await read(tasksControllerProvider).saveAt(
+      position,
+      state: taskState,
+      parameter: parameter,
+    );
+  }
+
+  /// タスク情報の下書きを反映する処理を呼び出すトップレベル関数（プライベート）
+  ///  - 編集未保存フラグを立てる
+  ///  - [TasksController] の下書き反映処理を呼び出す
+  Future<void> _draftTask({
+    required TaskList<VTask> taskState,
+    required int position,
+    String? newTitle,
+    bool? newChecked,
+    int? newLabelId,
+  })
+  // 折りたたみ用
+  async {
+    final parameter = TaskControlParameter(
+      newTitle: newTitle,
+      newChecked: newChecked,
+      newLabelId: newLabelId,
+    );
+    // 編集未保存フラグを立てる
+    read(editSavingControllerProvider.notifier).onEdited();
+    // [TasksController] の下書き反映処理を呼び出す
+    await read(tasksControllerProvider).draftAt(
+      position,
+      state: taskState,
+      parameter: parameter,
+    );
+  }
+
+  /// ラベルにタスク情報が加わるときのコールバック
+  Future<void> _onAddTaskInLabel({
+    required bool isAutoSave,
+    required VLabel vLabel,
+    required VTask vTask,
+  })
+  // 折りたたみ用
+  async {
+    // タスク ID がどのタスクの ID か
+    final LabelControlParameter parameter = switch (vTask) {
+      VDailyTask() => LabelControlParameter(newDailyId: vTask.id),
+      VWeeklyTask() => LabelControlParameter(newWeeklyId: vTask.id),
+      VMonthlyTask() => LabelControlParameter(newMonthlyId: vTask.id),
+      VYearlyTask() => LabelControlParameter(newYearlyId: vTask.id),
+    };
+    await _onControlLabel(
+      isAutoSave: isAutoSave,
+      vLabel: vLabel,
+      parameter: parameter,
+    );
+  }
+
+  // region todo ラベルタイトル変更時のコールバック（2026/09/25）＞＞
+  // Future<void> _onChangeLabelTitle({
+  //   required bool isAutoSave,
+  //   required VLabel vLabel,
+  //   required String newTitle,
+  // })
+  //     // 折りたたみ用
+  //     =>
+  //     _onControlLabel(
+  //       isAutoSave: isAutoSave,
+  //       vLabel: vLabel,
+  //       parameter: LabelControlParameter(
+  //         newTitle: newTitle,
+  //       ),
+  //     );
+  //     endregion
+
+  /// ラベル操作時のコールバック
+  Future<void> _onControlLabel({
+    required bool isAutoSave,
+    required VLabel vLabel,
+    required LabelControlParameter parameter,
+  })
+      // 折りたたみ用
+      =>
+      isAutoSave
+          ? _saveLabel(
+              vLabel: vLabel,
+              parameter: parameter,
+            )
+          : _draftLabel(
+              vLabel: vLabel,
+              parameter: parameter,
+            );
+
+  /// ラベル情報保存処理を呼び出すトップレベル関数（プライベート）
+  ///  - 保存フラグを立てる
+  ///  - [LabelsController] の保存処理を呼び出す
+  Future<void> _saveLabel({
+    required VLabel vLabel,
+    required LabelControlParameter parameter,
+  })
+  // 折りたたみ用
+  async {
+    // final parameter = LabelControlParameter(
+    //   newTitle: newTitle,
+    //   newDailyId: newDailyId,
+    //   newWeeklyId: newWeeklyId,
+    //   newMonthlyId: newMonthlyId,
+    //   newYearlyId: newYearlyId,
+    // );
+    // 編集未保存フラグをおろす
+    read(editSavingControllerProvider.notifier).onSaved();
+    await read(labelsControllerProvider).save(
+      vLabel: vLabel,
+      parameter: parameter,
+    );
+  }
+
+  /// タスク情報の下書きを反映する処理を呼び出すトップレベル関数（プライベート）
+  ///  - 編集未保存フラグを立てる
+  ///  - [LabelsController] の下書き反映処理を呼び出す
+  Future<void> _draftLabel({
+    required VLabel vLabel,
+    required LabelControlParameter parameter,
+  })
+  // 折りたたみ用
+  async {
+    // final parameter = LabelControlParameter(
+    //   newTitle: newTitle,
+    //   newDailyId: newDailyId,
+    //   newWeeklyId: newWeeklyId,
+    //   newMonthlyId: newMonthlyId,
+    //   newYearlyId: newYearlyId,
+    // );
+    // 編集未保存フラグを立てる
+    read(editSavingControllerProvider.notifier).onEdited();
+    // [LabelsController] の下書き反映処理を呼び出す
+    await read(labelsControllerProvider).draft(
+      vLabel: vLabel,
+      parameter: parameter,
+    );
+  }
 }
 
 /// printメソッド [tasks_view.dart]

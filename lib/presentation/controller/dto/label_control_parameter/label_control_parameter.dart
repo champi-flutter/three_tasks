@@ -1,20 +1,26 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:three_tasks/data_foundation/label_base/base_label_updater.dart';
-
-part 'label_control_parameter.freezed.dart';
 
 /// ラベル更新用パラメータ
-@freezed
-abstract class LabelControlParameter with _$LabelControlParameter, BaseLabelUpdater{
+class LabelControlParameter {
+  const LabelControlParameter({
+    this.newTitle,
+    this.newDailyId,
+    this.newWeeklyId,
+    this.newMonthlyId,
+    this.newYearlyId,
+  });
 
-  const LabelControlParameter._();
+  /// ラベルのタイトルを変更
+  final String? newTitle;
 
-  const factory LabelControlParameter({
-    required int targetLabelId,
-    String? newTitle,
-    int? newDailyId,
-    int? newWeeklyId,
-    int? newMonthlyId,
-    int? newYearlyId,
-  }) = _LabelControlParameter;
+  /// ラベルに日単位タスクを追加
+  final int? newDailyId;
+
+  /// ラベルに週単位タスクを追加
+  final int? newWeeklyId;
+
+  /// ラベルに月単位タスクを追加
+  final int? newMonthlyId;
+
+  /// ラベルに年単位タスクを追加
+  final int? newYearlyId;
 }

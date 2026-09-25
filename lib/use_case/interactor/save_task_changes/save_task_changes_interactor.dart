@@ -38,19 +38,20 @@ class SaveTaskChangesInteractor
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
   Future<void> execute({
-    required TaskList<ETask> updatedETaskList,
+    required TaskList<ETask> updatingETaskList,
   }) =>
       _loadingService.loadAsync(
         () async {
           try {
-            if (updatedETaskList.isEmpty) {
+            if (updatingETaskList.isEmpty) {
               throw Exception("無効な値です");
             }
             // リポジトリにデータの保存を依頼する
             final Result<void, Exception> result =
-                await _repository.saveTaskChanges(updatedETaskList: updatedETaskList);
-            // 保存が成功した場合に、キャッシュを更新する
+                await _repository.saveTaskChanges(updatingETaskList: updatingETaskList);
+            // 失敗を通知する
             switch (result) {
+              // region
               case Success():
                 break;
               case Failure(
@@ -59,6 +60,7 @@ class SaveTaskChangesInteractor
                 ):
                 final Exception fetchExc = fetchError(methodName: methodName);
                 notifyError(content: "$exc\n$fetchExc");
+                // endregion
             }
           } catch (e) {
             notifyError(content: "$e", specifiesLayer: true);

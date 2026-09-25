@@ -1,5 +1,3 @@
-
-
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,29 +7,34 @@ import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 ///  - 「はい」: `pop` して `true` を返す
 ///  - 「いいえ」: `pop` して `false` を返す
 class ConfirmingExistingLabelDialog extends StatelessWidget {
-  const ConfirmingExistingLabelDialog({super.key, required this.labelTitle});
+  const ConfirmingExistingLabelDialog({
+    super.key,
+    required this.labelTitle,
+    required this.onApply,
+  });
 
+  /// ラベルのタイトル
   final String labelTitle;
+
+  /// 対象のラベルの適用に同意した際のコールバック
+  final Future<void> Function() onApply;
 
   @override
   Widget build(BuildContext context) {
     return SizedSimpleDialog.confirm(
       title: UtilizedText(
-        "確認",
-        fontSize: 21,
+        "「$labelTitle」 はすでに存在します。",
+        fontSize: 18,
       ),
       contentsList: [
-        UtilizedText(
-          "「$labelTitle」 はすでに存在します。",
-          fontSize: 18,
-        ),
         UtilizedText(
           "「$labelTitle」 に登録しますか？",
           fontSize: 18,
         ),
         // todo 「以降表示しない」のチェックボックス（2026/07/01）＞＞
       ],
-      onDecided: () {
+      onDecided: () async {
+        await onApply();
         // pop 時に true を返す
         Navigator.of(context).popWithUnfocus(true);
       },

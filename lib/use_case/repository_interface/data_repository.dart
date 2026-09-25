@@ -1,6 +1,8 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
+import 'package:three_tasks/entities/e_label/e_label.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
 import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
 
@@ -9,7 +11,7 @@ abstract class DataRepository {
 
   // todo フェッチ
   /// ラベルデータをフェッチするメソッド
-  Future<Result<void, Exception>> fetchLabel();
+  Future<Result<List<ELabel>, Exception>> fetchLabel();
 
   /// 指定日付（[dateList]）の日単位タスクをフェッチするメソッド
   ///
@@ -48,12 +50,12 @@ abstract class DataRepository {
 
   /// タスク情報変更保存メソッド
   Future<Result<void, Exception>> saveTaskChanges({
-    required TaskList<ETask> updatedETaskList,
+    required TaskList<ETask> updatingETaskList,
   });
 
   /// 週タスク固有の情報変更保存メソッド
   Future<Result<void, Exception>> saveWeeklyTaskChanges({
-    required WeeklyTaskList<EWeeklyTask> updatedETaskList,
+    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
   });
 
   /// 週単位タスクの firstDate を書き換えるメソッド
@@ -71,7 +73,7 @@ abstract class DataRepository {
 
   /// ラベル情報変更保存メソッド
   Future<Result<void, Exception>> saveLabelChanges({
-    required LabelUpdateParameter updateParameter,
+    required ELabel eLabel,
   });
 
   /// 新しいラベルの枠を作成し、その ID を返す

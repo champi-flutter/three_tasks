@@ -13,6 +13,6 @@ abstract class SaveTaskChangesUseCase {
   /// [newTitle]、[newChecked]、[newLabelId] のいずれかと、
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   Future<void> execute({
-    required TaskList<ETask> updatedETaskList,
+    required TaskList<ETask> updatingETaskList,
   });
 }

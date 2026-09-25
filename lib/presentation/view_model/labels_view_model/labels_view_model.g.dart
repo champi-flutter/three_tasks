@@ -8,24 +8,30 @@ part of 'labels_view_model.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// todo 「ラベル化したタスク」の表示を管理するクラス（2026/09/08）＞＞
+/// 「ラベル化したタスク」の表示を管理するクラス
 ///
 /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
 /// インスタンスを提供する（呼び出し元破棄時に autoDispose される）。
+///
+/// Fetch が完了するまで、[VLabel.placeholder] が返される。
 
 @ProviderFor(LabelsViewModel)
 const labelsViewModelProvider = LabelsViewModelFamily._();
 
-/// todo 「ラベル化したタスク」の表示を管理するクラス（2026/09/08）＞＞
+/// 「ラベル化したタスク」の表示を管理するクラス
 ///
 /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
 /// インスタンスを提供する（呼び出し元破棄時に autoDispose される）。
+///
+/// Fetch が完了するまで、[VLabel.placeholder] が返される。
 final class LabelsViewModelProvider
     extends $NotifierProvider<LabelsViewModel, List<VLabel>> {
-  /// todo 「ラベル化したタスク」の表示を管理するクラス（2026/09/08）＞＞
+  /// 「ラベル化したタスク」の表示を管理するクラス
   ///
   /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
   /// インスタンスを提供する（呼び出し元破棄時に autoDispose される）。
+  ///
+  /// Fetch が完了するまで、[VLabel.placeholder] が返される。
   const LabelsViewModelProvider._(
       {required LabelsViewModelFamily super.from,
       required Token super.argument})
@@ -70,12 +76,14 @@ final class LabelsViewModelProvider
   }
 }
 
-String _$labelsViewModelHash() => r'3470ac5400a86549cb9bd64a6cc57349edbc7e7e';
+String _$labelsViewModelHash() => r'2aa2df6ddf8d69e7baa75e1ac4c66c8a623534c4';
 
-/// todo 「ラベル化したタスク」の表示を管理するクラス（2026/09/08）＞＞
+/// 「ラベル化したタスク」の表示を管理するクラス
 ///
 /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
 /// インスタンスを提供する（呼び出し元破棄時に autoDispose される）。
+///
+/// Fetch が完了するまで、[VLabel.placeholder] が返される。
 
 final class LabelsViewModelFamily extends $Family
     with
@@ -90,10 +98,12 @@ final class LabelsViewModelFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// todo 「ラベル化したタスク」の表示を管理するクラス（2026/09/08）＞＞
+  /// 「ラベル化したタスク」の表示を管理するクラス
   ///
   /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
   /// インスタンスを提供する（呼び出し元破棄時に autoDispose される）。
+  ///
+  /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 
   LabelsViewModelProvider call(
     Token token,
@@ -104,10 +114,12 @@ final class LabelsViewModelFamily extends $Family
   String toString() => r'labelsViewModelProvider';
 }
 
-/// todo 「ラベル化したタスク」の表示を管理するクラス（2026/09/08）＞＞
+/// 「ラベル化したタスク」の表示を管理するクラス
 ///
 /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
 /// インスタンスを提供する（呼び出し元破棄時に autoDispose される）。
+///
+/// Fetch が完了するまで、[VLabel.placeholder] が返される。
 
 abstract class _$LabelsViewModel extends $Notifier<List<VLabel>> {
   late final _$args = ref.$arg as Token;

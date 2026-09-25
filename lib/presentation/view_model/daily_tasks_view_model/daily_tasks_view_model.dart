@@ -10,7 +10,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'daily_tasks_view_model.g.dart';
 
-// todo 週タスクも（2026/09/12）＞＞
 @riverpod
 class DailyTasksViewModel extends _$DailyTasksViewModel
     with NotificationFromViewModel {

@@ -8,7 +8,7 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
-import 'package:three_tasks/view/specific_widgets/labeled_task_list_button.dart';
+import 'package:three_tasks/view/specific_widgets/label_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 import 'package:three_tasks/view_models/labels_view_model.dart';
 import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
