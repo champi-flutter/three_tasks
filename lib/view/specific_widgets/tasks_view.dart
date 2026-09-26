@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/presentation/controller/dto/label_control_parameter/label_control_parameter.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
-import 'package:three_tasks/presentation/controller/labels_controller.dart';
-import 'package:three_tasks/presentation/controller/tasks_controller.dart';
+
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
@@ -47,8 +47,6 @@ class TasksView extends ConsumerWidget {
     return ListView.builder(
       itemCount: 3,
       itemBuilder: (context, position) {
-
-        // todo 各コールバックのロジックをコントローラに委ねる（2026/09/25）＞＞
         // 各タスク編集時のコールバック
         final onControlTask = ({
           String? newTitle,
@@ -57,27 +55,37 @@ class TasksView extends ConsumerWidget {
         })
         // 折りたたみ用
         =>
-            ref._onControlTask(
+            ref.read(tasksControllerProvider).controlTask(
               isAutoSave: isAutoSave,
               taskState: taskState,
               position: position,
-              newTitle: newTitle,
-              newChecked: newChecked,
-              newLabelId: newLabelId,
+              parameter: TaskControlParameter(
+                newTitle: newTitle,
+                newChecked: newChecked,
+                newLabelId: newLabelId,
+              )
             );
 
         // ラベルにタスク情報が加わるときのコールバック
         final onAddTaskInLabel = ({
-          required VLabel vLabel,
+          required ListEntry<VLabel> vLabelEntry,
           required VTask vTask,
         })
         // 折りたたみ用
-        =>
-            ref._onAddTaskInLabel(
-              isAutoSave: isAutoSave,
-              vLabel: vLabel,
-              vTask: vTask,
-            );
+        async {
+          // タスク ID がどのタスクの ID か
+          final LabelControlParameter parameter = switch (vTask) {
+            VDailyTask() => LabelControlParameter(newDailyId: vTask.id),
+            VWeeklyTask() => LabelControlParameter(newWeeklyId: vTask.id),
+            VMonthlyTask() => LabelControlParameter(newMonthlyId: vTask.id),
+            VYearlyTask() => LabelControlParameter(newYearlyId: vTask.id),
+          };
+          await ref.read(labelsControllerProvider).controlLabel(
+          isAutoSave: isAutoSave,
+            labelEntry: vLabelEntry,
+          parameter: parameter,
+          );
+        };
 
         // ラベル適用時のコールバック
         final onSetLabel = (BuildContext context) => showLabelApplyingDialog(
@@ -85,17 +93,18 @@ class TasksView extends ConsumerWidget {
               taskState: taskState,
               targetPosition: position,
               onApply: ({
-                required VLabel vLabel,
-                required VTask vTask,
-              }) async {
+                required ListEntry<VLabel> vLabelEntry,
+                required ListEntry<VTask> vTaskEntry,
+              })
+              async {
                 // ラベルにタスク情報を追加する
                 await onAddTaskInLabel(
-                  vLabel: vLabel,
-                  vTask: vTask,
+                  vLabelEntry: vLabelEntry,
+                  vTask: vTaskEntry.value,
                 );
                 // タスクのラベル情報を更新する
                 await onControlTask(
-                  newLabelId: vLabel.labelId,
+                  newLabelId: vLabelEntry.value.labelId,
                 );
               },
             );
@@ -208,7 +217,7 @@ class _TaskField extends HookConsumerWidget {
         },
         // 入力欄に文字を入力したときに、編集未保存フラグを立てる。
         onChanged: (String value) {
-          ref.read(editSavingControllerProvider.notifier).onEdited();
+          ref.read(editControllerProvider).notifyEdited();
         },
       ),
     );
@@ -400,107 +409,7 @@ class _LabelIconTrailing extends StatelessWidget {
 }
 
 extension ControlActionOnTasksView on WidgetRef {
-  /// タスク操作時のコールバック
-  Future<void> _onControlTask({
-    required bool isAutoSave,
-    required TaskList<VTask> taskState,
-    required int position,
-    String? newTitle,
-    bool? newChecked,
-    int? newLabelId,
-  })
-      // 折りたたみ用
-      =>
-      isAutoSave
-          ? _saveTask(
-              taskState: taskState,
-              position: position,
-              newTitle: newTitle,
-              newChecked: newChecked,
-              newLabelId: newLabelId,
-            )
-          : _draftTask(
-              taskState: taskState,
-              position: position,
-              newTitle: newTitle,
-              newChecked: newChecked,
-              newLabelId: newLabelId,
-            );
 
-  /// タスク情報保存処理を呼び出すトップレベル関数（プライベート）
-  ///  - 保存フラグを立てる
-  ///  - [TasksController] の保存処理を呼び出す
-  Future<void> _saveTask({
-    required TaskList<VTask> taskState,
-    required int position,
-    String? newTitle,
-    bool? newChecked,
-    int? newLabelId,
-  })
-  // 折りたたみ用
-  async {
-    final parameter = TaskControlParameter(
-      newTitle: newTitle,
-      newChecked: newChecked,
-      newLabelId: newLabelId,
-    );
-    // 編集未保存フラグをおろす
-    read(editSavingControllerProvider.notifier).onSaved();
-    await read(tasksControllerProvider).saveAt(
-      position,
-      state: taskState,
-      parameter: parameter,
-    );
-  }
-
-  /// タスク情報の下書きを反映する処理を呼び出すトップレベル関数（プライベート）
-  ///  - 編集未保存フラグを立てる
-  ///  - [TasksController] の下書き反映処理を呼び出す
-  Future<void> _draftTask({
-    required TaskList<VTask> taskState,
-    required int position,
-    String? newTitle,
-    bool? newChecked,
-    int? newLabelId,
-  })
-  // 折りたたみ用
-  async {
-    final parameter = TaskControlParameter(
-      newTitle: newTitle,
-      newChecked: newChecked,
-      newLabelId: newLabelId,
-    );
-    // 編集未保存フラグを立てる
-    read(editSavingControllerProvider.notifier).onEdited();
-    // [TasksController] の下書き反映処理を呼び出す
-    await read(tasksControllerProvider).draftAt(
-      position,
-      state: taskState,
-      parameter: parameter,
-    );
-  }
-
-  /// ラベルにタスク情報が加わるときのコールバック
-  Future<void> _onAddTaskInLabel({
-    required bool isAutoSave,
-    required VLabel vLabel,
-    required VTask vTask,
-  })
-  // 折りたたみ用
-  async {
-    // タスク ID がどのタスクの ID か
-    final LabelControlParameter parameter = switch (vTask) {
-      VDailyTask() => LabelControlParameter(newDailyId: vTask.id),
-      VWeeklyTask() => LabelControlParameter(newWeeklyId: vTask.id),
-      VMonthlyTask() => LabelControlParameter(newMonthlyId: vTask.id),
-      VYearlyTask() => LabelControlParameter(newYearlyId: vTask.id),
-    };
-    await _onControlLabel(
-      isAutoSave: isAutoSave,
-      vLabel: vLabel,
-      parameter: parameter,
-    );
-  }
 
   // region todo ラベルタイトル変更時のコールバック（2026/09/25）＞＞
   // Future<void> _onChangeLabelTitle({
@@ -518,73 +427,6 @@ extension ControlActionOnTasksView on WidgetRef {
   //       ),
   //     );
   //     endregion
-
-  /// ラベル操作時のコールバック
-  Future<void> _onControlLabel({
-    required bool isAutoSave,
-    required VLabel vLabel,
-    required LabelControlParameter parameter,
-  })
-      // 折りたたみ用
-      =>
-      isAutoSave
-          ? _saveLabel(
-              vLabel: vLabel,
-              parameter: parameter,
-            )
-          : _draftLabel(
-              vLabel: vLabel,
-              parameter: parameter,
-            );
-
-  /// ラベル情報保存処理を呼び出すトップレベル関数（プライベート）
-  ///  - 保存フラグを立てる
-  ///  - [LabelsController] の保存処理を呼び出す
-  Future<void> _saveLabel({
-    required VLabel vLabel,
-    required LabelControlParameter parameter,
-  })
-  // 折りたたみ用
-  async {
-    // final parameter = LabelControlParameter(
-    //   newTitle: newTitle,
-    //   newDailyId: newDailyId,
-    //   newWeeklyId: newWeeklyId,
-    //   newMonthlyId: newMonthlyId,
-    //   newYearlyId: newYearlyId,
-    // );
-    // 編集未保存フラグをおろす
-    read(editSavingControllerProvider.notifier).onSaved();
-    await read(labelsControllerProvider).save(
-      vLabel: vLabel,
-      parameter: parameter,
-    );
-  }
-
-  /// タスク情報の下書きを反映する処理を呼び出すトップレベル関数（プライベート）
-  ///  - 編集未保存フラグを立てる
-  ///  - [LabelsController] の下書き反映処理を呼び出す
-  Future<void> _draftLabel({
-    required VLabel vLabel,
-    required LabelControlParameter parameter,
-  })
-  // 折りたたみ用
-  async {
-    // final parameter = LabelControlParameter(
-    //   newTitle: newTitle,
-    //   newDailyId: newDailyId,
-    //   newWeeklyId: newWeeklyId,
-    //   newMonthlyId: newMonthlyId,
-    //   newYearlyId: newYearlyId,
-    // );
-    // 編集未保存フラグを立てる
-    read(editSavingControllerProvider.notifier).onEdited();
-    // [LabelsController] の下書き反映処理を呼び出す
-    await read(labelsControllerProvider).draft(
-      vLabel: vLabel,
-      parameter: parameter,
-    );
-  }
 }
 
 /// printメソッド [tasks_view.dart]

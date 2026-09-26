@@ -3,13 +3,11 @@ import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
-import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/show_label_dialog.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/type_definition.dart';
 
 
@@ -40,7 +38,7 @@ class LabelListDialog extends HookConsumerWidget {
   final TaskList<VTask> taskState;
 
   /// 対象ラベルリスト
-  final List<VLabel> labelListState;
+  final LabelList<VLabel> labelListState;
 
   /// 対象のラベルの適用した際のコールバック
   final AddTaskIdInLabelCallback onApply;
@@ -63,7 +61,7 @@ class LabelListDialog extends HookConsumerWidget {
             itemCount: labelListState.length,
             itemBuilder: (context, int position) {
               // ラベルタイトル
-              final String labelTitle = labelListState[position].title;
+              final String labelTitle = labelListState[position].value.title;
               return ListTile(
                 // dense: true,
                 title: UtilizedText(
@@ -76,7 +74,7 @@ class LabelListDialog extends HookConsumerWidget {
                     context: context,
                     builder: (_) => _LabelApplyingDialog(
                       taskState: taskState,
-                      vLabel: labelListState[position],
+                      vLabelEntry: labelListState[position],
                       // .forSearch から呼ばれた場合は、null を渡す。
                       targetPosition: _singlePosition, // nullable
                       onApply: onApply,
@@ -145,7 +143,7 @@ class _LabelApplyingDialog extends ConsumerWidget {
 
   const _LabelApplyingDialog({
     required this.taskState,
-    required this.vLabel,
+    required this.vLabelEntry,
     required this.onApply,
     required int? targetPosition,
   }) : _singlePosition = targetPosition;
@@ -153,7 +151,7 @@ class _LabelApplyingDialog extends ConsumerWidget {
   final int? _singlePosition;
 
   /// 指定したラベル
-  final VLabel vLabel;
+  final ListEntry<VLabel> vLabelEntry;
 
   /// 対象の [VTask] のリスト
   final TaskList<VTask> taskState;
@@ -172,10 +170,10 @@ class _LabelApplyingDialog extends ConsumerWidget {
               fontSize: 21,
             ),
             onTap: () async {
-              final VTask targetTask = taskState[_singlePosition].value;
+              final ListEntry<VTask> vTaskEntry = taskState[_singlePosition];
 
               // targetTask に、 vLabel を当てはめる
-              await onApply(vLabel: vLabel, vTask: targetTask);
+              await onApply(vLabelEntry: vLabelEntry, vTaskEntry: vTaskEntry);
               if (context.mounted) {
                 // 遷移元に true を返し、全てのダイアログを閉じるよう促す
                 Navigator.of(context).popWithUnfocus(true);
@@ -184,7 +182,8 @@ class _LabelApplyingDialog extends ConsumerWidget {
           )
         ],
       false => List.generate(3, (position) {
-          final VTask targetTask = taskState[position].value;
+        final ListEntry<VTask> vTaskEntry = taskState[position];
+          final VTask targetTask = vTaskEntry.value;
           final bool isTaskEmpty = targetTask.title.isEmpty;
           return ListTile(
             title: UtilizedText(
@@ -195,7 +194,7 @@ class _LabelApplyingDialog extends ConsumerWidget {
             ),
             onTap: () async {
               // targetTask に、 vLabel を当てはめる
-              await onApply(vLabel: vLabel, vTask: targetTask);
+              await onApply(vLabelEntry: vLabelEntry, vTaskEntry: vTaskEntry);
               if (context.mounted) {
                 // 遷移元に true を返し、全てのダイアログを閉じるよう促す
                 Navigator.of(context).popWithUnfocus(true);

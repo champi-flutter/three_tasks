@@ -33,18 +33,6 @@ abstract class VLabel with LabelBase, _$VLabel {
       );
 }
 
-/// ラベルのリストを走査する拡張メソッド
-extension LabelListScanning on List<VLabel> {
-  /// 指定タイトル（[title]）と合致するラベルのID
-  ///
-  /// ない場合は、 `null` を返す。
-  VLabel? asSameTitleAs(String title) {
-    for (VLabel label in this) {
-      // 合致するラベルのIDを返す
-      if (label.title == title) {
-        return label;
-      }
-    }
-    return null;
-  }
-}
+// /// ラベルのリストを走査する拡張メソッド
+// extension LabelListScanning on List<VLabel> {
+// }

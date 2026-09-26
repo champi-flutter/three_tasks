@@ -8,18 +8,14 @@ part of 'use_case_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// ラベルフェッチフロー
 
 @ProviderFor(fetchLabelUseCase)
 const fetchLabelUseCaseProvider = FetchLabelUseCaseFamily._();
-
-/// ラベルフェッチフロー
 
 final class FetchLabelUseCaseProvider extends $FunctionalProvider<
     FetchLabelUseCase,
     FetchLabelUseCase,
     FetchLabelUseCase> with $Provider<FetchLabelUseCase> {
-  /// ラベルフェッチフロー
   const FetchLabelUseCaseProvider._(
       {required FetchLabelUseCaseFamily super.from,
       required Token super.argument})
@@ -77,8 +73,6 @@ final class FetchLabelUseCaseProvider extends $FunctionalProvider<
 
 String _$fetchLabelUseCaseHash() => r'8229091f88029fdcd1c3ba08c9c2105d2c333a7c';
 
-/// ラベルフェッチフロー
-
 final class FetchLabelUseCaseFamily extends $Family
     with $FunctionalFamilyOverride<FetchLabelUseCase, Token> {
   const FetchLabelUseCaseFamily._()
@@ -90,8 +84,6 @@ final class FetchLabelUseCaseFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// ラベルフェッチフロー
-
   FetchLabelUseCaseProvider call(
     Token token,
   ) =>
@@ -100,3 +92,135 @@ final class FetchLabelUseCaseFamily extends $Family
   @override
   String toString() => r'fetchLabelUseCaseProvider';
 }
+
+@ProviderFor(saveLabelChangesUseCase)
+const saveLabelChangesUseCaseProvider = SaveLabelChangesUseCaseProvider._();
+
+final class SaveLabelChangesUseCaseProvider extends $FunctionalProvider<
+    SaveLabelChangesUseCase,
+    SaveLabelChangesUseCase,
+    SaveLabelChangesUseCase> with $Provider<SaveLabelChangesUseCase> {
+  const SaveLabelChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'saveLabelChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$saveLabelChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SaveLabelChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SaveLabelChangesUseCase create(Ref ref) {
+    return saveLabelChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SaveLabelChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SaveLabelChangesUseCase>(value),
+    );
+  }
+}
+
+String _$saveLabelChangesUseCaseHash() =>
+    r'cbd3e1448d1c0a681ca972354b060bc20a7343aa';
+
+@ProviderFor(draftLabelChangesUseCase)
+const draftLabelChangesUseCaseProvider = DraftLabelChangesUseCaseProvider._();
+
+final class DraftLabelChangesUseCaseProvider extends $FunctionalProvider<
+    DraftLabelChangesUseCase,
+    DraftLabelChangesUseCase,
+    DraftLabelChangesUseCase> with $Provider<DraftLabelChangesUseCase> {
+  const DraftLabelChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'draftLabelChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$draftLabelChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DraftLabelChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DraftLabelChangesUseCase create(Ref ref) {
+    return draftLabelChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DraftLabelChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DraftLabelChangesUseCase>(value),
+    );
+  }
+}
+
+String _$draftLabelChangesUseCaseHash() =>
+    r'7cecead01391eb8c5098b48ee06ea0372c8a7f82';
+
+@ProviderFor(draftTaskChangesUseCase)
+const draftTaskChangesUseCaseProvider = DraftTaskChangesUseCaseProvider._();
+
+final class DraftTaskChangesUseCaseProvider extends $FunctionalProvider<
+    DraftTaskChangesUseCase,
+    DraftTaskChangesUseCase,
+    DraftTaskChangesUseCase> with $Provider<DraftTaskChangesUseCase> {
+  const DraftTaskChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'draftTaskChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$draftTaskChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DraftTaskChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DraftTaskChangesUseCase create(Ref ref) {
+    return draftTaskChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DraftTaskChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DraftTaskChangesUseCase>(value),
+    );
+  }
+}
+
+String _$draftTaskChangesUseCaseHash() =>
+    r'a233166ad24349d01b19f8ff30b1c55c062da1ed';

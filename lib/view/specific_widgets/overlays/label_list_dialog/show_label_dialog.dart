@@ -1,7 +1,9 @@
+import 'package:custom_core_types/custom_core_types.dart';
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
@@ -9,7 +11,6 @@ import 'package:three_tasks/view/hooks/use_labels_view_model.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/confirming_existing_label_dialog.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/label_list_dialog.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/type_definition.dart';
-
 
 /// 「ラベル化されたタスク一覧」ダイアログを開くトップレベル関数
 Future<T?> showLabelApplyingDialog<T>(
@@ -32,7 +33,7 @@ async {
 
 /// 「ラベル化されたタスク一覧」ダイアログを開くトップレベル関数
 Future<T?> showLabelSearchDialog<T>(
-  BuildContext context,{
+  BuildContext context, {
   required TaskList<VTask> taskState,
   required AddTaskIdInLabelCallback onApply,
 })
@@ -72,14 +73,16 @@ class _LabelDialogWrapper extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // VM が管理するリスト（state）を監視
-    final List<VLabel>? labelListState = useLabelsViewModel(ref);
+    final LabelList<VLabel>? labelListState = useLabelsViewModel(ref);
     // データが届いた場合
     if (labelListState != null) {
       // ラベルアイコンからのアクセスの場合
       if (_singlePosition != null) {
-        final VTask targetVTask = taskState[_singlePosition].value;
+        final ListEntry<VTask> targetVTaskEntry = taskState[_singlePosition];
+        final VTask targetVTask = targetVTaskEntry.value;
         final String targetTitle = targetVTask.title;
-        final VLabel? existingLabel = labelListState.asSameTitleAs(targetTitle);
+        final ListEntry<VLabel>? existingLabel =
+            labelListState.asSameTitleAs(targetTitle);
         // 該当IDがなかった場合
         if (existingLabel == null) {
           return LabelListDialog.toSingleTask(
@@ -94,8 +97,8 @@ class _LabelDialogWrapper extends HookConsumerWidget {
           return ConfirmingExistingLabelDialog(
             labelTitle: targetTitle,
             onApply: () => onApply(
-              vLabel: existingLabel,
-              vTask:  targetVTask,
+              vLabelEntry: existingLabel,
+              vTaskEntry: targetVTaskEntry,
             ),
           );
         }

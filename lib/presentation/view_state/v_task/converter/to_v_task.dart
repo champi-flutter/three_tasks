@@ -1,5 +1,5 @@
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
-import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 
 /// [VTask] への変換器
 class ToVTask {

@@ -430,55 +430,6 @@ final class NotifyDailyTasksAccessUseCaseProvider extends $FunctionalProvider<
 String _$notifyDailyTasksAccessUseCaseHash() =>
     r'b72db71785fb72bd708343ed5910ebd1c8be4da7';
 
-/// タスク情報の変更を下書きとして保有する処理フロー
-
-@ProviderFor(keepAsDraftUseCase)
-const keepAsDraftUseCaseProvider = KeepAsDraftUseCaseProvider._();
-
-/// タスク情報の変更を下書きとして保有する処理フロー
-
-final class KeepAsDraftUseCaseProvider extends $FunctionalProvider<
-    KeepAsDraftUseCase,
-    KeepAsDraftUseCase,
-    KeepAsDraftUseCase> with $Provider<KeepAsDraftUseCase> {
-  /// タスク情報の変更を下書きとして保有する処理フロー
-  const KeepAsDraftUseCaseProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'keepAsDraftUseCaseProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$keepAsDraftUseCaseHash();
-
-  @$internal
-  @override
-  $ProviderElement<KeepAsDraftUseCase> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  KeepAsDraftUseCase create(Ref ref) {
-    return keepAsDraftUseCase(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(KeepAsDraftUseCase value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<KeepAsDraftUseCase>(value),
-    );
-  }
-}
-
-String _$keepAsDraftUseCaseHash() =>
-    r'8511b5919ed4cf92e0f4fe95538bd12a52bca930';
-
 /// 下書き破棄フロー
 
 @ProviderFor(discardDraftUseCase)
@@ -669,56 +620,7 @@ final class TasksControllerProvider extends $FunctionalProvider<TasksController,
   }
 }
 
-String _$tasksControllerHash() => r'99a24d4c0ac0277329351549fdeb066a86a6bf7d';
-
-/// 週単位タスク操作クラス
-
-@ProviderFor(weeklyTasksController)
-const weeklyTasksControllerProvider = WeeklyTasksControllerProvider._();
-
-/// 週単位タスク操作クラス
-
-final class WeeklyTasksControllerProvider extends $FunctionalProvider<
-    WeeklyTasksController,
-    WeeklyTasksController,
-    WeeklyTasksController> with $Provider<WeeklyTasksController> {
-  /// 週単位タスク操作クラス
-  const WeeklyTasksControllerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'weeklyTasksControllerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$weeklyTasksControllerHash();
-
-  @$internal
-  @override
-  $ProviderElement<WeeklyTasksController> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  WeeklyTasksController create(Ref ref) {
-    return weeklyTasksController(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(WeeklyTasksController value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<WeeklyTasksController>(value),
-    );
-  }
-}
-
-String _$weeklyTasksControllerHash() =>
-    r'997d1d30503ea4a96bc790585ae48e3a9ae34874';
+String _$tasksControllerHash() => r'e3917e158baf45a07b2e685b469dadbe465be1d4';
 
 /// 日単位タスクのキャッシュストリームハンドラ
 

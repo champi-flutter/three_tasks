@@ -25,7 +25,7 @@ const labelsViewModelProvider = LabelsViewModelFamily._();
 ///
 /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 final class LabelsViewModelProvider
-    extends $NotifierProvider<LabelsViewModel, List<VLabel>> {
+    extends $NotifierProvider<LabelsViewModel, LabelList<VLabel>?> {
   /// 「ラベル化したタスク」の表示を管理するクラス
   ///
   /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
@@ -58,10 +58,10 @@ final class LabelsViewModelProvider
   LabelsViewModel create() => LabelsViewModel();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<VLabel> value) {
+  Override overrideWithValue(LabelList<VLabel>? value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<List<VLabel>>(value),
+      providerOverride: $SyncValueProvider<LabelList<VLabel>?>(value),
     );
   }
 
@@ -76,7 +76,7 @@ final class LabelsViewModelProvider
   }
 }
 
-String _$labelsViewModelHash() => r'2aa2df6ddf8d69e7baa75e1ac4c66c8a623534c4';
+String _$labelsViewModelHash() => r'c3e053fec440f4ebcacaf4ba5fba14f593319049';
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 ///
@@ -87,8 +87,8 @@ String _$labelsViewModelHash() => r'2aa2df6ddf8d69e7baa75e1ac4c66c8a623534c4';
 
 final class LabelsViewModelFamily extends $Family
     with
-        $ClassFamilyOverride<LabelsViewModel, List<VLabel>, List<VLabel>,
-            List<VLabel>, Token> {
+        $ClassFamilyOverride<LabelsViewModel, LabelList<VLabel>?,
+            LabelList<VLabel>?, LabelList<VLabel>?, Token> {
   const LabelsViewModelFamily._()
       : super(
           retry: null,
@@ -121,11 +121,11 @@ final class LabelsViewModelFamily extends $Family
 ///
 /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 
-abstract class _$LabelsViewModel extends $Notifier<List<VLabel>> {
+abstract class _$LabelsViewModel extends $Notifier<LabelList<VLabel>?> {
   late final _$args = ref.$arg as Token;
   Token get token => _$args;
 
-  List<VLabel> build(
+  LabelList<VLabel>? build(
     Token token,
   );
   @$mustCallSuper
@@ -134,10 +134,10 @@ abstract class _$LabelsViewModel extends $Notifier<List<VLabel>> {
     final created = build(
       _$args,
     );
-    final ref = this.ref as $Ref<List<VLabel>, List<VLabel>>;
+    final ref = this.ref as $Ref<LabelList<VLabel>?, LabelList<VLabel>?>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<List<VLabel>, List<VLabel>>,
-        List<VLabel>,
+        AnyNotifier<LabelList<VLabel>?, LabelList<VLabel>?>,
+        LabelList<VLabel>?,
         Object?,
         Object?>;
     element.handleValue(ref, created);

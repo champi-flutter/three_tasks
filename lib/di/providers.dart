@@ -2,6 +2,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/infrastructure_providers/cache_handler_providers.dart';
+import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/daily_tasks_cache_handler_impl.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/weekly_tasks_cache_handler_impl.dart';
 import 'package:three_tasks/infrastructure/drivers/db/database.dart';
@@ -52,7 +53,7 @@ DataRepository dataRepository(Ref ref) => DataRepositoryImpl(
       notificationService: ref.watch(notificationServiceProvider),
       dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider),
       weeklyTasksCacheHandler: ref.watch(weeklyTasksCacheHandlerProvider),
-  labelsCacheHandler: ref.watch(labelsCacheHandlerProvider),
+      labelsCacheHandler: ref.watch(labelsCacheHandlerProvider),
     );
 
 // todo UseCase
@@ -135,8 +136,11 @@ WeeklyTasksPresenter weeklyTasksPresenter(Ref ref) => WeeklyTasksPresenterImpl(
 @riverpod
 TasksController tasksController(Ref ref) => TasksController(
       saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),
-      keepAsDraftUseCase: ref.watch(keepAsDraftUseCaseProvider),
+      draftTaskChangesUseCase: ref.watch(draftTaskChangesUseCaseProvider),
       discardDraftUseCase: ref.watch(discardDraftUseCaseProvider),
+      saveWeeklyTaskChangesUseCase:
+          ref.watch(saveWeeklyTaskChangesUseCaseProvider),
+      editController: ref.watch(editControllerProvider),
     );
 
 // /// 週単位タスク操作クラス

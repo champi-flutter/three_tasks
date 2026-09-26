@@ -8,14 +8,18 @@ part of 'controller_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// ラベルのコントローラ
 
 @ProviderFor(labelsController)
 const labelsControllerProvider = LabelsControllerProvider._();
+
+/// ラベルのコントローラ
 
 final class LabelsControllerProvider extends $FunctionalProvider<
     LabelsController,
     LabelsController,
     LabelsController> with $Provider<LabelsController> {
+  /// ラベルのコントローラ
   const LabelsControllerProvider._()
       : super(
           from: null,
@@ -49,4 +53,4 @@ final class LabelsControllerProvider extends $FunctionalProvider<
   }
 }
 
-String _$labelsControllerHash() => r'106ac648cc4630b54003c345b6851c7329988c9a';
+String _$labelsControllerHash() => r'c6c61265749f134313b1b3ce560b99b83f2fee40';

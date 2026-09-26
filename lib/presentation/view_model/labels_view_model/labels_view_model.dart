@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_label/fetch_label_use_case.dart';
@@ -19,7 +20,7 @@ part 'labels_view_model.g.dart';
 class LabelsViewModel extends _$LabelsViewModel {
   // todo 初期化
   @override
-  List<VLabel>? build(Token token) {
+  LabelList<VLabel>? build(Token token) {
     _initViewModel();
 
     return null;
@@ -35,28 +36,7 @@ class LabelsViewModel extends _$LabelsViewModel {
   }
 
   /// [state] の更新
-  void update(List<VLabel> newState) {
+  void update(LabelList<VLabel> newState) {
     state = newState;
-    // if (_completer?.isCompleted == false) {
-    //   _completer!.complete();
-    // }
   }
-
-// /// 指定タイトル（[title]）と合致するラベルのID
-// ///
-// /// ない場合は、 `null` を返す。
-// Future<int?> idWithSameTitleAs(String title) async{
-//   // await _completer?.future;
-//   return state.idWithSameTitleAs(title);
-// }
 }
-
-// extension ReadLabelsViewModel on WidgetRef{
-//   /// 指定タイトル（[title]）と合致するラベルのID
-//   ///
-//   /// ない場合は、 `null` を返す。
-//   Future<int?> labelIdAsSameTitleAs(String title) async {
-//     final token = generateToken();
-//     return read(labelsViewModelProvider(token).notifier).idWithSameTitleAs(title);
-//   }
-// }
