@@ -50,4 +50,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-.metadata
+.env
+*.env
+*.p12
+*.p8
+*.mobileprovision
