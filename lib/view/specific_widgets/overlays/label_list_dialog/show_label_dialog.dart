@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
+import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/hooks/use_labels_view_model.dart';
@@ -48,6 +49,21 @@ async {
   );
 }
 
+
+
+abstract class WidgetWithLazyViewState extends HookConsumerWidget{
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+}
+
+
+
+
+
 class _LabelDialogWrapper extends HookConsumerWidget {
   const _LabelDialogWrapper.forSearch({
     super.key,
@@ -72,77 +88,83 @@ class _LabelDialogWrapper extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+
     // VM が管理するリスト（state）を監視
-    final LabelList<VLabel>? labelListState = useLabelsViewModel(ref);
-    // データが届いた場合
-    if (labelListState != null) {
-      // ラベルアイコンからのアクセスの場合
-      if (_singlePosition != null) {
-        final ListEntry<VTask> targetVTaskEntry = taskState[_singlePosition];
-        final VTask targetVTask = targetVTaskEntry.value;
-        final String targetTitle = targetVTask.title;
-        final ListEntry<VLabel>? existingLabel =
-            labelListState.asSameTitleAs(targetTitle);
-        // 該当IDがなかった場合
-        if (existingLabel == null) {
-          return LabelListDialog.toSingleTask(
+    final labelsViewModelState = ref.watch(labelsViewModelProvider);
+
+    return labelsViewModelState.when<Widget>(
+      // データが届いた場合
+      onReceived: (LabelList<VLabel> labelState){
+        // ラベルアイコンからのアクセスの場合
+        if (_singlePosition != null) {
+          final ListEntry<VTask> targetVTaskEntry = taskState[_singlePosition];
+          final VTask targetVTask = targetVTaskEntry.value;
+          final String targetTitle = targetVTask.title;
+          final ListEntry<VLabel>? existingLabel =
+          labelState.asSameTitleAs(targetTitle);
+          // 該当IDがなかった場合
+          if (existingLabel == null) {
+            return LabelListDialog.toSingleTask(
+              taskState: taskState,
+              labelListState: labelState,
+              targetPosition: _singlePosition,
+              onApply: onApply,
+            );
+          }
+          // 該当IDが存在した場合
+          else {
+            return ConfirmingExistingLabelDialog(
+              labelTitle: targetTitle,
+              onApply: () => onApply(
+                vLabelEntry: existingLabel,
+                vTaskEntry: targetVTaskEntry,
+              ),
+            );
+          }
+        }
+        // 「ラベル一覧ボタン」からのアクセス
+        else {
+          return LabelListDialog.forSearch(
             taskState: taskState,
-            labelListState: labelListState,
-            targetPosition: _singlePosition,
+            labelListState: labelState,
             onApply: onApply,
           );
         }
-        // 該当IDが存在した場合
-        else {
-          return ConfirmingExistingLabelDialog(
-            labelTitle: targetTitle,
-            onApply: () => onApply(
-              vLabelEntry: existingLabel,
-              vTaskEntry: targetVTaskEntry,
-            ),
-          );
-        }
-      }
-      // 「ラベル一覧ボタン」からのアクセス
-      else {
-        return LabelListDialog.forSearch(
-          taskState: taskState,
-          labelListState: labelListState,
-          onApply: onApply,
-        );
-      }
-    }
-    // データローディング中の場合
-    else {
-      return SimpleDialog(
-        contentPadding: EdgeInsets.fromLTRB(0.0, 12.h, 0.0, 24.h),
-        children: [
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: context.screenWidth * 0.8,
-              maxHeight: context.screenHeight * 0.6,
-            ),
-            // リスト要素数 0 に対応した contents
-            child: Container(),
-          ),
-          // 戻るボタン
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: EdgeInsets.only(right: 16.w),
-              child: FloatingActionButton(
-                mini: true,
-                onPressed: () {
-                  // TextField 等にフォーカスを残さない
-                  Navigator.of(context).popWithUnfocus();
-                },
-                child: Icon(Icons.clear),
-                elevation: 2,
+      },
+      // データローディング中の場合
+      // riverpod_wrapper の LoadingWrapper がローディング表示を行うので、白背景のみ
+      onLoading: (_){
+        return SimpleDialog(
+          contentPadding: EdgeInsets.fromLTRB(0.0, 12.h, 0.0, 24.h),
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: context.screenWidth * 0.8,
+                maxHeight: context.screenHeight * 0.6,
               ),
+              // リスト要素数 0 に対応した contents
+              child: Container(),
             ),
-          )
-        ],
-      );
-    }
+          ],
+        );
+      },
+      // todo VM からエラーを返された場合（2026/09/28）＞＞
+      onError: (_, __){
+        return SimpleDialog(
+          contentPadding: EdgeInsets.fromLTRB(0.0, 12.h, 0.0, 24.h),
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: context.screenWidth * 0.8,
+                maxHeight: context.screenHeight * 0.6,
+              ),
+              // リスト要素数 0 に対応した contents
+              child: Container(),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

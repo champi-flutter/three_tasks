@@ -1793,6 +1793,201 @@ class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
   }
 }
 
+class $PageSettingsTable extends PageSettings
+    with TableInfo<$PageSettingsTable, PageSetting> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PageSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _pageIdMeta = const VerificationMeta('pageId');
+  @override
+  late final GeneratedColumn<int> pageId = GeneratedColumn<int>(
+      'page_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _autoSaveMeta =
+      const VerificationMeta('autoSave');
+  @override
+  late final GeneratedColumn<bool> autoSave = GeneratedColumn<bool>(
+      'auto_save', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("auto_save" IN (0, 1))'),
+      defaultValue: Constant(true));
+  @override
+  List<GeneratedColumn> get $columns => [pageId, autoSave];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'page_settings';
+  @override
+  VerificationContext validateIntegrity(Insertable<PageSetting> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('page_id')) {
+      context.handle(_pageIdMeta,
+          pageId.isAcceptableOrUnknown(data['page_id']!, _pageIdMeta));
+    } else if (isInserting) {
+      context.missing(_pageIdMeta);
+    }
+    if (data.containsKey('auto_save')) {
+      context.handle(_autoSaveMeta,
+          autoSave.isAcceptableOrUnknown(data['auto_save']!, _autoSaveMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => const {};
+  @override
+  PageSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PageSetting(
+      pageId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}page_id'])!,
+      autoSave: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}auto_save'])!,
+    );
+  }
+
+  @override
+  $PageSettingsTable createAlias(String alias) {
+    return $PageSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class PageSetting extends DataClass implements Insertable<PageSetting> {
+  /// 各ページの識別子
+  final int pageId;
+
+  /// 自動保存オンオフ
+  final bool autoSave;
+  const PageSetting({required this.pageId, required this.autoSave});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['page_id'] = Variable<int>(pageId);
+    map['auto_save'] = Variable<bool>(autoSave);
+    return map;
+  }
+
+  PageSettingsCompanion toCompanion(bool nullToAbsent) {
+    return PageSettingsCompanion(
+      pageId: Value(pageId),
+      autoSave: Value(autoSave),
+    );
+  }
+
+  factory PageSetting.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PageSetting(
+      pageId: serializer.fromJson<int>(json['pageId']),
+      autoSave: serializer.fromJson<bool>(json['autoSave']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'pageId': serializer.toJson<int>(pageId),
+      'autoSave': serializer.toJson<bool>(autoSave),
+    };
+  }
+
+  PageSetting copyWith({int? pageId, bool? autoSave}) => PageSetting(
+        pageId: pageId ?? this.pageId,
+        autoSave: autoSave ?? this.autoSave,
+      );
+  PageSetting copyWithCompanion(PageSettingsCompanion data) {
+    return PageSetting(
+      pageId: data.pageId.present ? data.pageId.value : this.pageId,
+      autoSave: data.autoSave.present ? data.autoSave.value : this.autoSave,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PageSetting(')
+          ..write('pageId: $pageId, ')
+          ..write('autoSave: $autoSave')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(pageId, autoSave);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PageSetting &&
+          other.pageId == this.pageId &&
+          other.autoSave == this.autoSave);
+}
+
+class PageSettingsCompanion extends UpdateCompanion<PageSetting> {
+  final Value<int> pageId;
+  final Value<bool> autoSave;
+  final Value<int> rowid;
+  const PageSettingsCompanion({
+    this.pageId = const Value.absent(),
+    this.autoSave = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PageSettingsCompanion.insert({
+    required int pageId,
+    this.autoSave = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : pageId = Value(pageId);
+  static Insertable<PageSetting> custom({
+    Expression<int>? pageId,
+    Expression<bool>? autoSave,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (pageId != null) 'page_id': pageId,
+      if (autoSave != null) 'auto_save': autoSave,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PageSettingsCompanion copyWith(
+      {Value<int>? pageId, Value<bool>? autoSave, Value<int>? rowid}) {
+    return PageSettingsCompanion(
+      pageId: pageId ?? this.pageId,
+      autoSave: autoSave ?? this.autoSave,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (pageId.present) {
+      map['page_id'] = Variable<int>(pageId.value);
+    }
+    if (autoSave.present) {
+      map['auto_save'] = Variable<bool>(autoSave.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PageSettingsCompanion(')
+          ..write('pageId: $pageId, ')
+          ..write('autoSave: $autoSave, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$MyDatabase extends GeneratedDatabase {
   _$MyDatabase(QueryExecutor e) : super(e);
   $MyDatabaseManager get managers => $MyDatabaseManager(this);
@@ -1802,12 +1997,20 @@ abstract class _$MyDatabase extends GeneratedDatabase {
   late final $YearlyTasksTable yearlyTasks = $YearlyTasksTable(this);
   late final $ReviewsTable reviews = $ReviewsTable(this);
   late final $LabeledTasksTable labeledTasks = $LabeledTasksTable(this);
+  late final $PageSettingsTable pageSettings = $PageSettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [dayTasks, weeklyTasks, monthlyTasks, yearlyTasks, reviews, labeledTasks];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        dayTasks,
+        weeklyTasks,
+        monthlyTasks,
+        yearlyTasks,
+        reviews,
+        labeledTasks,
+        pageSettings
+      ];
 }
 
 typedef $$DayTasksTableCreateCompanionBuilder = DayTasksCompanion Function({
@@ -2778,6 +2981,134 @@ typedef $$LabeledTasksTableProcessedTableManager = ProcessedTableManager<
     ),
     LabeledTask,
     PrefetchHooks Function()>;
+typedef $$PageSettingsTableCreateCompanionBuilder = PageSettingsCompanion
+    Function({
+  required int pageId,
+  Value<bool> autoSave,
+  Value<int> rowid,
+});
+typedef $$PageSettingsTableUpdateCompanionBuilder = PageSettingsCompanion
+    Function({
+  Value<int> pageId,
+  Value<bool> autoSave,
+  Value<int> rowid,
+});
+
+class $$PageSettingsTableFilterComposer
+    extends Composer<_$MyDatabase, $PageSettingsTable> {
+  $$PageSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get pageId => $composableBuilder(
+      column: $table.pageId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get autoSave => $composableBuilder(
+      column: $table.autoSave, builder: (column) => ColumnFilters(column));
+}
+
+class $$PageSettingsTableOrderingComposer
+    extends Composer<_$MyDatabase, $PageSettingsTable> {
+  $$PageSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get pageId => $composableBuilder(
+      column: $table.pageId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get autoSave => $composableBuilder(
+      column: $table.autoSave, builder: (column) => ColumnOrderings(column));
+}
+
+class $$PageSettingsTableAnnotationComposer
+    extends Composer<_$MyDatabase, $PageSettingsTable> {
+  $$PageSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get pageId =>
+      $composableBuilder(column: $table.pageId, builder: (column) => column);
+
+  GeneratedColumn<bool> get autoSave =>
+      $composableBuilder(column: $table.autoSave, builder: (column) => column);
+}
+
+class $$PageSettingsTableTableManager extends RootTableManager<
+    _$MyDatabase,
+    $PageSettingsTable,
+    PageSetting,
+    $$PageSettingsTableFilterComposer,
+    $$PageSettingsTableOrderingComposer,
+    $$PageSettingsTableAnnotationComposer,
+    $$PageSettingsTableCreateCompanionBuilder,
+    $$PageSettingsTableUpdateCompanionBuilder,
+    (
+      PageSetting,
+      BaseReferences<_$MyDatabase, $PageSettingsTable, PageSetting>
+    ),
+    PageSetting,
+    PrefetchHooks Function()> {
+  $$PageSettingsTableTableManager(_$MyDatabase db, $PageSettingsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PageSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PageSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PageSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> pageId = const Value.absent(),
+            Value<bool> autoSave = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PageSettingsCompanion(
+            pageId: pageId,
+            autoSave: autoSave,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int pageId,
+            Value<bool> autoSave = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PageSettingsCompanion.insert(
+            pageId: pageId,
+            autoSave: autoSave,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$PageSettingsTableProcessedTableManager = ProcessedTableManager<
+    _$MyDatabase,
+    $PageSettingsTable,
+    PageSetting,
+    $$PageSettingsTableFilterComposer,
+    $$PageSettingsTableOrderingComposer,
+    $$PageSettingsTableAnnotationComposer,
+    $$PageSettingsTableCreateCompanionBuilder,
+    $$PageSettingsTableUpdateCompanionBuilder,
+    (
+      PageSetting,
+      BaseReferences<_$MyDatabase, $PageSettingsTable, PageSetting>
+    ),
+    PageSetting,
+    PrefetchHooks Function()>;
 
 class $MyDatabaseManager {
   final _$MyDatabase _db;
@@ -2794,4 +3125,6 @@ class $MyDatabaseManager {
       $$ReviewsTableTableManager(_db, _db.reviews);
   $$LabeledTasksTableTableManager get labeledTasks =>
       $$LabeledTasksTableTableManager(_db, _db.labeledTasks);
+  $$PageSettingsTableTableManager get pageSettings =>
+      $$PageSettingsTableTableManager(_db, _db.pageSettings);
 }

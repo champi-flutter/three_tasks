@@ -11,7 +11,7 @@ part of 'controller_providers.dart';
 /// ラベルのコントローラ
 
 @ProviderFor(labelsController)
-const labelsControllerProvider = LabelsControllerProvider._();
+const labelsControllerProvider = LabelsControllerFamily._();
 
 /// ラベルのコントローラ
 
@@ -20,10 +20,10 @@ final class LabelsControllerProvider extends $FunctionalProvider<
     LabelsController,
     LabelsController> with $Provider<LabelsController> {
   /// ラベルのコントローラ
-  const LabelsControllerProvider._()
+  const LabelsControllerProvider._(
+      {required LabelsControllerFamily super.from,
+      required Token super.argument})
       : super(
-          from: null,
-          argument: null,
           retry: null,
           name: r'labelsControllerProvider',
           isAutoDispose: true,
@@ -34,6 +34,13 @@ final class LabelsControllerProvider extends $FunctionalProvider<
   @override
   String debugGetCreateSourceHash() => _$labelsControllerHash();
 
+  @override
+  String toString() {
+    return r'labelsControllerProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   $ProviderElement<LabelsController> $createElement($ProviderPointer pointer) =>
@@ -41,7 +48,11 @@ final class LabelsControllerProvider extends $FunctionalProvider<
 
   @override
   LabelsController create(Ref ref) {
-    return labelsController(ref);
+    final argument = this.argument as Token;
+    return labelsController(
+      ref,
+      argument,
+    );
   }
 
   /// {@macro riverpod.override_with_value}
@@ -51,6 +62,40 @@ final class LabelsControllerProvider extends $FunctionalProvider<
       providerOverride: $SyncValueProvider<LabelsController>(value),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LabelsControllerProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$labelsControllerHash() => r'c6c61265749f134313b1b3ce560b99b83f2fee40';
+String _$labelsControllerHash() => r'5aa74ed52bd4b7a9dd51314c5671970b6ee3a74b';
+
+/// ラベルのコントローラ
+
+final class LabelsControllerFamily extends $Family
+    with $FunctionalFamilyOverride<LabelsController, Token> {
+  const LabelsControllerFamily._()
+      : super(
+          retry: null,
+          name: r'labelsControllerProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// ラベルのコントローラ
+
+  LabelsControllerProvider call(
+    Token token,
+  ) =>
+      LabelsControllerProvider._(argument: token, from: this);
+
+  @override
+  String toString() => r'labelsControllerProvider';
+}

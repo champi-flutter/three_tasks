@@ -2,28 +2,43 @@ import 'dart:collection';
 
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
+import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 
-/// データを `Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>>` で持ち、大括弧で
-/// [Date] を指定すると、 `TaskList<VWeeklyTask>` を返すハッシュマップクラス
+/// データを `Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>` で持ち、
+/// 大括弧で [Date] を指定すると、 `LazyViewState<TaskList<VWeeklyTask>>`
+/// を返すハッシュマップクラス
 ///
 /// 大括弧の operator の処理は若干重めなので、View 層で監視する際は、以下のように、
 /// build につき1回だけ参照すること。
 /// ```
-/// final TaskList<VWeeklyTask> weeklyTaskList =
+/// final LazyViewState<TaskList<VWeeklyTask>> weeklyTasksState =
 ///     ref.watch(weeklyTasksViewModelProvider.select((state)=> state[today]));
 /// ```
 class WeeklyLazyMap {
   WeeklyLazyMap({
-    Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>>? initialData,
+    Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>? initialData,
+    required this.onAnyAccess,
+    required this.onNewAccess,
+    required TaskList<VWeeklyTask> Function(Date key) placeholder,
+  })  : _source =
+            Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>.of(
+                initialData ?? {}),
+        _refLengthAtEachDate = {},
+        placeholder = ((Date key) =>
+            LazyViewState<TaskList<VWeeklyTask>>.placeholder(placeholder(key)));
+
+  /// コピーメソッドのためのプライベートなコンストラクタ
+  WeeklyLazyMap._copy({
+    required Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>> source,
+    required Map<Date, int> refLengthAtEachDate,
     required this.onAnyAccess,
     required this.onNewAccess,
     required this.placeholder,
-  })  : _sent =
-            Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>>.of(initialData ?? {}),
-        _refLengthAtEachDate = {};
+  })  : _source = {...source},
+        _refLengthAtEachDate = refLengthAtEachDate;
 
   /// まだ値の入っていない key にアクセスされたときのコールバック
   @protected
@@ -35,18 +50,19 @@ class WeeklyLazyMap {
 
   /// [onNewAccess] が呼ばれている間に入れる仮データ
   @protected
-  final TaskList<VWeeklyTask> Function(Date key) placeholder;
+  late final LazyViewState<TaskList<VWeeklyTask>> Function(Date key)
+      placeholder;
 
   // final Map<Date, TaskList<VWeeklyTask>> _dateMap;
 
   /// 送られてくる単位のタスクリスト
-  final Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> _sent;
+  final Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>> _source;
 
   /// 各 key （日付）が持つタスクの数
   final Map<Date, int> _refLengthAtEachDate;
 
   // @override
-  TaskList<VWeeklyTask> operator [](Object? key) {
+  LazyViewState<TaskList<VWeeklyTask>> operator [](Object? key) {
     if (key is Date) {
       // 参照前段階での有効要素数
       final int? oldListLength = _refLengthAtEachDate[key];
@@ -57,17 +73,18 @@ class WeeklyLazyMap {
         return placeholder(key);
       }
 
-      // // _sent を、対象日付を含む週のエントリのリストに変換する
+      // // _source を、対象日付を含む週のエントリのリストに変換する
       // // fixme UniqueWeek を持つリストから対象日付を探索する計算ロジックは改善の余地あり
       // //  （現状 O(n) （n は UniqueWeek の数））
       // final taskEntries =
-      //     _sent.entries.where((e) => e.key.includesDate(key)).toList();
+      //     _source.entries.where((e) => e.key.includesDate(key)).toList();
       //
       // // 週が古い順の順になるようにソートする
       // // （更新時の順番の乱れを防ぐ）
       // taskEntries.sort((a, b) => a.key.compareTo(b.key));
 
-      final taskEntries = <MapEntry<UniqueWeek, WeeklyTaskList<VWeeklyTask>>>[];
+      final taskEntries =
+          <MapEntry<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>>[];
       // key（指定日付）を含む週の開始日で探索する（最大7回）
       // 開始日順に探索することで、週が古い順になるようにする（更新時の順番の乱れを防ぐ）
       for (int diff = 1; diff <= 7; diff++) {
@@ -77,7 +94,8 @@ class WeeklyLazyMap {
           firstDate: targetFirstDate,
         );
 
-        final WeeklyTaskList<VWeeklyTask>? targetTaskList = _sent[targetWeek];
+        final LazyViewState<WeeklyTaskList<VWeeklyTask>>? targetTaskList =
+            _source[targetWeek];
         if (targetTaskList != null) {
           taskEntries.add(MapEntry(targetWeek, targetTaskList));
         }
@@ -92,8 +110,12 @@ class WeeklyLazyMap {
 
       // ソート済みの値を取り出して、EWeeklyTask に変換して、結果リストを作成する
       for (final entry in taskEntries) {
-        // 週1つ分のタスクのリスト
-        final WeeklyTaskList<VWeeklyTask> tasksOfUnitWeek = entry.value;
+        // 週1つ分のタスクリストのstate
+        final LazyViewState<WeeklyTaskList<VWeeklyTask>> tasksStateOfUnitWeek =
+            entry.value;
+
+        final WeeklyTaskList<VWeeklyTask> tasksOfUnitWeek =
+            tasksStateOfUnitWeek.data;
 
         // Iterable<VWeeklyTask> に変換する
         final iterable = tasksOfUnitWeek.mapValues((value) => value);
@@ -123,11 +145,12 @@ class WeeklyLazyMap {
       onAnyAccess(key);
 
       // TaskList に変換する
-      return TaskList<VWeeklyTask>(
+      final taskList = TaskList<VWeeklyTask>(
         resultList[0],
         resultList[1],
         resultList[2],
       );
+      return LazyViewState.data(taskList);
     } else {
       throw Exception("key が不適当です");
     }
@@ -146,9 +169,9 @@ class WeeklyLazyMap {
   //       return placeholder;
   //     }
   //     else {
-  //       // _sent を key を含む週のエントリのリストに変換する
+  //       // _source を key を含む週のエントリのリストに変換する
   //       final taskEntries =
-  //       _sent.entries.where((e) => e.key.includesDate(key)).toList();
+  //       _source.entries.where((e) => e.key.includesDate(key)).toList();
   //
   //       // 週が古い順の順になるようにソートする
   //       // （更新時の順番の乱れを防ぐ）
@@ -197,8 +220,8 @@ class WeeklyLazyMap {
   //   }
   // }
 
-  void setAt(UniqueWeek week, WeeklyTaskList<VWeeklyTask> value) {
-    _sent[week] = value;
+  void setReception(UniqueWeek week, WeeklyTaskList<VWeeklyTask> value) {
+    _source[week] = LazyViewState.data(value);
   }
 
   // @override
@@ -208,23 +231,35 @@ class WeeklyLazyMap {
 
   // @override
   void clear() {
-    _sent.clear();
+    _source.clear();
     _refLengthAtEachDate.clear();
   }
 
   // @override
   TaskList<VWeeklyTask>? remove(Object? key) {
     _refLengthAtEachDate.remove(key);
-    _sent.remove(key);
+    _source.remove(key);
     return null;
   }
 
   /// 指定 [UniqueWeek] のを更新して、複製した [WeeklyLazyMap] の新しい枠を返すメソッド
-  WeeklyLazyMap copyWith(UniqueWeek key, WeeklyTaskList<VWeeklyTask> value) {
-    final newMap = Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>>.of(_sent)
-      ..[key] = value;
-    return WeeklyLazyMap(
-      initialData: newMap,
+  ///
+  /// 受信データを当てはめたコピーを返す
+  WeeklyLazyMap copyReception(UniqueWeek key, WeeklyTaskList<VWeeklyTask> value) =>
+      copyWith(key, LazyViewState.data(value));
+
+  /// [copyWith] の override
+  ///
+  /// 呼び出しは、他のメソッドに限定する。
+  @protected
+  WeeklyLazyMap copyWith(
+    UniqueWeek key,
+    LazyViewState<WeeklyTaskList<VWeeklyTask>> value,
+  ) {
+    final newMap = Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>.of(_source)..[key] = value;
+    return WeeklyLazyMap._copy(
+      source: newMap,
+      refLengthAtEachDate: _refLengthAtEachDate,
       onAnyAccess: onAnyAccess,
       onNewAccess: onNewAccess,
       placeholder: placeholder,
@@ -232,13 +267,17 @@ class WeeklyLazyMap {
   }
 
   /// 自身を更新して、複製した [WeeklyLazyMap] の新しい枠を返すメソッド
-  WeeklyLazyMap copyAs(Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> newMap) =>
-      WeeklyLazyMap(
-        initialData: newMap,
-        onAnyAccess: onAnyAccess,
-        onNewAccess: onNewAccess,
-        placeholder: placeholder,
-      );
+  WeeklyLazyMap copyAs(
+    Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>> newMap,
+  ) {
+    return WeeklyLazyMap._copy(
+      source: newMap,
+      refLengthAtEachDate: _refLengthAtEachDate,
+      onAnyAccess: onAnyAccess,
+      onNewAccess: onNewAccess,
+      placeholder: placeholder,
+    );
+  }
 }
 
 /// 週タスクの key の変換ロジック
@@ -264,7 +303,7 @@ extension WeeklyTasksKeyConverter<WeeklyTask extends WeeklyTaskBase>
         "[convertKeyTo] 変換後の型を指定する場合、引数 `typeConverter` を指定してください。",
       );
     } else {
-      // _sent を key を含む週のエントリのリストに変換する
+      // _source を key を含む週のエントリのリストに変換する
       final taskEntries = where((e) => e.key.includesDate(targetDate)).toList();
 
       // 週が古い順の順になるようにソートする

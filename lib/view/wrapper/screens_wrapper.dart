@@ -1,189 +1,126 @@
-
+import 'package:custom_core_types/custom_core_types.dart';
+import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/config/private_config.dart';
-import 'package:three_tasks/entities/view_type/task_type.dart';
+import 'package:three_tasks/di/providers.dart';
+import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view/screens/review_screen.dart';
 import 'package:three_tasks/view/screens/enumeration/screen_type.dart';
+import 'package:three_tasks/view/specific_widgets/pages/page_list.dart';
 
-class ScreensWrapper extends HookConsumerWidget {
-
+class ScreensWrapper extends ConsumerWidget {
   ScreensWrapper({super.key});
 
   // todo build
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ローディング状態を監視
-    final LoadingState loadingState = ref.watch(loadingViewModelProvider);
 
-    // 現在選択されている画面のインデックス
-    final selectedIndex = useState<int>(0);
+    // このスコープの Token を一元管理
+    final Token scopeToken = ref.generateToken();
 
-    // selectedIndex を TaskType に変換
-    final TaskType taskType = selectedIndex.value.taskType;
+    // PageIndexViewModel を上の Token で参照して、現在表示されているページの
+    // インデックスを取得する
+    final currentPageIndex = ref.watch(pageIndexViewModelProvider(scopeToken).select((state) => state.currentIndex,),
+    );
 
-    // PageViewを制御するためのPageControllerフック（自動的にdisposeされます）
-    final pageViewController =
-        usePageController(initialPage: selectedIndex.value);
+    // インデックスに対応するページ
+    final currentPage = pageList[currentPageIndex].value;
 
-    // 現在表示している画面に、未保存の編集があるかどうか（ScrollPhysics 制御用）
-    final isEdited = ref.watch(editSavingControllerProvider);
-
-    // ChoiceChipがタップされた時のスクロールアニメーション処理
-    Future<void> onChipSelected(int index) async {
-      // 現在の画面の Chip をタップしても何も起きない
-      if(selectedIndex.value == index){
-        return;
-      }
-      // 編集未保存の場合
-      if(isEdited){
-        final bool willDiscard = await confirmToDiscard(context);
-        // 「破棄」を選択した場合、以降の処理に進む
-        if(willDiscard){
-          ref.read(editSavingControllerProvider.notifier).onDiscarded();
-        }
-        // 「編集を続ける」を選択した場合、何もせず早期リターン
-        else {
-          return;
-        }
-      }
-      selectedIndex.value = index;
-
-      // PageViewを指定したインデックスまで横スクロールでアニメーション遷移させる
-      pageViewController.animateToPage(
-        index,
-        // 遷移にかかる時間
-        duration: const Duration(milliseconds: 300),
-        // スムーズなアニメーションカーブ
-        curve: Curves.easeInOut,
-      );
-    }
-
-    // スワイプで遷移する画面の列挙型
-    final List<ScreenType> screenList = ScreenType.values;
-
-    // 現在表示されている画面
-    final ScreenType currentScreen = screenList[selectedIndex.value];
-
-    // 画面ごとのタイトル
-    final String title = currentScreen.appBarTitle;
-
-    return GestureDetector(
-      onTap: () {
-        // キーボードなどにフォーカスが移動しているとき、背景タップでフォーカスを解除する
-        FocusScope.of(context).unfocus();
-      },
+    return UnfocusTapScrimScope(
       child: Scaffold(
-        // todo appBar
+        // appBar
         appBar: AppBar(
           toolbarHeight: 56.h,
           centerTitle: true,
           // todo サイズ確認
           title: UtilizedText(
-            title,
+            currentPage.title,
             fontSize: 21,
           ),
           actions: [
-            // レビューボタン
+            // todo レビューボタン（2026/09/29）＞＞
             _NavigationForReview(
-              taskType: taskType,
+              taskRec: currentPage.rec,
             ),
           ],
         ),
-        // todo drawer
+        // drawer
         drawer: ScaffoldMenuBar(
           termsUrl: PrivateConfig.termsUrl,
           privacyPolicyUrl: PrivateConfig.privacyPolicyUrl,
         ),
         resizeToAvoidBottomInset: false,
-        // 自動保存でない場合に、未保存の編集を確認するラッパー
-        body: EditSavedPopScope(
-          // 「破棄」を選択した場合の処理
-          actionOnDiscarded: ()async{
 
-          },
-          child: Column(
-            children: [
-              // 画面遷移用の Chip
-              _NavigationChips(
-                selectedIndex: selectedIndex.value,
-                // 列挙型の値の数 = 画面の数
-                numberOfScreen: screenList.length,
-                // `ScreenType.chipsName` （String）のリストに変換
-                screenNameList: [...screenList]
-                    .map((ScreenType screenType) => screenType.chipsName)
-                    .toList(),
-                onChipSelected: onChipSelected,
+        body: Column(
+          children: [
+            // 画面遷移用の Chip
+            _NavigationChips(
+              pageList: pageList,
+              onChipSelected: (int targetIndex) {
+                // ControlledPageView.withGuard で管理しているページを変更する
+                ref
+                    .read(pageNavigationControllerProvider(scopeToken))
+                    .navigateWithGuardTo(targetIndex);
+              },
+              scopeToken: scopeToken,
+            ),
+            // 画面本体
+            Expanded(
+              // riverpod_wrapper の ControlledPageView
+              // （自動保存でない場合に未保存の編集を確認するラッパー付き）
+              child: ControlledPageView.withGuard(
+                controlledPageList: pageList,
+                // スワイプ不可
+                physics: const NeverScrollableScrollPhysics(),
+                isAlertValid: isAutoSave,
+                scopeToken: scopeToken,
+                // 未保存編集破棄ロジック
+                onDiscarded: (int targetIndex) {
+                  // 各ページが TaskPageBase を継承する際に設定した TaskRec
+                  final targetRec = pageList[targetIndex].value.rec;
+                  // 下書きの破棄を呼び出す
+                  ref.read(tasksControllerProvider).discardDraft(
+                        taskRec: targetRec,
+                      );
+                },
               ),
-              // 画面本体
-              Expanded(
-                child: PageView.builder(
-                  controller: pageViewController,
-                  itemCount: screenList.length,
-                  // 編集中は、左右のスワイプによる遷移にロックをかける
-                  physics: isEdited
-                      // スワイプ不可
-                      ? const NeverScrollableScrollPhysics()
-                      // スワイプ可能
-                      : const ClampingScrollPhysics(),
-                  onPageChanged: (int index) async {
-                    // 画面の値のコントローラを破棄（完了までローディング）
-                    await ref.read(loadingViewModelProvider.notifier).loadAsync(()async{
-                      await ref.invalidate();
-                    });
-                    // ユーザが手動でスワイプしてページを切り替えた際、ChoiceChipの選択状態も同期する
-                    selectedIndex.value = index;
-                  },
-                  // インデックスで画面を選択
-                  itemBuilder: (context, index) {
-                    // ローディング終了後にビルドを開始するようにする
-                    // （古いコントローラの参照等を防ぐため）
-                    if(loadingState.isLoading){
-                      return Container(color: Colors.black12,);
-                    }
-                    else {
-                      return screenList[index].constructor;
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _NavigationChips extends StatelessWidget {
+class _NavigationChips extends ConsumerWidget {
   const _NavigationChips({
     super.key,
-    required this.selectedIndex,
-    required this.numberOfScreen,
-    required this.screenNameList,
+    required this.pageList,
     required this.onChipSelected,
+    required this.scopeToken,
   });
 
-  /// 現在の画面のインデックス
-  final int selectedIndex;
-
-  /// 画面クラスリストの `length`
-  final int numberOfScreen;
-
-  /// 画面クラスの名前のリスト
-  final List<String> screenNameList;
+  final ControlledPageList pageList;
 
   /// Chip が選択されたときの処理
   ///
   /// 引数は、対象の画面のインデックス
   final void Function(int) onChipSelected;
 
+  /// 現在参照している [Token]
+  final Token scopeToken;
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 現在の画面のインデックスを
+    final currentIndex = ref.watch(pageIndexViewModelProvider(scopeToken)
+        .select((state) => state.currentIndex));
+
     return Container(
       height: 60.0,
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -200,15 +137,15 @@ class _NavigationChips extends StatelessWidget {
       ),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: numberOfScreen,
+        itemCount: pageList.length,
         separatorBuilder: (context, index) => const SizedBox(width: 8.0),
         // Chip 1つずつの設定
         itemBuilder: (context, index) {
-          final isSelected = selectedIndex == index;
+          final isSelected = currentIndex == index;
           return ChoiceChip(
             // todo サイズ確認（2026/06/10）＞＞
             label: UtilizedText(
-              screenNameList[index],
+              pageList[index].value.shortTitle,
               // 完全に中心を指定
               alignment: AlignmentGeometry.center,
             ),
@@ -237,10 +174,10 @@ class _NavigationChips extends StatelessWidget {
 class _NavigationForReview extends StatelessWidget {
   const _NavigationForReview({
     super.key,
-    required this.taskType,
+    required this.taskRec,
   });
 
-  final TaskType taskType;
+  final TaskRec taskRec;
 
   /// 「今日」「今週」「今月」「今年」
   String get _currentStr => taskType.currentLabel;

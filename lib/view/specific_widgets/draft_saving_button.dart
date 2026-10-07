@@ -1,16 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
+import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
-import 'package:three_tasks/view_controller/task_check_editing_controller.dart';
-import 'package:three_tasks/view_controller/task_label_editing_controller.dart';
-import 'package:three_tasks/view_controller/task_title_editing_controller.dart';
 
+/// 「下書き保存」ボタン
 class DraftSavingButton extends ConsumerWidget {
   const DraftSavingButton({
     super.key,
@@ -24,6 +21,7 @@ class DraftSavingButton extends ConsumerWidget {
           "チェックボックス変更の更新処理の記述がありません。（DraftSavingButton）",
         );
 
+  /// このボタンが有効かどうか
   final bool isValid;
 
   /// 対象の [VTask] のリスト
@@ -48,6 +46,11 @@ class DraftSavingButton extends ConsumerWidget {
       isValid: isValid,
       onPressedAsync: () async {
         // todo 下書き保存ロジック（2026/09/25）＞＞
+        // タスクの下書きを保存する
+        await ref.read(tasksControllerProvider).saveCurrentState(
+          taskState: taskState,
+        );
+
       },
     );
   }

@@ -8,8 +8,10 @@ import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/entities/e_setting/e_page_setting.dart';
 import 'package:three_tasks/entities/e_task/converter/to_e_task.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/labels_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/weekly_tasks_cache_handler.dart';
@@ -21,6 +23,7 @@ import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_task/converter/to_c_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/converter/e_to_q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/q_to_e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/to_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/unload_from_q_task.dart';
@@ -331,6 +334,39 @@ class DataRepositoryImpl
     }
   }
 
+  /// 各種設定値をフェッチする
+  @override
+  Future<Result<ESettingsMap, Exception>> fetchSettings() async {
+    final Result<QSettingsMap, Exception> result =
+        await _dataSource.getSettings();
+    switch (result) {
+      // region
+      case Success(value: final QSettingsMap resultMap):
+        // 返すデータの枠を用意する
+        final Map<int, EPageSetting> returningMap = {};
+        // 受け取ったデータを探索し、 returningMap に当てはめていく
+        for (final qEntry in resultMap.entries) {
+          final int pageId = qEntry.key;
+          final QPageSetting qPageSetting = qEntry.value;
+          returningMap[pageId] = EPageSetting(
+            pageIndex: pageId,
+            autoSave: qPageSetting.autoSave,
+          );
+        }
+        // 返す形に変換する
+        final ESettingsMap eSettingsMap = ESettingsMap.fromMapCopy(
+          returningMap,
+        );
+        return Success(eSettingsMap);
+      case Failure(
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
+        throw queryError(details: "$exc", methodName: methodName);
+      // endregion
+    }
+  }
+
   // /// 週単位タスクフェッチメソッド
   // ///
   // /// DB からデータを取得して、ストリームに流す。
@@ -624,7 +660,9 @@ class DataRepositoryImpl
   @override
   Future<Result<void, Exception>> updateWeeklyTasksFirstDate({
     required Map<int, Date> idFirstDateMap,
-  }) async {
+  })
+  // 折りたたみ用
+  async {
     final Result<void, Exception> result = await _dataSource
         .updateWeeklyTasksFirstDate(idFirstDateMap: idFirstDateMap);
     switch (result) {
@@ -714,8 +752,9 @@ class DataRepositoryImpl
     // 保存用 DTO に変換する
     final QLabel qLabel = EToQLabel.toQLabel(eLabel);
     // データソースに保存する
-    final Result<void, Exception> result = await _dataSource.saveLabels(qLabel: qLabel);
-    switch(result){
+    final Result<void, Exception> result =
+        await _dataSource.saveLabels(qLabel: qLabel);
+    switch (result) {
       // region
       case Success():
         final CLabel cLabel = EToCLabel.toCLabel(eLabel);
@@ -725,9 +764,9 @@ class DataRepositoryImpl
         await _labelsCacheHandler.tryUpdateSingleLabel(cLabel);
         return Success(null);
       case Failure(
-      exception: final Exception exc,
-      methodName: final String? methodName,
-      ):
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
         final Exception queryExc = queryError(methodName: methodName);
         return Failure(Exception("$exc\n$queryExc"));
       // endregion
@@ -890,128 +929,69 @@ class DataRepositoryImpl
     );
   }
 
-  /// 指定タスクのラベル化を解除するメソッド
-  ///
-  /// 指定タスク（[dTask]）がこの段階で属しているラベルから、このタスクのIDを除外する。
-  ///
-  /// 指定タスクの [DTask.labelId] を `null` にする。
+  /// 新しい値を当てはめずに、現在のキャッシュを流す
   @override
-  Future<void> unlabeling({
-    required DTask dTask,
+  Future<Result<void, Exception>> outputCurrentCache(TaskRec rec) async {
+    try {
+      // 指定のタスク種別に対応するキャッシュハンドラに、現在のキャッシュを流してもらう
+      switch (rec) {
+        // region
+        case TaskRec.day:
+          await _dailyTasksCacheHandler.outputCurrentCache();
+
+        case TaskRec.week:
+          await _weeklyTasksCacheHandler.outputCurrentCache();
+
+        case TaskRec.month:
+          await _monthlyTasksCacheHandler.outputCurrentCache();
+
+        case TaskRec.year:
+          await _yearlyTasksCacheHandler.outputCurrentCache();
+        // endregion
+      }
+      return Success(null);
+    } catch (e, st) {
+      return Failure(
+        Exception("$e\n$st"),
+        methodName: "DataRepository.outputCurrentCache",
+      );
+    }
+  }
+
+  /// 各種設定を初期化する
+  @override
+  Future<Result<ESettingsMap, Exception>> initSettings({
+    required int length,
   })
   // 折りたたみ用
   async {
-    switch (dTask) {
-      // DTask.task は書き換えメソッドの整合性チェックのため、nullable だが、
-      // 書き換え以外では null はない
-      case DDailyTask(
-          id: final int id,
-          labelId: final int? labelId,
-        ):
-        // DB にラベル化解除を依頼
-        final Result<void, Exception> result = labelId != null
-            ? await _dataSource.unlabelDailyTask(
-                labelId: labelId, targetId: dTask.id)
-            // ここで見つからないのは、どこかの記入ミス
-            : Failure(Exception("元のラベルが見つかりませんでした。"));
-
-        switch (result) {
-          case Success():
-            // 日単位タスクのキャッシュを更新して、ストリームに流す
-            // 仕様上、必ず存在すると思われるが一応例外処理
-            try {
-              _streamUpdatedDailyTasks(
-                date: dTask.date,
-                taskId: id,
-                labelId: null,
-              );
-            } catch (e) {
-              // todo エラーハンドリング（2026/06/30）＞＞
-            }
-            // ラベル化タスクのキャッシュを更新
-            _streamLabeledTasksUpdatedDailyId(labelId: labelId!, removedId: id);
-          case Failure(
-              exception: Exception error,
-              methodName: String? methodName
-            ):
-          // todo エラーハンドリング（2026/06/22）＞＞
+    final Result<QSettingsMap, Exception> result =
+        await _dataSource.initSettings(length: length);
+    switch (result) {
+    // region
+      case Success(value: final QSettingsMap resultMap):
+      // 返すデータの枠を用意する
+        final Map<int, EPageSetting> returningMap = {};
+        // 受け取ったデータを探索し、 returningMap に当てはめていく
+        for (final qEntry in resultMap.entries) {
+          final int pageId = qEntry.key;
+          final QPageSetting qPageSetting = qEntry.value;
+          returningMap[pageId] = EPageSetting(
+            pageIndex: pageId,
+            autoSave: qPageSetting.autoSave,
+          );
         }
-      case DWeeklyTask(
-          id: final int id,
-          labelId: final int? labelId,
-        ):
-        // DB にラベル化解除を依頼
-        final Result<void, Exception> result = labelId != null
-            ? await _dataSource.unlabelWeeklyTask(
-                labelId: labelId, targetId: dTask.id)
-            // ここで見つからないのは、どこかの記入ミス
-            : Failure(Exception("元のラベルが見つかりませんでした。"));
-
-        switch (result) {
-          case Success():
-            // 週単位タスクのキャッシュを更新して、ストリームに流す
-            _streamUpdatedWeeklyTasks(taskId: id, labelId: null);
-            // ラベル化タスクのキャッシュを更新
-            _streamLabeledTasksUpdatedWeeklyId(
-                labelId: labelId!, removedId: id);
-          case Failure(
-              exception: Exception error,
-              methodName: String? methodName,
-            ):
-          // todo エラーハンドリング（2026/06/22）＞＞
-        }
-      case DMonthlyTask(
-          id: final int id,
-          labelId: final int? labelId,
-        ):
-        // DB にラベル化解除を依頼
-        final Result<void, Exception> result = labelId != null
-            ? await _dataSource.unlabelMonthlyTask(
-                labelId: labelId, targetId: dTask.id)
-            // ここで見つからないのは、どこかの記入ミス
-            : Failure(Exception("元のラベルが見つかりませんでした。"));
-
-        switch (result) {
-          case Success():
-            // todo 月単位タスクのキャッシュを更新して、ストリームに流す（2026/06/30）＞＞
-
-            // ラベル化タスクのキャッシュを更新
-            _streamLabeledTasksUpdatedMonthlyId(
-              labelId: labelId!,
-              removedId: id,
-            );
-          case Failure(
-              exception: Exception error,
-              methodName: String? methodName
-            ):
-          // todo エラーハンドリング（2026/06/22）＞＞
-        }
-      case DYearlyTask(
-          id: final int id,
-          labelId: final int? labelId,
-        ):
-        // DB にラベル化解除を依頼
-        final Result<void, Exception> result = labelId != null
-            ? await _dataSource.unlabelYearlyTask(
-                labelId: labelId, targetId: dTask.id)
-            // ここで見つからないのは、どこかの記入ミス
-            : Failure(Exception("元のラベルが見つかりませんでした。"));
-
-        switch (result) {
-          case Success():
-            // todo 年単位タスクのキャッシュを更新して、ストリームに流す（2026/06/30）＞＞
-
-            // ラベル化タスクのキャッシュを更新
-            _streamLabeledTasksUpdatedDailyId(
-              labelId: labelId!,
-              removedId: id,
-            );
-          case Failure(
-              exception: Exception error,
-              methodName: String? methodName
-            ):
-          // todo エラーハンドリング（2026/06/22）＞＞
-        }
+        // 返す形に変換する
+        final ESettingsMap eSettingsMap = ESettingsMap.fromMapCopy(
+          returningMap,
+        );
+        return Success(eSettingsMap);
+      case Failure(
+      exception: final Exception exc,
+      methodName: final String? methodName,
+      ):
+        throw queryError(details: "$exc", methodName: methodName);
+    // endregion
     }
   }
 }

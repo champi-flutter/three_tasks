@@ -150,8 +150,11 @@ class TasksController {
   }
 
   /// 現時点でのタスクの View State でタスク変更保存フローを呼び出す
-  Future<void> saveCurrentState<VTaskType extends VTask>(
-      {required TaskList<VTaskType> taskState}) async {
+  Future<void> saveCurrentState<VTaskType extends VTask>({
+    required TaskList<VTaskType> taskState,
+  })
+  // 折りたたみ用
+  async {
     // 週タスクの場合
     if (VTaskType is VWeeklyTask) {
       final WeeklyTaskList<EWeeklyTask> eTaskList = taskState

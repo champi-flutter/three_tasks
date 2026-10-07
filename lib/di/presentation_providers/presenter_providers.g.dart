@@ -11,17 +11,17 @@ part of 'presenter_providers.dart';
 /// ラベルデータ反映クラス
 
 @ProviderFor(labelsPresenter)
-const labelsPresenterProvider = LabelsPresenterFamily._();
+const labelsPresenterProvider = LabelsPresenterProvider._();
 
 /// ラベルデータ反映クラス
 
 final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
     LabelsPresenter, LabelsPresenter> with $Provider<LabelsPresenter> {
   /// ラベルデータ反映クラス
-  const LabelsPresenterProvider._(
-      {required LabelsPresenterFamily super.from,
-      required Token super.argument})
+  const LabelsPresenterProvider._()
       : super(
+          from: null,
+          argument: null,
           retry: null,
           name: r'labelsPresenterProvider',
           isAutoDispose: true,
@@ -32,13 +32,6 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
   @override
   String debugGetCreateSourceHash() => _$labelsPresenterHash();
 
-  @override
-  String toString() {
-    return r'labelsPresenterProvider'
-        ''
-        '($argument)';
-  }
-
   @$internal
   @override
   $ProviderElement<LabelsPresenter> $createElement($ProviderPointer pointer) =>
@@ -46,11 +39,7 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
 
   @override
   LabelsPresenter create(Ref ref) {
-    final argument = this.argument as Token;
-    return labelsPresenter(
-      ref,
-      argument,
-    );
+    return labelsPresenter(ref);
   }
 
   /// {@macro riverpod.override_with_value}
@@ -60,40 +49,6 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
       providerOverride: $SyncValueProvider<LabelsPresenter>(value),
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    return other is LabelsPresenterProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
 }
 
-String _$labelsPresenterHash() => r'af925d4ba144970787a45120626178f39c4fd9cb';
-
-/// ラベルデータ反映クラス
-
-final class LabelsPresenterFamily extends $Family
-    with $FunctionalFamilyOverride<LabelsPresenter, Token> {
-  const LabelsPresenterFamily._()
-      : super(
-          retry: null,
-          name: r'labelsPresenterProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
-
-  /// ラベルデータ反映クラス
-
-  LabelsPresenterProvider call(
-    Token token,
-  ) =>
-      LabelsPresenterProvider._(argument: token, from: this);
-
-  @override
-  String toString() => r'labelsPresenterProvider';
-}
+String _$labelsPresenterHash() => r'a95decdda6e2d12d9aab70eaa87dcb6b041f5c11';

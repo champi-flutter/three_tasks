@@ -6,7 +6,7 @@ import 'package:three_tasks/presentation/view_state/v_label/converter/e_to_v_lab
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/use_case/output_boundary/labels_presenter.dart';
 
-/// Label の情報をView 層に反映させるクラスの実装
+/// Label の情報を View 層に反映させるクラスの実装
 class LabelsPresenterImpl implements LabelsPresenter {
   // todo コンストラクタ
   LabelsPresenterImpl({required LabelsViewModel labelsViewModel})

@@ -7,9 +7,9 @@ part 'controller_providers.g.dart';
 
 /// ラベルのコントローラ
 @riverpod
-LabelsController labelsController(Ref ref) => LabelsController(
+LabelsController labelsController(Ref ref, Token token) => LabelsController(
       saveLabelChangesUseCase: ref.watch(saveLabelChangesUseCaseProvider),
-      editController: ref.watch(editControllerProvider),
+      editController: ref.watch(editControllerProvider(token)),
       draftLabelChangesUseCase: ref.watch(draftLabelChangesUseCaseProvider),
       notificationService: ref.watch(notificationServiceProvider),
     );

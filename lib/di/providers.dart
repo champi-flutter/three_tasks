@@ -16,14 +16,12 @@ import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily
 import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_daily_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/discard_draft_use_case.dart';
-import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draft_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
 import 'package:three_tasks/use_case/interactor/notify_access/notify_daily_tasks_access_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/draft/discard_draft_interactor.dart';
-import 'package:three_tasks/use_case/interactor/save_task_changes/draft/draft_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/save_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/save_weekly_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_daily_tasks_interactor.dart';
@@ -36,7 +34,6 @@ import 'package:three_tasks/use_case/stream_handler_interface/daily_tasks_stream
 import 'package:three_tasks/use_case/stream_handler_interface/weekly_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/toast_count.dart';
 import 'package:three_tasks/presentation/controller/tasks_controller.dart';
-import 'package:three_tasks/presentation/controller/weekly_tasks_controller.dart';
 import 'package:three_tasks/presentation/presenter/daily_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/weekly_tasks_presenter_impl.dart';
 
@@ -134,13 +131,13 @@ WeeklyTasksPresenter weeklyTasksPresenter(Ref ref) => WeeklyTasksPresenterImpl(
 
 /// 週単位タスク操作クラス
 @riverpod
-TasksController tasksController(Ref ref) => TasksController(
+TasksController tasksController(Ref ref, Token token) => TasksController(
       saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),
       draftTaskChangesUseCase: ref.watch(draftTaskChangesUseCaseProvider),
       discardDraftUseCase: ref.watch(discardDraftUseCaseProvider),
       saveWeeklyTaskChangesUseCase:
           ref.watch(saveWeeklyTaskChangesUseCaseProvider),
-      editController: ref.watch(editControllerProvider),
+      editController: ref.watch(editControllerProvider(token)),
     );
 
 // /// 週単位タスク操作クラス

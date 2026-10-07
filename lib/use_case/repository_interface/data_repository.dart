@@ -1,7 +1,9 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/entities/e_setting/e_page_setting.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
 import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
@@ -45,6 +47,9 @@ abstract class DataRepository {
   Future<Result<List<EWeeklyTask>, Exception>> createWeeklyTaskRecord({
     required List<Date> firstDateList,
   });
+
+  /// 各種設定値をフェッチする
+  Future<Result<ESettingsMap, Exception>> fetchSettings();
 
   // todo 書き換え
 
@@ -98,12 +103,11 @@ abstract class DataRepository {
     required int labelId,
   });
 
-  /// 指定タスクのラベル化を解除するメソッド
-  ///
-  /// 指定タスク（[dTask]）がこの段階で属しているラベルから、このタスクのIDを除外する。
-  ///
-  /// 指定タスクの [DTask.labelId] を `null` にする。
-  Future<void> unlabeling({
-    required DTask dTask,
+  /// 新しい値を当てはめずに、現在のキャッシュを流す
+  Future<Result<void, Exception>> outputCurrentCache(TaskRec rec);
+
+  /// 各種設定を初期化する
+  Future<Result<ESettingsMap, Exception>> initSettings({
+    required int length,
   });
 }

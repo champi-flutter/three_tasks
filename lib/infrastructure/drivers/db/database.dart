@@ -6,9 +6,11 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/infrastructure/drivers/db/table/setting_tables.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/data_source_interface/data_source.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
@@ -26,7 +28,6 @@ class DayTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   BoolColumn get isChecked => boolean().withDefault(Constant(false))();
-
 
   // 2026/06/30 追加: ラベルID（ラベル化の際に追加）
   // todo デフォルトの追加（2026/09/16）＞＞
@@ -53,7 +54,6 @@ class WeeklyTasks extends Table {
 
   BoolColumn get isChecked => boolean().withDefault(Constant(false))();
 
-
   // 2026/06/30 追加: ラベルID（ラベル化の際に追加）
   IntColumn get labelId => integer()();
 }
@@ -68,7 +68,6 @@ class MonthlyTasks extends Table {
 
   BoolColumn get isChecked => boolean().withDefault(Constant(false))();
 
-
   // 2026/06/30 追加: ラベルID（ラベル化の際に追加）
   IntColumn get labelId => integer()();
 }
@@ -82,7 +81,6 @@ class YearlyTasks extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   BoolColumn get isChecked => boolean().withDefault(Constant(false))();
-
 
   // 2026/06/30 追加: ラベルID（ラベル化の際に追加）
   IntColumn get labelId => integer()();
@@ -137,6 +135,7 @@ class LabeledTasks extends Table {
   YearlyTasks,
   Reviews,
   LabeledTasks,
+  PageSettings,
 ])
 class MyDatabase extends _$MyDatabase implements DataSource {
   // データベースをどこに保存するかをDriftに伝えるリダイレクトコンストラクタ
@@ -234,6 +233,24 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     );
   }
 
+  /// [PageSetting] から [QPageSetting] への変更
+  QPageSetting _toQPageSetting(PageSetting pageSetting) {
+    return QPageSetting(
+      pageId: pageSetting.pageId,
+      autoSave: pageSetting.autoSave,
+    );
+  }
+
+  /// `List<PageSetting>` から [QSettingsMap] への変更
+  QSettingsMap _toQSettingMap(List<PageSetting> pageSettingList) {
+    final Map<int, QPageSetting> map = {};
+    // pageId を key として map に QPageSetting を組み込んでいく
+    for (final pageSetting in pageSettingList) {
+      map[pageSetting.pageId] = _toQPageSetting(pageSetting);
+    }
+    return QSettingsMap.fromMapCopy(map);
+  }
+
   // todo フェッチ
   // todo LabeledTasks
   /// `LabeledTask` フェッチメソッド
@@ -306,11 +323,21 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         return Success(resultValue);
       } else {
         throw Exception(
-            "週のタスクが 4 つ以上存在します。\nlength = ${resultValue
-                .length} （${targetDate.toStrFormat()}）");
+            "週のタスクが 4 つ以上存在します。\nlength = ${resultValue.length} （${targetDate.toStrFormat()}）");
       }
-    } catch (e) {
-      return Failure(Exception(e), methodName: "getWeeklyTasksByDate");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "getWeeklyTasksByDate");
+    }
+  }
+
+  /// データソースに保存している各種設定値を取得する
+  @override
+  Future<Result<QSettingsMap, Exception>> getSettings() async {
+    try {
+      final settings = await managers.pageSettings.get();
+      return Success(_toQSettingMap(settings));
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "getSettings");
     }
   }
 
@@ -339,11 +366,10 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   //     .get();
 
   /// 達成されなかったタスクを抽出
-  Future<List<DayTask>> get allTasksNotAchieved =>
-      managers.dayTasks
-          .filter((f) => f.isChecked.equals(false))
-          .orderBy((o) => o.date.asc())
-          .get();
+  Future<List<DayTask>> get allTasksNotAchieved => managers.dayTasks
+      .filter((f) => f.isChecked.equals(false))
+      .orderBy((o) => o.date.asc())
+      .get();
 
   // Update（更新）
   // 指定したデータ行（）を古いデータと置き換える
@@ -367,18 +393,17 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         // 空のタスクを3つ作る
         for (int i = 0; i < 3; i++) {
           final DayTask rawData =
-          await managers.dayTasks.createReturning((record) =>
-              record(
-                task: "",
-                date: targetDateInt,
-              ));
+              await managers.dayTasks.createReturning((record) => record(
+                    task: "",
+                    date: targetDateInt,
+                  ));
           rawDataList.add(rawData);
         }
       });
       // Fetch 用の DTO に変換して返す
       return Success(_toFDailyTaskList(rawDataList));
-    } catch (e) {
-      return Failure(Exception(e), methodName: "createDailyTaskRecord");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "createDailyTaskRecord");
     }
   }
 
@@ -398,19 +423,19 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       await transaction(() async {
         for (int index in indexList) {
           final int createdId =
-          await managers.weeklyTasks.create((record) =>
-              record(
-                task: "",
-                // カラムの型の変換に対応
-                firstDate: today.toIntIdentifier(),
-              ));
+              await managers.weeklyTasks.create((record) => record(
+                    task: "",
+                    // カラムの型の変換に対応
+                    firstDate: today.toIntIdentifier(),
+                  ));
           // 作ったタスクを、返す Map に組み込む
           dataMap[index] = createdId;
         }
       });
       return Success(dataMap);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "createWeeklyTaskRecord");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"),
+          methodName: "createWeeklyTaskRecord");
     }
   }
 
@@ -471,12 +496,12 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     try {
       switch (newQTask) {
         case QDailyTask():
-        // 変更後情報をテーブルのレコードの型に変換する
+          // 変更後情報をテーブルのレコードの型に変換する
           final newRecord = _toDayTaskRecord(newQTask);
           // 変更後のレコードを保存する
           await managers.dayTasks.replace(newRecord);
         case QWeeklyTask():
-        // 変更後情報をテーブルのレコードの型に変換する
+          // 変更後情報をテーブルのレコードの型に変換する
           final newRecord = _toWeeklyTaskRecord(newQTask);
           // 変更後のレコードを保存する
           await managers.weeklyTasks.replace(newRecord);
@@ -507,16 +532,16 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           await managers.weeklyTasks
               .filter((weeklyTask) => weeklyTask.id.equals(targetId))
               .update(
-                (task) =>
-                task(
+                (task) => task(
                   firstDate: Value(firstDateInt),
                 ),
-          );
+              );
         }
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "updateWeeklyTasksFirstDate");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"),
+          methodName: "updateWeeklyTasksFirstDate");
     }
   }
 
@@ -528,7 +553,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     return managers.dayTasks
         .filter(
           (f) => f.task.equals(unnecessaryDayTask.task),
-    )
+        )
         .delete();
   }
 
@@ -542,14 +567,13 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     try {
       // LabeledTasks に新しいレコードを作成
       final int createdId = await managers.labeledTasks.create(
-            (record) =>
-            record(
-              label: title,
-            ),
+        (record) => record(
+          label: title,
+        ),
       );
       return Success(createdId);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "createNewLabel");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "createNewLabel");
     }
   }
 
@@ -561,7 +585,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       // 指定レコード（ID を自動検索）に新しい情報を当てはめる
       await managers.labeledTasks.replace(newRecord);
       return Success(null);
-    }catch (e, st) {
+    } catch (e, st) {
       return Failure(Exception("$e\n$st"), methodName: "saveLabels");
     }
   }
@@ -581,23 +605,21 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       await transaction(() async {
         // LabeledTasks に新しいレコードを作成
         _labeledTask = await managers.labeledTasks.createReturning(
-              (record) =>
-              record(
-                label: label,
-                dailyIdList: Value(
-                  Uint8List.fromList([newId]),
-                ),
-              ),
+          (record) => record(
+            label: label,
+            dailyIdList: Value(
+              Uint8List.fromList([newId]),
+            ),
+          ),
         );
         // タスクIDに該当するタスクの labelId を更新
         await managers.dayTasks
             .filter((dayTask) => dayTask.id.equals(newId))
             .update(
-              (dayTask) =>
-              dayTask(
+              (dayTask) => dayTask(
                 labelId: Value(_labeledTask!.labeledId),
               ),
-        );
+            );
       });
       if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
@@ -606,8 +628,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       else {
         throw Exception("_labeledTask == null");
       }
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingDailyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingDailyTask");
     }
   }
 
@@ -626,24 +648,22 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       await transaction(() async {
         // LabeledTasks に新しいレコードを作成
         _labeledTask = await managers.labeledTasks.createReturning(
-              (record) =>
-              record(
-                label: label,
-                weeklyIdList: Value(
-                  Uint8List.fromList([newId]),
-                ),
-              ),
+          (record) => record(
+            label: label,
+            weeklyIdList: Value(
+              Uint8List.fromList([newId]),
+            ),
+          ),
         );
 
         // タスクIDに該当するタスクの labelId を更新
         await managers.weeklyTasks
             .filter((weeklyTask) => weeklyTask.id.equals(newId))
             .update(
-              (weeklyTask) =>
-              weeklyTask(
+              (weeklyTask) => weeklyTask(
                 labelId: Value(_labeledTask!.labeledId),
               ),
-        );
+            );
       });
       if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
@@ -652,8 +672,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       else {
         throw Exception("_labeledTask == null");
       }
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingWeeklyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingWeeklyTask");
     }
   }
 
@@ -672,23 +692,21 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       await transaction(() async {
         // LabeledTasks に新しいレコードを作成
         _labeledTask =
-        await managers.labeledTasks.createReturning((record) =>
-            record(
-              label: label,
-              monthlyIdList: Value(
-                Uint8List.fromList([newId]),
-              ),
-            ));
+            await managers.labeledTasks.createReturning((record) => record(
+                  label: label,
+                  monthlyIdList: Value(
+                    Uint8List.fromList([newId]),
+                  ),
+                ));
 
         // タスクIDに該当するタスクの labelId を更新
         await managers.monthlyTasks
             .filter((monthlyTask) => monthlyTask.id.equals(newId))
             .update(
-              (monthlyTask) =>
-              monthlyTask(
+              (monthlyTask) => monthlyTask(
                 labelId: Value(_labeledTask!.labeledId),
               ),
-        );
+            );
       });
       if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
@@ -697,8 +715,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       else {
         throw Exception("_labeledTask == null");
       }
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingMonthlyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingMonthlyTask");
     }
   }
 
@@ -717,24 +735,22 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       await transaction(() async {
         // LabeledTasks に新しいレコードを作成
         _labeledTask = await managers.labeledTasks.createReturning(
-              (record) =>
-              record(
-                label: label,
-                yearlyIdList: Value(
-                  Uint8List.fromList([newId]),
-                ),
-              ),
+          (record) => record(
+            label: label,
+            yearlyIdList: Value(
+              Uint8List.fromList([newId]),
+            ),
+          ),
         );
 
         // タスクIDに該当するタスクの labelId を更新
         await managers.yearlyTasks
             .filter((yearlyTask) => yearlyTask.id.equals(newId))
             .update(
-              (yearlyTask) =>
-              yearlyTask(
+              (yearlyTask) => yearlyTask(
                 labelId: Value(_labeledTask!.labeledId),
               ),
-        );
+            );
       });
       if (_labeledTask != null) {
         return Success(_dLabeledTask(_labeledTask!));
@@ -743,8 +759,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       else {
         throw Exception("_labeledTask == null");
       }
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingYearlyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingYearlyTask");
     }
   }
 
@@ -773,15 +789,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.dayTasks
             .filter((dayTask) => dayTask.id.equals(targetId))
             .update(
-              (dayTask) =>
-              dayTask(
+              (dayTask) => dayTask(
                 labelId: Value(null),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "unlabelingDailyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "unlabelingDailyTask");
     }
   }
 
@@ -810,15 +825,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.weeklyTasks
             .filter((weeklyTask) => weeklyTask.id.equals(targetId))
             .update(
-              (weeklyTask) =>
-              weeklyTask(
+              (weeklyTask) => weeklyTask(
                 labelId: Value(null),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingWeeklyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingWeeklyTask");
     }
   }
 
@@ -847,15 +861,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.monthlyTasks
             .filter((monthlyTask) => monthlyTask.id.equals(targetId))
             .update(
-              (monthlyTask) =>
-              monthlyTask(
+              (monthlyTask) => monthlyTask(
                 labelId: Value(null),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingMonthlyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingMonthlyTask");
     }
   }
 
@@ -884,15 +897,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.yearlyTasks
             .filter((yearlyTask) => yearlyTask.id.equals(targetId))
             .update(
-              (yearlyTask) =>
-              yearlyTask(
+              (yearlyTask) => yearlyTask(
                 labelId: Value(null),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingYearlyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingYearlyTask");
     }
   }
 
@@ -920,41 +932,41 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         final LabeledTasksCompanion updater;
         // タスクの種類に対応した場所に dTask.id をあてはめる
         switch (dTask) {
-        // region
+          // region
           case DDailyTask(id: final int taskId):
-          // 取得したレコードの dailyIdList の参照のコピー
+            // 取得したレコードの dailyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.dailyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
             final Uint8List? newBlob =
-            (currentBlob ?? Uint8List(0)).updateWith(taskId);
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater =
                 LabeledTasksCompanion(dailyIdList: Value.absentIfNull(newBlob));
           case DWeeklyTask(id: final int taskId):
-          // 取得したレコードの weeklyIdList の参照のコピー
+            // 取得したレコードの weeklyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.weeklyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
             final Uint8List newBlob =
-            (currentBlob ?? Uint8List(0)).updateWith(taskId);
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater = LabeledTasksCompanion(weeklyIdList: Value(newBlob));
           case DMonthlyTask(id: final int taskId):
-          // 取得したレコードの monthlyIdList の参照のコピー
+            // 取得したレコードの monthlyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.monthlyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
             final Uint8List newBlob =
-            (currentBlob ?? Uint8List(0)).updateWith(taskId);
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater = LabeledTasksCompanion(monthlyIdList: Value(newBlob));
           case DYearlyTask(id: final int taskId):
-          // 取得したレコードの yearlyIdList の参照のコピー
+            // 取得したレコードの yearlyIdList の参照のコピー
             final Uint8List? currentBlob = currentRecord.yearlyIdList;
             // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
             final Uint8List newBlob =
-            (currentBlob ?? Uint8List(0)).updateWith(taskId);
+                (currentBlob ?? Uint8List(0)).updateWith(taskId);
             // update に返す形にあてはめる。
             updater = LabeledTasksCompanion(yearlyIdList: Value(newBlob));
-        // endregion
+          // endregion
         }
 
         // updater を適用する
@@ -963,8 +975,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             .update((_) => updater);
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "addTaskIdToLabel");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "addTaskIdToLabel");
     }
   }
 
@@ -997,15 +1009,15 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.dayTasks
             .filter((dayTask) => dayTask.id.equals(targetId))
             .update(
-              (dayTask) =>
-              dayTask(
+              (dayTask) => dayTask(
                 labelId: Value(labelId),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "addingDailyTaskToLabel");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"),
+          methodName: "addingDailyTaskToLabel");
     }
   }
 
@@ -1038,15 +1050,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.weeklyTasks
             .filter((weeklyTask) => weeklyTask.id.equals(targetId))
             .update(
-              (weeklyTask) =>
-              weeklyTask(
+              (weeklyTask) => weeklyTask(
                 labelId: Value(labelId),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingWeeklyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingWeeklyTask");
     }
   }
 
@@ -1079,15 +1090,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.monthlyTasks
             .filter((monthlyTask) => monthlyTask.id.equals(targetId))
             .update(
-              (monthlyTask) =>
-              monthlyTask(
+              (monthlyTask) => monthlyTask(
                 labelId: Value(labelId),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingMonthlyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingMonthlyTask");
     }
   }
 
@@ -1120,15 +1130,14 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         await managers.yearlyTasks
             .filter((yearlyTask) => yearlyTask.id.equals(targetId))
             .update(
-              (yearlyTask) =>
-              yearlyTask(
+              (yearlyTask) => yearlyTask(
                 labelId: Value(labelId),
               ),
-        );
+            );
       });
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "labelingYearlyTask");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "labelingYearlyTask");
     }
   }
 
@@ -1141,13 +1150,35 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      await managers.labeledTasks.update((record) =>
-          record(
+      await managers.labeledTasks.update((record) => record(
             dailyIdList: Value(Uint8List.fromList(newIdList)),
           ));
       return Success(null);
-    } catch (e) {
-      return Failure(Exception(e), methodName: "addDailyTaskInLabel");
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "addDailyTaskInLabel");
+    }
+  }
+
+  /// 各種設定を初期化する
+  @override
+  Future<Result<QSettingsMap, Exception>> initSettings({
+    required int length,
+  }) async {
+    try {
+      // 取得する生データを入れる枠を用意する
+      final List<PageSetting> rawCreatedList = [];
+      await transaction(() async {
+        for (int i = 0; i < length; i++) {
+          // i を識別子として、設定テーブルに登録して取得する
+          final setting = await managers.pageSettings.createReturning(
+                (setting) => setting(pageId: i),
+          );
+          rawCreatedList.add(setting);
+        }
+      });
+      return Success(_toQSettingMap(rawCreatedList));
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "initSettings");
     }
   }
 
@@ -1187,7 +1218,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
                 columnTransformer: {
                   // date カラムのデータを変換する処理を記述
                   dayTasks.date: CustomExpression<int>(
-                    // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
+                      // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
                       'CAST(REPLACE(date, "-", "") AS INTEGER)'),
                 },
               ),
@@ -1205,7 +1236,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
                 columnTransformer: {
                   // date カラムのデータを変換する処理を記述
                   weeklyTasks.firstDate: CustomExpression<int>(
-                    // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
+                      // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
                       'CAST(REPLACE(week, "-", "") AS INTEGER)'),
                 },
               ),

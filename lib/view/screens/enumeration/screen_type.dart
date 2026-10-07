@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:three_tasks/view/screens/home_screen.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:three_tasks/view/screens/todays_screen.dart';
 import 'package:three_tasks/view/screens/monthly_tasks_screen.dart';
 import 'package:three_tasks/view/screens/tomorrows_screen.dart';
 import 'package:three_tasks/view/screens/weekly_tasks_screen.dart';
@@ -23,7 +24,7 @@ enum ScreenType {
 
   /// 画面クラスのコンストラクタ
   Widget get constructor => switch (this) {
-        ScreenType.today => HomeScreen(),
+        ScreenType.today => TodaysScreen(),
         ScreenType.tomorrow => TomorrowsScreen(),
         ScreenType.week => WeeklyTasksScreen(),
         ScreenType.month => MonthlyTasksScreen(),
@@ -32,3 +33,4 @@ enum ScreenType {
 
   // todo provider を指定できるようにしたいが、型を指定できないので意味がなくなる（2026/06/29）＞＞
 }
+

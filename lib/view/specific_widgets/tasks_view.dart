@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/di/providers.dart';
@@ -27,14 +26,19 @@ class TasksView extends ConsumerWidget {
   const TasksView.checkbox({
     required this.taskState,
     required this.isAutoSave,
+    required this.scopeToken,
   }) : tasksViewStyle = TasksViewStyle.checkbox;
 
   const TasksView.icon({
     required this.taskState,
     required this.isAutoSave,
+    required this.scopeToken,
   }) : tasksViewStyle = TasksViewStyle.icon;
 
   final TasksViewStyle tasksViewStyle;
+
+  /// このスコープの [Token]
+  final Token scopeToken;
 
   /// タスクのリスト
   final TaskList<VTask> taskState;
@@ -53,26 +57,25 @@ class TasksView extends ConsumerWidget {
           bool? newChecked,
           int? newLabelId,
         })
-        // 折りたたみ用
-        =>
-            ref.read(tasksControllerProvider).controlTask(
-              isAutoSave: isAutoSave,
-              taskState: taskState,
-              position: position,
-              parameter: TaskControlParameter(
-                newTitle: newTitle,
-                newChecked: newChecked,
-                newLabelId: newLabelId,
-              )
-            );
+            // 折りたたみ用
+            =>
+            ref.read(tasksControllerProvider(scopeToken)).controlTask(
+                isAutoSave: isAutoSave,
+                taskState: taskState,
+                position: position,
+                parameter: TaskControlParameter(
+                  newTitle: newTitle,
+                  newChecked: newChecked,
+                  newLabelId: newLabelId,
+                ));
 
         // ラベルにタスク情報が加わるときのコールバック
         final onAddTaskInLabel = ({
           required ListEntry<VLabel> vLabelEntry,
           required VTask vTask,
         })
-        // 折りたたみ用
-        async {
+            // 折りたたみ用
+            async {
           // タスク ID がどのタスクの ID か
           final LabelControlParameter parameter = switch (vTask) {
             VDailyTask() => LabelControlParameter(newDailyId: vTask.id),
@@ -80,11 +83,11 @@ class TasksView extends ConsumerWidget {
             VMonthlyTask() => LabelControlParameter(newMonthlyId: vTask.id),
             VYearlyTask() => LabelControlParameter(newYearlyId: vTask.id),
           };
-          await ref.read(labelsControllerProvider).controlLabel(
-          isAutoSave: isAutoSave,
-            labelEntry: vLabelEntry,
-          parameter: parameter,
-          );
+          await ref.read(labelsControllerProvider(scopeToken)).controlLabel(
+                isAutoSave: isAutoSave,
+                vLabelEntry: vLabelEntry,
+                parameter: parameter,
+              );
         };
 
         // ラベル適用時のコールバック
@@ -95,8 +98,7 @@ class TasksView extends ConsumerWidget {
               onApply: ({
                 required ListEntry<VLabel> vLabelEntry,
                 required ListEntry<VTask> vTaskEntry,
-              })
-              async {
+              }) async {
                 // ラベルにタスク情報を追加する
                 await onAddTaskInLabel(
                   vLabelEntry: vLabelEntry,
@@ -123,6 +125,7 @@ class TasksView extends ConsumerWidget {
                 onControlTask: onControlTask,
                 onSetLabel: onSetLabel,
                 onUnlabel: onUnlabel,
+                scopeToken: scopeToken,
               ),
             );
 
@@ -138,6 +141,7 @@ class TasksView extends ConsumerWidget {
                     onControlTask: onControlTask,
                     onSetLabel: onSetLabel,
                     onUnlabel: onUnlabel,
+                    scopeToken: scopeToken,
                   ),
                 );
               },
@@ -155,6 +159,7 @@ class _TaskField extends HookConsumerWidget {
   const _TaskField({
     required this.taskEntry,
     required this.onTextEdited,
+    required this.scopeToken,
   });
 
   /// 対象の [VTask] のエントリ
@@ -165,9 +170,8 @@ class _TaskField extends HookConsumerWidget {
     String? newTitle,
   }) onTextEdited;
 
-  // // フォーカスが外れたことをフラグに、その段階での入力値を保存する処理を起動するハンドラ
-  // Future<void> _handleSave(String value) async {
-  // }
+  /// このスコープの [Token]
+  final Token scopeToken;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -197,29 +201,27 @@ class _TaskField extends HookConsumerWidget {
         useTextFocusController(onUnfocused: _onUnfocused);
 
     // 入力欄本体
-    return TextFieldTapRegion(
+    return TextField(
       // この領域の「外」がタップされたらフォーカスを外す
       onTapOutside: (event) {
         textFocusController.focusNode.unfocus();
       },
-      child: TextField(
-        maxLines: null,
-        decoration: InputDecoration(
-          labelText: "タスク${position + 1}",
-          // contentPadding: EdgeInsets.all(0),
-        ),
-        controller: textFocusController.controller,
-        style: TextStyle(fontSize: 17.0.sp),
-        textInputAction: TextInputAction.done,
-        // エンターキー等で、入力完了によってフォーカスが外れるようにする
-        onSubmitted: (_) {
-          textFocusController.focusNode.unfocus();
-        },
-        // 入力欄に文字を入力したときに、編集未保存フラグを立てる。
-        onChanged: (String value) {
-          ref.read(editControllerProvider).notifyEdited();
-        },
+      maxLines: null,
+      decoration: InputDecoration(
+        labelText: "タスク${position + 1}",
+        // contentPadding: EdgeInsets.all(0),
       ),
+      controller: textFocusController.controller,
+      style: TextStyle(fontSize: 17.0.sp),
+      textInputAction: TextInputAction.done,
+      // エンターキー等で、入力完了によってフォーカスが外れるようにする
+      onSubmitted: (_) {
+        textFocusController.focusNode.unfocus();
+      },
+      // 入力欄に文字を入力したときに、編集未保存フラグを立てる。
+      onChanged: (String value) {
+        ref.read(editControllerProvider(scopeToken)).notifyEdited();
+      },
     );
   }
 }
@@ -231,6 +233,7 @@ class _CheckableTaskField extends HookConsumerWidget {
     required this.onControlTask,
     required this.onSetLabel,
     required this.onUnlabel,
+    required this.scopeToken,
   });
 
   /// 対象の [VTask] のエントリ
@@ -249,6 +252,9 @@ class _CheckableTaskField extends HookConsumerWidget {
   /// ラベル解除時のコールバック
   final Future<void> Function(BuildContext context) onUnlabel;
 
+  /// このスコープの [Token]
+  final Token scopeToken;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // タスク本体
@@ -261,6 +267,7 @@ class _CheckableTaskField extends HookConsumerWidget {
     return CheckboxListTile(
       title: _TaskField(
         taskEntry: taskEntry,
+        scopeToken: scopeToken,
         onTextEdited: ({String? newTitle}) => onControlTask(
           newTitle: newTitle,
         ),
@@ -292,6 +299,7 @@ class _IconTaskField extends ConsumerWidget {
     required this.onControlTask,
     required this.onSetLabel,
     required this.onUnlabel,
+    required this.scopeToken,
   });
 
   /// 対象の [VTask] のエントリ
@@ -310,6 +318,9 @@ class _IconTaskField extends ConsumerWidget {
   /// ラベル解除時のコールバック
   final Future<void> Function(BuildContext context) onUnlabel;
 
+  /// このスコープの [Token]
+  final Token scopeToken;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // // タスクの位置
@@ -325,6 +336,7 @@ class _IconTaskField extends ConsumerWidget {
         onTextEdited: ({String? newTitle}) => onControlTask(
           newTitle: newTitle,
         ),
+        scopeToken: scopeToken,
       ),
       trailing: _LabelIconTrailing(
         isLabeled: isLabeled,
@@ -409,8 +421,6 @@ class _LabelIconTrailing extends StatelessWidget {
 }
 
 extension ControlActionOnTasksView on WidgetRef {
-
-
   // region todo ラベルタイトル変更時のコールバック（2026/09/25）＞＞
   // Future<void> _onChangeLabelTitle({
   //   required bool isAutoSave,

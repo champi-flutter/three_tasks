@@ -1,5 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
+import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -40,24 +41,22 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel{
 
   /// [state] （`List<VWeeklyTask>`）更新メソッド
   void update(Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> newData) {
-    final WeeklyLazyMap newStateMap = state;
+    final Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>> newStateMap = {};
+    // リビルドを行うトリガー
     bool isChanged = false;
+    // 各エントリ（週とタスクリスト）
     for(final newEntry in newData.entries){
       final UniqueWeek updatedWeek = newEntry.key;
       final WeeklyTaskList<VWeeklyTask> newTaskList = newEntry.value;
-      // 中身が同じなら早期リターン
-      if (newTaskList.isUnorderedEqualTo(state[updatedWeek])) {
-        break;
-      }
-      // 変化がある場合は、newStateMap に記録する
-      else {
+      // 中身が違うのを確認したら、リビルドトリガーをオンにする
+      if (!newTaskList.isUnorderedEqualTo(state[updatedWeek])) {
         isChanged = true;
-        newStateMap.setAt(updatedWeek, newTaskList);
       }
+      newStateMap[updatedWeek]= LazyViewState.data(newTaskList);
     }
     if(isChanged) {
       // state を更新して、リビルドを促す
-      state = newStateMap;
+      state = state.copyAs(newStateMap);
     }
   }
 }

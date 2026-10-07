@@ -11,6 +11,6 @@ part 'presenter_providers.g.dart';
 // todo 各 Presenter の Provider をこっちに移していく（2026/09/19）＞＞
 /// ラベルデータ反映クラス
 @riverpod
-LabelsPresenter labelsPresenter(Ref ref, Token token) => LabelsPresenterImpl(
-      labelsViewModel: ref.watch(labelsViewModelProvider(token).notifier),
+LabelsPresenter labelsPresenter(Ref ref) => LabelsPresenterImpl(
+      labelsViewModel: ref.watch(labelsViewModelProvider.notifier),
     );

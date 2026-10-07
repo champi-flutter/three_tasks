@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
@@ -9,6 +8,8 @@ import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_label/fetch_label_use_case.dart';
 
 part 'labels_view_model.g.dart';
+
+// typedef LabelViewState = LazyViewState<LabelList<VLabel>>;
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 ///
@@ -20,15 +21,17 @@ part 'labels_view_model.g.dart';
 class LabelsViewModel extends _$LabelsViewModel {
   // todo 初期化
   @override
-  LabelList<VLabel>? build(Token token) {
+  LazyViewState<LabelList<VLabel>> build() {
     _initViewModel();
 
-    return null;
+    final LabelList<VLabel> placeholder = LabelList.fromIterable([]);
+
+    return LazyViewState.placeholder(placeholder);
   }
 
   /// Token（[build] の引数）を指定して、[FetchLabelUseCase] を参照する getter
   FetchLabelUseCase get _fetchLabelUseCase =>
-      ref.read(fetchLabelUseCaseProvider(token));
+      ref.read(fetchLabelUseCaseProvider);
 
   /// この VM の新しいインスタンスが生成された時の初期化
   Future<void> _initViewModel() async {
@@ -37,6 +40,6 @@ class LabelsViewModel extends _$LabelsViewModel {
 
   /// [state] の更新
   void update(LabelList<VLabel> newState) {
-    state = newState;
+    state = LazyViewState.data(newState);
   }
 }

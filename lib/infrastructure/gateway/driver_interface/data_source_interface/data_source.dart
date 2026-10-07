@@ -2,6 +2,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_label/f_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
@@ -20,13 +21,16 @@ abstract class DataSource {
     required int targetDateInt,
   });
 
-  /// `WeeklyTask` フェッチメソッド
+  /// データソースに保存している週タスクを、日付を指定して取得する
   ///
   /// 要求された日付（[dateList]）に該当するデータを返す。
   Future<Result<List<QWeeklyTask>, Exception>> getWeeklyTasksByDate({
     required Date targetDate,
     required List<int> exclusionDiffs,
   });
+
+  /// データソースに保存している各種設定値を取得する
+  Future<Result<QSettingsMap, Exception>> getSettings();
 
   // todo 書き換え
   /// 日単位タスクの新しい日付の枠を作成するメソッド
@@ -191,6 +195,11 @@ abstract class DataSource {
   Future<Result<void, Exception>> addYearlyTaskToLabel({
     required int labelId,
     required int targetId,
+  });
+
+  /// 各種設定を初期化する
+  Future<Result<QSettingsMap, Exception>> initSettings({
+    required int length,
   });
 
 // /// 既存のラベルを採用した枠を作るメソッド

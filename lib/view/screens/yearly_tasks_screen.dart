@@ -7,7 +7,7 @@ import 'package:three_tasks/db/database.dart';
 import 'package:three_tasks/main.dart';
 import 'package:three_tasks/view/screens/review_screen.dart';
 import 'history_screen.dart';
-import 'home_screen.dart';
+import 'todays_screen.dart';
 
 class YearlyTasksScreen extends StatelessWidget {
   // Popupのmenu

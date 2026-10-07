@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:three_tasks/data_foundation/label_base/label_base.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 
 part 'v_label.freezed.dart';
 

@@ -580,17 +580,17 @@ String _$weeklyTasksPresenterHash() =>
 /// 週単位タスク操作クラス
 
 @ProviderFor(tasksController)
-const tasksControllerProvider = TasksControllerProvider._();
+const tasksControllerProvider = TasksControllerFamily._();
 
 /// 週単位タスク操作クラス
 
 final class TasksControllerProvider extends $FunctionalProvider<TasksController,
     TasksController, TasksController> with $Provider<TasksController> {
   /// 週単位タスク操作クラス
-  const TasksControllerProvider._()
+  const TasksControllerProvider._(
+      {required TasksControllerFamily super.from,
+      required Token super.argument})
       : super(
-          from: null,
-          argument: null,
           retry: null,
           name: r'tasksControllerProvider',
           isAutoDispose: true,
@@ -601,6 +601,13 @@ final class TasksControllerProvider extends $FunctionalProvider<TasksController,
   @override
   String debugGetCreateSourceHash() => _$tasksControllerHash();
 
+  @override
+  String toString() {
+    return r'tasksControllerProvider'
+        ''
+        '($argument)';
+  }
+
   @$internal
   @override
   $ProviderElement<TasksController> $createElement($ProviderPointer pointer) =>
@@ -608,7 +615,11 @@ final class TasksControllerProvider extends $FunctionalProvider<TasksController,
 
   @override
   TasksController create(Ref ref) {
-    return tasksController(ref);
+    final argument = this.argument as Token;
+    return tasksController(
+      ref,
+      argument,
+    );
   }
 
   /// {@macro riverpod.override_with_value}
@@ -618,9 +629,43 @@ final class TasksControllerProvider extends $FunctionalProvider<TasksController,
       providerOverride: $SyncValueProvider<TasksController>(value),
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TasksControllerProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
 }
 
-String _$tasksControllerHash() => r'e3917e158baf45a07b2e685b469dadbe465be1d4';
+String _$tasksControllerHash() => r'719b09eda231537b6771e78cca12292f9a71e7eb';
+
+/// 週単位タスク操作クラス
+
+final class TasksControllerFamily extends $Family
+    with $FunctionalFamilyOverride<TasksController, Token> {
+  const TasksControllerFamily._()
+      : super(
+          retry: null,
+          name: r'tasksControllerProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// 週単位タスク操作クラス
+
+  TasksControllerProvider call(
+    Token token,
+  ) =>
+      TasksControllerProvider._(argument: token, from: this);
+
+  @override
+  String toString() => r'tasksControllerProvider';
+}
 
 /// 日単位タスクのキャッシュストリームハンドラ
 

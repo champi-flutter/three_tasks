@@ -7,7 +7,7 @@ import 'package:three_tasks/db/database.dart';
 import 'package:three_tasks/entities/view_type/task_type.dart';
 import 'package:three_tasks/main.dart';
 import 'history_screen.dart';
-import 'home_screen.dart';
+import 'todays_screen.dart';
 
 enum ReviewStatus { date, week, month, year }
 

@@ -67,7 +67,7 @@ class TaskList<Task extends TaskBase> extends TaskListBase<Task> {
 
   /// 同じ情報を持つ別の新しい [TaskList]  のインスタンスを生成する
   @override
-  TaskList<Task> get deepCopy => TaskList._copy(toList());
+  TaskList<Task> get deepCopy => TaskList._copy(toEntryList());
 }
 
 /// 週タスクのリスト
@@ -98,5 +98,5 @@ class WeeklyTaskList<Task extends WeeklyTaskBase> extends TaskListBase<Task> {
 
   /// 同じ情報を持つ別の新しい [WeeklyTaskList]  のインスタンスを生成する
   @override
-  WeeklyTaskList<Task> get deepCopy => WeeklyTaskList._copy(toList());
+  WeeklyTaskList<Task> get deepCopy => WeeklyTaskList._copy(toEntryList());
 }

@@ -2,10 +2,10 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
+import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
-import 'package:three_tasks/view_models/view_state/v_task/converter/to_v_task.dart';
-import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
-import 'package:three_tasks/presentation/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 
 /// データ更新反映ポートの具象クラス
 class WeeklyTasksPresenterImpl
@@ -39,7 +39,7 @@ class WeeklyTasksPresenterImpl
         (key, value) => MapEntry(
           key,
           value
-              .mapValues(ToVTask.toVWeeklyTask<EWeeklyTask>)
+              .mapValues(EToVTask.toVWeeklyTask)
               .toListAs(WeeklyTaskList.fromIterable),
         ),
       );
@@ -52,5 +52,5 @@ class WeeklyTasksPresenterImpl
 
   /// データの型をエンティティから View State へ変換するプライベートメソッド
   List<VWeeklyTask> _convertToVList(List<EWeeklyTask> eTaskList) =>
-      eTaskList.map<VWeeklyTask>(ToVTask.toVWeeklyTask<EWeeklyTask>).toList();
+      eTaskList.map<VWeeklyTask>(EToVTask.toVWeeklyTask).toList();
 }

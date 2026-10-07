@@ -10,16 +10,16 @@ part of 'use_case_providers.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(fetchLabelUseCase)
-const fetchLabelUseCaseProvider = FetchLabelUseCaseFamily._();
+const fetchLabelUseCaseProvider = FetchLabelUseCaseProvider._();
 
 final class FetchLabelUseCaseProvider extends $FunctionalProvider<
     FetchLabelUseCase,
     FetchLabelUseCase,
     FetchLabelUseCase> with $Provider<FetchLabelUseCase> {
-  const FetchLabelUseCaseProvider._(
-      {required FetchLabelUseCaseFamily super.from,
-      required Token super.argument})
+  const FetchLabelUseCaseProvider._()
       : super(
+          from: null,
+          argument: null,
           retry: null,
           name: r'fetchLabelUseCaseProvider',
           isAutoDispose: true,
@@ -30,13 +30,6 @@ final class FetchLabelUseCaseProvider extends $FunctionalProvider<
   @override
   String debugGetCreateSourceHash() => _$fetchLabelUseCaseHash();
 
-  @override
-  String toString() {
-    return r'fetchLabelUseCaseProvider'
-        ''
-        '($argument)';
-  }
-
   @$internal
   @override
   $ProviderElement<FetchLabelUseCase> $createElement(
@@ -45,11 +38,7 @@ final class FetchLabelUseCaseProvider extends $FunctionalProvider<
 
   @override
   FetchLabelUseCase create(Ref ref) {
-    final argument = this.argument as Token;
-    return fetchLabelUseCase(
-      ref,
-      argument,
-    );
+    return fetchLabelUseCase(ref);
   }
 
   /// {@macro riverpod.override_with_value}
@@ -59,39 +48,9 @@ final class FetchLabelUseCaseProvider extends $FunctionalProvider<
       providerOverride: $SyncValueProvider<FetchLabelUseCase>(value),
     );
   }
-
-  @override
-  bool operator ==(Object other) {
-    return other is FetchLabelUseCaseProvider && other.argument == argument;
-  }
-
-  @override
-  int get hashCode {
-    return argument.hashCode;
-  }
 }
 
-String _$fetchLabelUseCaseHash() => r'8229091f88029fdcd1c3ba08c9c2105d2c333a7c';
-
-final class FetchLabelUseCaseFamily extends $Family
-    with $FunctionalFamilyOverride<FetchLabelUseCase, Token> {
-  const FetchLabelUseCaseFamily._()
-      : super(
-          retry: null,
-          name: r'fetchLabelUseCaseProvider',
-          dependencies: null,
-          $allTransitiveDependencies: null,
-          isAutoDispose: true,
-        );
-
-  FetchLabelUseCaseProvider call(
-    Token token,
-  ) =>
-      FetchLabelUseCaseProvider._(argument: token, from: this);
-
-  @override
-  String toString() => r'fetchLabelUseCaseProvider';
-}
+String _$fetchLabelUseCaseHash() => r'6449a21836460cde358f5e3763f70edfc0e7919a';
 
 @ProviderFor(saveLabelChangesUseCase)
 const saveLabelChangesUseCaseProvider = SaveLabelChangesUseCaseProvider._();

@@ -1,13 +1,9 @@
+import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/view/screens/home_screen.dart';
 import 'package:three_tasks/view/wrapper/screens_wrapper.dart';
-
-import 'db/database.dart';
 
 // late MyDatabase database;
 //
@@ -42,11 +38,14 @@ void main() {
   // WidgetsFlutterBinding.ensureInitialized();
   // MobileAds.instance.initialize();
 
-  runApp(ProviderScope(
-    child: MyApp(
-        // isFirstLaunch: _isFirstLaunch,
-    
-        ),
+  runApp(
+      ProviderScope(
+    child: TextUtilizerScope(
+      defaultInfo: TextUtilizerDefault(fontSize: 21, designSide: 411),
+      child: MyApp(
+          // isFirstLaunch: _isFirstLaunch,
+          ),
+    ),
   ));
 }
 

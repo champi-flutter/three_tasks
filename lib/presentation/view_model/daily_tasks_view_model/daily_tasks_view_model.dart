@@ -15,13 +15,13 @@ class DailyTasksViewModel extends _$DailyTasksViewModel
     with NotificationFromViewModel {
   // todo 初期化
   @override
-  LazyMap<Date, TaskList<VDailyTask>> build() {
+  LazyMapViewState<Date, TaskList<VDailyTask>> build() {
     // 監視フローを開始する
     _startWatching(today);
     // リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
     // ハンドラ（`_handleDayTasksUpdating`）が1回起動して初めて実際のデータが表示される
-    return LazyMap(
-      onAnyAccess: _startWatching,//fixme
+    return LazyMapViewState(
+      onAnyAccess: _startWatching, //fixme
       onNewAccess: _startWatching,
       placeholder: _placeholder,
     );
@@ -56,18 +56,23 @@ class DailyTasksViewModel extends _$DailyTasksViewModel
   ///
   /// キャッシュは追加されるたびに、LFU 方式で evict される。
   void update(Map<Date, TaskList<VDailyTask>> newData) {
-    final Map<Date, TaskList<VDailyTask>> newStateMap = {};
+    final Map<Date, LazyViewState<TaskList<VDailyTask>>> newStateMap = {};
+    // リビルドを行うトリガー
+    bool isChanged = false;
+    // 各エントリ（日付とタスクリスト）
     for(final newEntry in newData.entries){
       final Date targetDate = newEntry.key;
       final TaskList<VDailyTask> newTaskList = newEntry.value;
-      // 中身が同じなら早期リターン
-      if (newTaskList.isUnorderedEqualTo(state[targetDate])) {
-        break;
+      // 中身が違うのを確認したら、リビルドトリガーをオンにする
+      if (!newTaskList.isUnorderedEqualTo(state[targetDate])) {
+        isChanged = true;
       }
-      newStateMap[targetDate] = newTaskList;
+      newStateMap[targetDate] = LazyViewState.data(newTaskList);
     }
-    // state を更新してリビルドを促す
-    state = state.copyAs(newStateMap);
+    if(isChanged) {
+      // state を更新してリビルドを促す
+      state = state.copyAs(newStateMap);
+    }
   }
 }
 

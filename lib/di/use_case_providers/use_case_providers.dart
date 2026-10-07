@@ -17,9 +17,9 @@ part 'use_case_providers.g.dart';
 // todo UseCase 層のクラスの Provider をこっちに移していく（2026/09/19）＞＞
 // ラベルフェッチフロー
 @riverpod
-FetchLabelUseCase fetchLabelUseCase(Ref ref, Token token) => FetchLabelInteractor(
+FetchLabelUseCase fetchLabelUseCase(Ref ref) => FetchLabelInteractor(
   dataRepository: ref.watch(dataRepositoryProvider),
-  labelsPresenter: ref.watch(labelsPresenterProvider(token)),
+  labelsPresenter: ref.watch(labelsPresenterProvider),
   loadingService: ref.watch(loadingServiceProvider),
   notificationService: ref.watch(notificationServiceProvider),
 );

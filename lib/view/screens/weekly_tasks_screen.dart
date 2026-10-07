@@ -4,15 +4,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/view_type/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/label_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
-import 'package:three_tasks/view_models/labels_view_model.dart';
-import 'package:three_tasks/view_models/view_state/v_task/v_task.dart';
-import 'package:three_tasks/presentation/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'history_screen.dart';
 
 // // 週の初め
@@ -29,39 +28,12 @@ class WeeklyTasksScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // VM のデータの、当日の分を監視する
-    final TaskList<VWeeklyTask> weeklyTaskList = ref.watch(
-        weeklyTasksViewModelProvider.select((state)=> state[today]));
+    final weeklyTasksViewModelState = ref.watch(
+        weeklyTasksViewModelProvider.select((state) => state[today]));
 
-    Future<void> _saveTaskChanges({
-      required int position,
-      String? newTitle,
-      bool? newChecked,
-      int? newLabelId,})
-    async {
-      // 週タスクのコントローラを参照
-      final controller = ref.read(weeklyTasksControllerProvider);
-      // 入力値の保存を依頼
-      await controller.saveTaskChanges(taskInfo: [
-        (
-        targetVTask: weeklyTaskList[0],
-        newTitle: position == 0 ? newTitle : null,
-        newChecked: position == 0 ? newChecked : null, // 変更しない項目は null
-        newLabelId: position == 0 ? newLabelId : null,
-        ),
-        (
-        targetVTask: weeklyTaskList[1],
-        newTitle: position == 1 ? newTitle : null,
-        newChecked: position == 1 ? newChecked : null, // 変更しない項目は null
-        newLabelId: position == 1 ? newLabelId : null,
-        ),
-        (
-        targetVTask: weeklyTaskList[2],
-        newTitle: position == 2 ? newTitle : null,
-        newChecked: position == 2 ? newChecked : null, // 変更しない項目は null
-        newLabelId: position == 2 ? newLabelId : null,
-        ),
-      ],);
-    }
+    // ローディング表示は riverpod_wrapper の LoadingService に任せるので、
+    // `.when` は使わず、 `.data` を直接参照する
+    final TaskList<VWeeklyTask> taskState = weeklyTasksViewModelState.data;
 
     return SingleChildScrollView(
       child: Center(
@@ -72,16 +44,9 @@ class WeeklyTasksScreen extends HookConsumerWidget {
 
             // 週タスク入力欄
             TasksView.checkbox(
-              taskList: weeklyTaskList,
-              // 保存処理
-              saveTaskAuto: (int position, String newValue) =>
-                  _saveTaskChanges(position: position, newTitle: newValue,),
-              saveCheckAuto: (int position, bool newValue)  =>
-                  _saveTaskChanges(position: position, newChecked: newValue,),
-              // todo ラベル化処理（2026/06/11）＞＞
-              saveAdditionToLabelAuto: ,
-              saveNewLabelAuto: (int position) {  },
-              saveUnlabelAuto: (int position) {  },
+              taskState: taskState,
+              // todo isAutoSave（2026/09/29）＞＞
+              isAutoSave: isAutoSave,
             ),
 
             // 余白
@@ -93,8 +58,11 @@ class WeeklyTasksScreen extends HookConsumerWidget {
               child: Column(
                 children: [
                   // 「ラベル化されたタスク一覧」ボタン
-                  const LabeledTaskListButton(),
-                  // 履歴ボタン
+                  LabelListButton(
+                    taskState: taskState,
+                    isAutoSave: isAutoSave,
+                  ),
+                  // fixme 履歴ボタン
                   BottomButton.sync(
                     text: "履歴",
                     onPressedSync: () {
