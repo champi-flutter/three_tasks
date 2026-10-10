@@ -41,14 +41,14 @@ class TasksController {
 
   /// タスク操作時のコールバック
   Future<void> controlTask({
-    required bool isAutoSave,
+    required bool willAutoSave,
     required TaskList<VTask> taskState,
     required int position,
     required TaskControlParameter parameter,
   })
       // 折りたたみ用
       =>
-      isAutoSave
+          willAutoSave
           ? _saveAt(
               position,
               state: taskState,

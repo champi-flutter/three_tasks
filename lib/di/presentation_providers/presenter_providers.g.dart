@@ -52,3 +52,51 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
 }
 
 String _$labelsPresenterHash() => r'a95decdda6e2d12d9aab70eaa87dcb6b041f5c11';
+
+/// 各種設定反映クラス
+
+@ProviderFor(settingsPresenter)
+const settingsPresenterProvider = SettingsPresenterProvider._();
+
+/// 各種設定反映クラス
+
+final class SettingsPresenterProvider extends $FunctionalProvider<
+    SettingsPresenter,
+    SettingsPresenter,
+    SettingsPresenter> with $Provider<SettingsPresenter> {
+  /// 各種設定反映クラス
+  const SettingsPresenterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'settingsPresenterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$settingsPresenterHash();
+
+  @$internal
+  @override
+  $ProviderElement<SettingsPresenter> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SettingsPresenter create(Ref ref) {
+    return settingsPresenter(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SettingsPresenter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SettingsPresenter>(value),
+    );
+  }
+}
+
+String _$settingsPresenterHash() => r'27036811072e1c3fda697c88c11d3af1158213e0';

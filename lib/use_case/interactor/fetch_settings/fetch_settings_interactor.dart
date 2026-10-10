@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/e_setting/e_page_setting.dart';
+import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_settings/fetch_settings_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/settings_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';

@@ -15,10 +15,8 @@ class AutoSaveSwitch extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-    // fixme 監視のスコープはこのクラスより外（2026/10/07）＞＞
     // PageSettingsViewModel を監視する
-    final state = ref.watch(pageSettingsViewModelProvider(pageList));
+    final state = ref.watch(pageSettingsViewModelProvider);
 
     return state.when(
       onReceived: (data){

@@ -9,6 +9,7 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
@@ -17,6 +18,12 @@ import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 
 class TodaysPage extends TaskPageBase {
+
+  TodaysPage({
+    required this.pageIndex,
+    required this.scopeToken,
+  });
+
   @override
   final String title = "今日のタスク";
 
@@ -25,6 +32,11 @@ class TodaysPage extends TaskPageBase {
 
   @override
   final TaskRec rec = TaskRec.day;
+
+  @override
+  final int pageIndex;
+
+  final Token scopeToken;
 
   // todo build
   @override
@@ -36,6 +48,9 @@ class TodaysPage extends TaskPageBase {
     // ローディング表示は riverpod_wrapper の LoadingService に任せるので、
     // `.when` は使わず、 `.data` を直接参照する
     final TaskList<VDailyTask> taskState = dailyTasksViewModelState.data;
+
+    // 自動保存オンオフを監視する
+    final bool willAutoSave = ref.watch(pageSettingsViewModelProvider.select((state)=>state.data[pageIndex].autoSave));
 
     return SingleChildScrollView(
       child: Center(
@@ -50,7 +65,8 @@ class TodaysPage extends TaskPageBase {
             // 「今日のタスク」欄
             TasksView.checkbox(
               taskState: taskState,
-              isAutoSave: isAutoSave,
+              willAutoSave: willAutoSave,
+              scopeToken: scopeToken,
             ),
 
             // 余白
@@ -64,7 +80,7 @@ class TodaysPage extends TaskPageBase {
                   // 「ラベル化されたタスク一覧」ボタン
                   LabelListButton(
                     taskState: taskState,
-                    isAutoSave: isAutoSave,
+                    willAutoSave: willAutoSave,
                   ),
                   // 履歴ボタン
                   BottomButton.sync(

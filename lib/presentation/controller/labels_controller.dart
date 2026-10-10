@@ -35,13 +35,13 @@ class LabelsController with NotificationFromViewModel {
 
   /// ラベル操作時のコールバック
   Future<void> controlLabel({
-    required bool isAutoSave,
+    required bool willAutoSave,
     required ListEntry<VLabel> vLabelEntry,
     required LabelControlParameter parameter,
   })
       // 折りたたみ用
       =>
-      isAutoSave
+          willAutoSave
           ? _saveAt(vLabelEntry: vLabelEntry, parameter: parameter)
           : _draftAt(vLabelEntry: vLabelEntry, parameter: parameter);
 

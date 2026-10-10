@@ -25,13 +25,13 @@ enum TasksViewStyle { checkbox, icon }
 class TasksView extends ConsumerWidget {
   const TasksView.checkbox({
     required this.taskState,
-    required this.isAutoSave,
+    required this.willAutoSave,
     required this.scopeToken,
   }) : tasksViewStyle = TasksViewStyle.checkbox;
 
   const TasksView.icon({
     required this.taskState,
-    required this.isAutoSave,
+    required this.willAutoSave,
     required this.scopeToken,
   }) : tasksViewStyle = TasksViewStyle.icon;
 
@@ -44,7 +44,7 @@ class TasksView extends ConsumerWidget {
   final TaskList<VTask> taskState;
 
   /// 自動保存かどうか
-  final bool isAutoSave;
+  final bool willAutoSave;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -60,7 +60,7 @@ class TasksView extends ConsumerWidget {
             // 折りたたみ用
             =>
             ref.read(tasksControllerProvider(scopeToken)).controlTask(
-                isAutoSave: isAutoSave,
+                willAutoSave: willAutoSave,
                 taskState: taskState,
                 position: position,
                 parameter: TaskControlParameter(
@@ -84,7 +84,7 @@ class TasksView extends ConsumerWidget {
             VYearlyTask() => LabelControlParameter(newYearlyId: vTask.id),
           };
           await ref.read(labelsControllerProvider(scopeToken)).controlLabel(
-                isAutoSave: isAutoSave,
+            willAutoSave: willAutoSave,
                 vLabelEntry: vLabelEntry,
                 parameter: parameter,
               );

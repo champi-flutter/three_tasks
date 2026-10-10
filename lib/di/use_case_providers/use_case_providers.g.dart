@@ -183,3 +183,47 @@ final class DraftTaskChangesUseCaseProvider extends $FunctionalProvider<
 
 String _$draftTaskChangesUseCaseHash() =>
     r'a233166ad24349d01b19f8ff30b1c55c062da1ed';
+
+@ProviderFor(fetchSettingsUseCase)
+const fetchSettingsUseCaseProvider = FetchSettingsUseCaseProvider._();
+
+final class FetchSettingsUseCaseProvider extends $FunctionalProvider<
+    FetchSettingsUseCase,
+    FetchSettingsUseCase,
+    FetchSettingsUseCase> with $Provider<FetchSettingsUseCase> {
+  const FetchSettingsUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'fetchSettingsUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$fetchSettingsUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<FetchSettingsUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  FetchSettingsUseCase create(Ref ref) {
+    return fetchSettingsUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FetchSettingsUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FetchSettingsUseCase>(value),
+    );
+  }
+}
+
+String _$fetchSettingsUseCaseHash() =>
+    r'42404d92cff1890bd0a36df10bbb6fba094d1a77';

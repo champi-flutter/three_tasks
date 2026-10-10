@@ -1,7 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
-import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/use_case/input_boundary/draft_label/draft_label_changes_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/labels_presenter.dart';
 

@@ -8,10 +8,13 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/config/private_config.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view/screens/review_screen.dart';
 import 'package:three_tasks/view/screens/enumeration/screen_type.dart';
+import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
 import 'package:three_tasks/view/specific_widgets/pages/page_list.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
 
 class ScreensWrapper extends ConsumerWidget {
   ScreensWrapper({super.key});
@@ -19,17 +22,21 @@ class ScreensWrapper extends ConsumerWidget {
   // todo build
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     // このスコープの Token を一元管理
     final Token scopeToken = ref.generateToken();
 
     // PageIndexViewModel を上の Token で参照して、現在表示されているページの
     // インデックスを取得する
-    final currentPageIndex = ref.watch(pageIndexViewModelProvider(scopeToken).select((state) => state.currentIndex,),
+    final currentPageIndex = ref.watch(
+      pageIndexViewModelProvider(scopeToken).select(
+        (state) => state.currentIndex,
+      ),
     );
 
+    final scopedPageList = pageList(scopeToken: scopeToken);
+
     // インデックスに対応するページ
-    final currentPage = pageList[currentPageIndex].value;
+    final currentPage = scopedPageList[currentPageIndex].value;
 
     return UnfocusTapScrimScope(
       child: Scaffold(
@@ -47,6 +54,10 @@ class ScreensWrapper extends ConsumerWidget {
             _NavigationForReview(
               taskRec: currentPage.rec,
             ),
+            // 自動保存オンオフスイッチ
+            AutoSaveSwitch(
+              pageIndex: currentPageIndex,
+            ),
           ],
         ),
         // drawer
@@ -60,7 +71,7 @@ class ScreensWrapper extends ConsumerWidget {
           children: [
             // 画面遷移用の Chip
             _NavigationChips(
-              pageList: pageList,
+              pageList: scopedPageList,
               onChipSelected: (int targetIndex) {
                 // ControlledPageView.withGuard で管理しているページを変更する
                 ref
@@ -71,23 +82,10 @@ class ScreensWrapper extends ConsumerWidget {
             ),
             // 画面本体
             Expanded(
-              // riverpod_wrapper の ControlledPageView
-              // （自動保存でない場合に未保存の編集を確認するラッパー付き）
-              child: ControlledPageView.withGuard(
-                controlledPageList: pageList,
-                // スワイプ不可
-                physics: const NeverScrollableScrollPhysics(),
-                isAlertValid: isAutoSave,
+              child: _ScreenBody(
+                currentPageIndex: currentPageIndex,
+                scopedPageList: scopedPageList,
                 scopeToken: scopeToken,
-                // 未保存編集破棄ロジック
-                onDiscarded: (int targetIndex) {
-                  // 各ページが TaskPageBase を継承する際に設定した TaskRec
-                  final targetRec = pageList[targetIndex].value.rec;
-                  // 下書きの破棄を呼び出す
-                  ref.read(tasksControllerProvider).discardDraft(
-                        taskRec: targetRec,
-                      );
-                },
               ),
             ),
           ],
@@ -166,6 +164,66 @@ class _NavigationChips extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+/// 画面本体
+///
+/// 設定値取得処理中は、LoadingWrapper （riverpod_wrapper） で
+/// タップ不可だが、一応ローディング完了を待って描画する
+class _ScreenBody extends ConsumerWidget {
+  const _ScreenBody({
+    super.key,
+    required this.currentPageIndex,
+    required this.scopedPageList,
+    required this.scopeToken,
+  });
+
+  /// 現在参照しているページのインデックス
+  final int currentPageIndex;
+
+  /// 対象スコープで管理する [Token]
+  final Token scopeToken;
+
+  /// [scopeToken] と同じスコープで定義されるページリスト
+  final ControlledPageList<TaskPageBase> scopedPageList;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // PageSettingsViewModel を監視する
+    final settingsVMState = ref.watch(pageSettingsViewModelProvider);
+    return settingsVMState.when(
+      onReceived: (data) {
+        final bool willAutoSave = data[currentPageIndex].autoSave;
+
+        // riverpod_wrapper の ControlledPageView
+        // （自動保存でない場合に未保存の編集を確認するラッパー付き）
+        return ControlledPageView.withGuard(
+          controlledPageList: scopedPageList,
+          // スワイプ不可
+          physics: const NeverScrollableScrollPhysics(),
+          isAlertValid: willAutoSave,
+          scopeToken: scopeToken,
+          // 未保存編集破棄ロジック
+          onDiscarded: (int targetIndex) {
+            // 各ページが TaskPageBase を継承する際に設定した TaskRec
+            final targetRec = scopedPageList[targetIndex].value.rec;
+            // 下書きの破棄を呼び出す
+            ref.read(tasksControllerProvider(scopeToken)).discardDraft(
+                  taskRec: targetRec,
+                );
+          },
+        );
+      },
+      onLoading: (placeholder) {
+        return Container();
+      },
+      // エラーや例外が発生した場合は、NotificationView（riverpod_wrapper）
+      // で表示される
+      onError: (placeholder, _) {
+        return Container();
+      },
     );
   }
 }

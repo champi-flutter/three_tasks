@@ -6,6 +6,8 @@ import 'package:three_tasks/presentation/controller/labels_controller.dart';
 part 'controller_providers.g.dart';
 
 /// ラベルのコントローラ
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
 @riverpod
 LabelsController labelsController(Ref ref, Token token) => LabelsController(
       saveLabelChangesUseCase: ref.watch(saveLabelChangesUseCaseProvider),

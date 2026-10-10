@@ -130,6 +130,8 @@ WeeklyTasksPresenter weeklyTasksPresenter(Ref ref) => WeeklyTasksPresenterImpl(
     );
 
 /// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
 @riverpod
 TasksController tasksController(Ref ref, Token token) => TasksController(
       saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),

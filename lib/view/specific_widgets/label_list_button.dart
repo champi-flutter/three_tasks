@@ -1,6 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/di/providers.dart';
@@ -9,7 +10,6 @@ import 'package:three_tasks/presentation/controller/dto/task_control_parameter/t
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
-import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/label_list_dialog.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/show_label_dialog.dart';
 
 /// 「ラベル化されたタスク一覧」ボタンクラス
@@ -17,14 +17,18 @@ class LabelListButton extends ConsumerWidget {
   const LabelListButton({
     super.key,
     required this.taskState,
-    required this.isAutoSave,
+    required this.willAutoSave,
+    required this.scopeToken,
   });
 
   /// 対象の [VTask] のリスト
   final TaskList<VTask> taskState;
 
   /// 自動保存かどうか
-  final bool isAutoSave;
+  final bool willAutoSave;
+
+  /// 対象スコープで管理する [Token]
+  final Token scopeToken;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,14 +48,17 @@ class LabelListButton extends ConsumerWidget {
         VMonthlyTask() => LabelControlParameter(newMonthlyId: vTask.id),
         VYearlyTask() => LabelControlParameter(newYearlyId: vTask.id),
       };
-      await ref.read(labelsControllerProvider).controlLabel(
-        isAutoSave: isAutoSave,
+      // ラベルコントローラからラベル情報更新処理を開始する
+      // （Provider には EditController の Token を当てはめる）
+      await ref.read(labelsControllerProvider(scopeToken)).controlLabel(
+        willAutoSave: willAutoSave,
         vLabelEntry: vLabelEntry,
         parameter: parameter,
       );
-      // タスクのラベル情報を更新する
-      await ref.read(tasksControllerProvider).controlTask(
-          isAutoSave: isAutoSave,
+      // タスクコントローラからラベル情報更新処理を開始する
+      // （Provider には EditController の Token を当てはめる）
+      await ref.read(tasksControllerProvider(scopeToken)).controlTask(
+          willAutoSave: willAutoSave,
           taskState: taskState,
           position: vTaskEntry.index,
           parameter: TaskControlParameter(

@@ -21,18 +21,17 @@ class VPageSetting {
   const VPageSetting.placeholder(this.controlledIndex) : autoSave = true;
 }
 
-// todo エンティティを作る（2026/10/05）＞＞
-
 /// 各ページにおける設定のハッシュマップ
 ///
-/// [PageListType] におけるこのページのインデックスを key として、
-/// [VPageSetting] を参照する。
-class VSettingsMap<PageListType extends FixedList>
+/// ページのインデックスを key として、 [VPageSetting] を参照する。
+class VSettingsMap
     extends MapBase<int, VPageSetting> {
+  /// 設定の対象となるページの総数を引数にとり（[numberOfPages]）、空の枠
+  /// （[VPageSetting.placeholder]）を確保するコンストラクタ
   VSettingsMap.initFromPageList({
-    required PageListType pageList,
+    required int numberOfPages,
   }) : _source = {
-          for (final p in pageList) p.index: VPageSetting.placeholder(p.index),
+          for (int index= 0; index < numberOfPages; index++) index: VPageSetting.placeholder(index),
         };
 
   final Map<int, VPageSetting> _source;
