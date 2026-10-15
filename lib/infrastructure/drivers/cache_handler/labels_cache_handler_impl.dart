@@ -14,33 +14,36 @@ class LabelsCacheHandlerImpl extends SlidingTtlCacheHandler<int, List<CLabel>>
   @override
   Future<void> updateLabelList(List<CLabel> dataList) => update({0: dataList});
 
-  /// キャッシュされているラベルリストの中のラベルを 1 つだけ更新する
+  /// キャッシュされているラベルリストの中の一部のラベルを更新する
   ///
   /// キャッシュされていなかった場合、`false` を返す。
   ///
   /// key は `0` の 1 つのみで管理する。
   @override
-  Future<bool> tryUpdateSingleLabel(CLabel data) async {
+  Future<bool> tryUpdateLabels(List<CLabel> data) async {
     final currentCacheList = cache[0];
-    final targetIndex =
-        currentCacheList?.indexWhere((item) => item.labelId == data.labelId);
     // キャッシュされている場合
-    // targetIndex != null なら、 currentCacheList != null
-    if (targetIndex != null && currentCacheList != null) {
-      // 現在のラベルリストにあるラベルを変更する場合
-      if (targetIndex != -1) {
-        final List<CLabel> updatedList = List<CLabel>.of(currentCacheList)
-          ..[targetIndex] = data;
-        await updateLabelList(updatedList);
-        return true;
+    if (currentCacheList != null) {
+      // 現在のキャッシュリストをコピーする
+      final List<CLabel> updatingList = List<CLabel>.of(currentCacheList);
+      for (final targetData in data) {
+        final targetIndex = currentCacheList.indexWhere(
+          (item) => item.labelId == targetData.labelId,
+        );
+        // 現在のラベルリストにあるラベルを変更する場合
+        if (targetIndex != -1) {
+          // 対象箇所を更新する
+            updatingList[targetIndex] = targetData;
+        }
+        // 現在のラベルリストにないラベル（新規ラベル）の場合
+        else {
+          // 新規データを追加する
+          updatingList.add(targetData);
+        }
       }
-      // 現在のラベルリストにないラベル（新規ラベル）の場合
-      else{
-        // 追加して更新する
-        currentCacheList.add(data);
-        await updateLabelList(currentCacheList);
-        return true;
-      }
+      // update を呼び出して、処理完了後に true を返す
+      await updateLabelList(updatingList);
+      return true;
     }
     // キャッシュされていない場合
     else {

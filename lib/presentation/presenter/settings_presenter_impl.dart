@@ -1,5 +1,6 @@
 
-import 'package:three_tasks/entities/e_setting/e_page_setting.dart';
+import 'package:three_tasks/domain/application_config.dart';
+import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
 import 'package:three_tasks/use_case/output_boundary/settings_presenter.dart';
@@ -13,10 +14,21 @@ class SettingsPresenterImpl implements SettingsPresenter{
   final PageSettingsViewModel _viewModel;
 
   @override
-  Future<void> present(ESettingsMap newData) async {
+  Future<void> presentWith(EPageSetting newPageSetting)async{
+    // Presentation 用の値に変換する
+    final VPageSetting vPageSetting = VPageSetting(
+      controlledIndex: newPageSetting.pageIndex,
+      autoSave: newPageSetting.autoSave,
+    );
+    // VM に反映する
+    _viewModel.updateWith(vPageSetting);
+  }
+
+  @override
+  Future<void> presentAll(ESettingsMap newData) async {
     // VM に渡すデータの枠を生成する
     final VSettingsMap vData = VSettingsMap.initFromPageList(
-      pageList: _viewModel.pageList,
+      numberOfPages: pageConfig.numberOfPages,
     );
     // newData と vData の length が一致しない場合は実装エラー
     if(newData.length != vData.length){
@@ -33,6 +45,6 @@ class SettingsPresenterImpl implements SettingsPresenter{
         autoSave: ePageSetting.autoSave,
       );
     }
-    _viewModel.update(vData);
+    _viewModel.updateAll(vData);
   }
 }

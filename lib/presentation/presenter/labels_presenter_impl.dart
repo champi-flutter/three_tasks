@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
-import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_label/converter/e_to_v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
@@ -16,8 +16,14 @@ class LabelsPresenterImpl implements LabelsPresenter {
   final LabelsViewModel _viewModel;
 
   @override
-  Future<void> present(LabelList<ELabel> newData) async {
-    final LabelList<VLabel> adaptedData = newData.mapValues(EToVLabel.toVLabel).toListAs(LabelList.fromIterable);
+  Future<void> presentWith(ELabel newLabel) async {
+    final LabelList<VLabel> adaptedData = newData.mapValues<VLabel>(EToVLabel.toVLabel).toListAs(LabelList.fromIterable);
+    _viewModel.update(adaptedData);
+  }
+
+  @override
+  Future<void> presentAll(LabelList<ELabel> newData) async {
+    final LabelList<VLabel> adaptedData = newData.mapValues<VLabel>(EToVLabel.toVLabel).toListAs(LabelList.fromIterable);
     _viewModel.update(adaptedData);
   }
 }

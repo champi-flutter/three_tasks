@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/config/private_config.dart';
+import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
@@ -33,6 +34,7 @@ class ScreensWrapper extends ConsumerWidget {
       ),
     );
 
+    // ControlledPageView が表示するページのリスト
     final scopedPageList = pageList(scopeToken: scopeToken);
 
     // インデックスに対応するページ
@@ -57,6 +59,28 @@ class ScreensWrapper extends ConsumerWidget {
             // 自動保存オンオフスイッチ
             AutoSaveSwitch(
               pageIndex: currentPageIndex,
+              // スイッチ切り替え時の保存処理
+              onSwitched: (bool value) async {
+                // 自動保存オフ => オン の場合
+                if (value) {
+                  // 現在のページが参照しているタスク VM の state を ref.read で
+                  // 一度だけ取得する
+                  final taskState = getTaskStateOnCurrentPage(
+                    ref,
+                    pageIndex: currentPageIndex,
+                  );
+                  // タスクの下書きを保存する
+                  await ref.read(tasksControllerProvider(scopeToken)).saveCurrent(
+                    taskState: taskState,
+                  );
+                  // ラベルの変更の下書きを保存する
+                  await ref.read(labelsControllerProvider(scopeToken)).saveDraft();
+                }
+                // 自動保存オン => オフ の場合
+                else {
+                  // 追加の処理はなし
+                }
+              },
             ),
           ],
         ),
@@ -209,10 +233,12 @@ class _ScreenBody extends ConsumerWidget {
           onDiscarded: (int targetIndex) {
             // 各ページが TaskPageBase を継承する際に設定した TaskRec
             final targetRec = scopedPageList[targetIndex].value.rec;
-            // 下書きの破棄を呼び出す
+            // タスクの下書きの破棄を呼び出す
             ref.read(tasksControllerProvider(scopeToken)).discardDraft(
                   taskRec: targetRec,
                 );
+            // ラベルの下書きの破棄を呼び出す
+            ref.read(labelsControllerProvider(scopeToken)).discardDraft();
           },
         );
       },

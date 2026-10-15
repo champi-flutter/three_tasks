@@ -1,8 +1,8 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/entities/e_label/e_label.dart';
-import 'package:three_tasks/entities/e_setting/e_page_setting.dart';
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
+import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
@@ -15,9 +15,7 @@ abstract class DataRepository {
   /// ラベルデータをフェッチするメソッド
   Future<Result<List<ELabel>, Exception>> fetchLabel();
 
-  /// 指定日付（[dateList]）の日単位タスクをフェッチするメソッド
-  ///
-  /// 複数の日付を指定可能。
+  /// 指定日付の日単位タスクをフェッチするメソッド
   Future<Result<void, Exception>> fetchDailyTasks({
     required Date targetDate,
   });
@@ -26,17 +24,23 @@ abstract class DataRepository {
   ///
   /// DB からデータを取得して、ストリームに流す。
   ///
-  /// 基本はキャッシュを参照するが、参照したい日付（[dateList]）がキャッシュにない場合
-  /// にこのメソッドを呼び出す。
+  /// 基本はキャッシュを参照するが、参照したい日付がキャッシュにない場合にこのメソッドを
+  /// 呼び出す。
   Future<Result<void, Exception>> fetchWeeklyTasks({
     required Date targetDate,
+  });
+
+  /// 指定月の月単位タスクをフェッチするメソッド
+  Future<Result<void, Exception>> fetchMonthlyTasks({
+    required Month targetMonth,
   });
 
   /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド
   ///
   /// 複数の日付を指定可能。
-  Future<Result<void, Exception>> fetchWeeklyTaskList(
-      {required List<Date> firstDateList});
+  Future<Result<void, Exception>> fetchWeeklyTaskList({
+    required List<Date> firstDateList,
+  });
 
   // /// 日単位タスクの新しい日付の枠を作成するメソッド
   // Future<Result<Map<Date, List<EDailyTask>>, Exception>> createDailyTaskRecord({
@@ -77,13 +81,17 @@ abstract class DataRepository {
   // Future<Result<void, Exception>> saveCheck({required DTask newTask});
 
   /// ラベル情報変更保存メソッド
+  ///
+  ///
   Future<Result<void, Exception>> saveLabelChanges({
-    required ELabel eLabel,
+    required List<ELabel> changedLabels,
+    required bool shouldReflect,
   });
 
   /// 新しいラベルの枠を作成し、その ID を返す
-  Future<Result<int, Exception>> createNewLabel({
+  Future<Result<void, Exception>> createNewLabel({
     required String title,
+    required ETask firstETask,
   });
 
   /// タスクラベル化メソッド
@@ -109,5 +117,10 @@ abstract class DataRepository {
   /// 各種設定を初期化する
   Future<Result<ESettingsMap, Exception>> initSettings({
     required int length,
+  });
+
+  /// 設定値の変更を保存する
+  Future<Result<void, Exception>> saveSettingChanges({
+    required EPageSetting ePageSetting,
   });
 }

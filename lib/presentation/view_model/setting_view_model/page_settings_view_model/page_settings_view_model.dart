@@ -27,10 +27,20 @@ class PageSettingsViewModel extends _$PageSettingsViewModel {
     await _fetchSettingsUseCase.execute(validLength: pageConfig.numberOfPages);
   }
 
-  /// この VM の [state] を更新する
-  void update(VSettingsMap newState) {
-    if (state.data.hasChanges(newState)) {
-      state = LazyViewState.data(newState);
+  /// この VM の [state] の一部を更新する
+  void updateWith(VPageSetting newSetting) {
+
+    final VSettingsMap updatingMap = state.data;
+
+    updatingMap[newSetting.controlledIndex] = newSetting;
+
+    state = LazyViewState.data(updatingMap);
+  }
+
+  /// この VM の [state] を Map で更新する
+  void updateAll(VSettingsMap newMapState) {
+    if (state.data.hasChanges(newMapState)) {
+      state = LazyViewState.data(newMapState);
     }
   }
 }

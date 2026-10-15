@@ -1,7 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/v_to_e_task.dart';
@@ -150,11 +150,13 @@ class TasksController {
   }
 
   /// 現時点でのタスクの View State でタスク変更保存フローを呼び出す
-  Future<void> saveCurrentState<VTaskType extends VTask>({
+  Future<void> saveCurrent<VTaskType extends VTask>({
     required TaskList<VTaskType> taskState,
   })
   // 折りたたみ用
   async {
+    // 編集未保存フラグをおろす
+    _editController.notifySaved();
     // 週タスクの場合
     if (VTaskType is VWeeklyTask) {
       final WeeklyTaskList<EWeeklyTask> eTaskList = taskState
@@ -190,6 +192,9 @@ class TasksController {
   // }
 
   /// 下書きを破棄する
-  Future<void> discardDraft({required TaskRec taskRec}) =>
-      _discardDraftUseCase.execute(taskRec: taskRec);
+  Future<void> discardDraft({required TaskRec taskRec}) async{
+    // 編集未保存フラグをおろす
+    _editController.notifyDiscarded();
+    await _discardDraftUseCase.execute(taskRec: taskRec);
+  }
 }

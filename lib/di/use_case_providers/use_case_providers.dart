@@ -1,22 +1,41 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/di/infrastructure_providers/stream_handler_providers.dart';
 import 'package:three_tasks/di/presentation_providers/presenter_providers.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/use_case/input_boundary/draft_label/draft_label_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_label/fetch_label_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_settings/fetch_settings_use_case.dart';
+import 'package:three_tasks/use_case/input_boundary/save_label/register_new_label_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_label/save_label_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_boundary/save_settings/save_setting_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draft_task_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_monthly_tasks_use_case.dart';
 import 'package:three_tasks/use_case/interactor/draft_label/draft_label_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/fetch_label/fetch_label_interactor.dart';
 import 'package:three_tasks/use_case/interactor/fetch_settings/fetch_settings_interactor.dart';
+import 'package:three_tasks/use_case/interactor/save_label/register_new_label_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_label/save_label_changes_interactor.dart';
+import 'package:three_tasks/use_case/interactor/save_settings/save_setting_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/draft/draft_task_changes_interactor.dart';
+import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_monthly_tasks_interactor.dart';
 
 part 'use_case_providers.g.dart';
 
 // todo UseCase 層のクラスの Provider をこっちに移していく（2026/09/19）＞＞
+
+
+// 月単位タスク監視フロー
+@riverpod
+WatchMonthlyTasksUseCase watchMonthlyTasksUseCase(Ref ref) => WatchMonthlyTasksInteractor(
+  dataRepository: ref.watch(dataRepositoryProvider),
+  notificationService: ref.watch(notificationServiceProvider),
+  loadingService: ref.watch(loadingServiceProvider), 
+  monthlyTasksPresenter: ref.watch(monthlyTasksPresenterProvider), 
+  monthlyTasksStreamHandler: ref.watch(monthlyTasksStreamHandlerProvider),
+);
+
 // ラベルフェッチフロー
 @riverpod
 FetchLabelUseCase fetchLabelUseCase(Ref ref) => FetchLabelInteractor(
@@ -34,11 +53,12 @@ SaveLabelChangesUseCase saveLabelChangesUseCase(Ref ref) => SaveLabelChangesInte
     loadingService: ref.watch(loadingServiceProvider),
 );
 
-// タスク情報変更下書きフロー
+// 新規ラベル登録フロー
 @riverpod
-DraftLabelChangesUseCase draftLabelChangesUseCase(Ref ref) => DraftLabelChangesInteractor(
-    notificationService: ref.watch(notificationServiceProvider),
-    loadingService: ref.watch(loadingServiceProvider),
+RegisterNewLabelUseCase registerNewLabelUseCase(Ref ref) => RegisterNewLabelInteractor(
+  dataRepository: ref.watch(dataRepositoryProvider),
+  notificationService: ref.watch(notificationServiceProvider),
+  loadingService: ref.watch(loadingServiceProvider),
 );
 
 // タスク情報変更下書きフロー
@@ -49,8 +69,18 @@ DraftTaskChangesUseCase draftTaskChangesUseCase(Ref ref) => DraftTaskChangesInte
   dailyTasksPresenter: ref.watch(dailyTasksPresenterProvider),
 );
 
+// 設定値フェッチフロー
 @riverpod
 FetchSettingsUseCase fetchSettingsUseCase(Ref ref)=> FetchSettingsInteractor(
+  dataRepository: ref.watch(dataRepositoryProvider),
+  loadingService: ref.watch(loadingServiceProvider),
+  notificationService: ref.watch(notificationServiceProvider),
+  settingsPresenter: ref.watch(settingsPresenterProvider),
+);
+
+// 設定値変更保存フロー
+@riverpod
+SaveSettingChangesUseCase saveSettingChangesUseCase(Ref ref) => SaveSettingChangesInteractor(
   dataRepository: ref.watch(dataRepositoryProvider),
   loadingService: ref.watch(loadingServiceProvider),
   notificationService: ref.watch(notificationServiceProvider),

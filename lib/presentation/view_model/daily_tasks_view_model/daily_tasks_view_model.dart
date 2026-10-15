@@ -74,6 +74,8 @@ class DailyTasksViewModel extends _$DailyTasksViewModel
       state = state.copyAs(newStateMap);
     }
   }
+
+  TaskList<VDailyTask> getCurrentStateAt(Date date)=>state[date].data;
 }
 
 /// printメソッド [当日のタスクVM]

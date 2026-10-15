@@ -1,7 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,6 +12,7 @@ import 'package:three_tasks/presentation/view_model/setting_view_model/page_sett
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
+import 'package:three_tasks/view/specific_widgets/draft_saving_button.dart';
 import 'package:three_tasks/view/specific_widgets/label_list_button.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
@@ -36,6 +36,7 @@ class TodaysPage extends TaskPageBase {
   @override
   final int pageIndex;
 
+  /// このページの管理元のスコープの [Token]
   final Token scopeToken;
 
   // todo build
@@ -51,6 +52,9 @@ class TodaysPage extends TaskPageBase {
 
     // 自動保存オンオフを監視する
     final bool willAutoSave = ref.watch(pageSettingsViewModelProvider.select((state)=>state.data[pageIndex].autoSave));
+
+    // 現在表示している画面に、未保存の編集があるかどうか
+    final isEdited = ref.watch(editViewModelProvider(scopeToken));
 
     return SingleChildScrollView(
       child: Center(
@@ -77,10 +81,19 @@ class TodaysPage extends TaskPageBase {
               padding: EdgeInsets.all(4.0.r),
               child: Column(
                 children: [
+                  // 「上書き保存」ボタン
+                  DraftSavingButton(
+                    // 自動保存オフかつ、編集未保存の場合にのみ有効
+                    isValid: isEdited && !willAutoSave,
+                    taskState: taskState,
+                    tasksViewStyle: TasksViewStyle.checkbox,
+                    scopeToken: scopeToken,
+                  ),
                   // 「ラベル化されたタスク一覧」ボタン
                   LabelListButton(
                     taskState: taskState,
                     willAutoSave: willAutoSave,
+                    scopeToken: scopeToken,
                   ),
                   // 履歴ボタン
                   BottomButton.sync(

@@ -85,7 +85,7 @@ class TomorrowsScreen extends HookConsumerWidget {
                           tomorrowsTaskList[position]: newValue,
                         });
                   }
-                  // 保存を「下書き保存」ボタンで行う場合
+                  // 保存を「上書き保存」ボタンで行う場合
                       : null,
                   // ラベル化処理（自動保存）
                   saveNewLabelAuto: isAutoSaveEnabled.value
@@ -132,7 +132,7 @@ class TomorrowsScreen extends HookConsumerWidget {
                   padding: EdgeInsets.all(4.0.r),
                   child: Column(
                     children: [
-                      // 「下書き保存」ボタン
+                      // 「上書き保存」ボタン
                       DraftSavingButton(
                         // 自動保存オフかつ、編集未保存の場合にのみ有効
                         isValid: isEdited && !isAutoSaveEnabled.value,

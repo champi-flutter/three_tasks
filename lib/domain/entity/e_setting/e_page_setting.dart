@@ -16,6 +16,17 @@ class EPageSetting {
     required this.pageIndex,
     required this.autoSave,
   });
+
+  /// パラメータを更新する
+  void update({
+    bool? newAutoSave,
+  })
+  // 折りたたみ用
+  {
+    if(newAutoSave != null){
+      autoSave = newAutoSave;
+    }
+  }
 }
 
 /// 各ページにおける設定のハッシュマップ

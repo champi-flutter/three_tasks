@@ -24,5 +24,5 @@ abstract class LabelsCacheHandler implements CacheHandlerBaseInterface<int, List
   /// キャッシュされていなかった場合、`false` を返す。
   ///
   /// key は `0` の 1 つのみで管理する。
-  Future<bool> tryUpdateSingleLabel(CLabel data);
+  Future<bool> tryUpdateLabels(List<CLabel> data);
 }

@@ -1,6 +1,6 @@
 
+import 'package:three_tasks/presentation/controller/dto/label_control_parameter/label_control_parameter.dart';
 import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
-import 'package:three_tasks/view_models/controller/dto/label_control_parameter/label_control_parameter.dart';
 
 /// [LabelUpdateParameter] への変換器
 class ToLabelUpdateParameter {

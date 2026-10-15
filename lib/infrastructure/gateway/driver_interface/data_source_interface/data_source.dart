@@ -1,4 +1,5 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_label/f_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
@@ -14,10 +15,10 @@ abstract class DataSource {
 
   /// `DailyTask` フェッチメソッド
   ///
-  /// 要求された日付（[targetDate]）に該当するデータを返す。
+  /// 要求された日付に該当するデータを返す。
   ///
   /// **【注意】** このデータは空の場合もある。
-  Future<Result<List<FDailyTask>, Exception>> getDailyTasksByDate({
+  Future<Result<List<QDailyTask>, Exception>> getDailyTasksByDate({
     required int targetDateInt,
   });
 
@@ -29,22 +30,34 @@ abstract class DataSource {
     required List<int> exclusionDiffs,
   });
 
+  /// `MonthlyTask` フェッチメソッド
+  ///
+  /// 要求された月に該当するデータを返す。
+  ///
+  /// **【注意】** このデータは空の場合もある。
+  Future<Result<List<QMonthlyTask>, Exception>> getMonthlyTasks({
+    required int targetMonthInt,
+  });
+
   /// データソースに保存している各種設定値を取得する
   Future<Result<QSettingsMap, Exception>> getSettings();
 
   // todo 書き換え
   /// 日単位タスクの新しい日付の枠を作成するメソッド
-  ///
-  /// 複数の日付を指定可能。
-  Future<Result<List<FDailyTask>, Exception>> createDailyTaskRecord({
+  Future<Result<TaskList<QDailyTask>, Exception>> createDailyTaskRecord({
     required int targetDateInt,
   });
 
-  /// 日単位タスクの新しい日付の枠を作成するメソッド
+  /// 週単位タスクの新しい枠を作成するメソッド
   ///
-  /// 複数の日付を指定可能。
+  /// 指定した座（[indexList]）に対応するタスク ID の Map （`Map<int, int>`）を返す。
   Future<Result<Map<int, int>, Exception>> createWeeklyTaskRecord({
     required List<int> indexList,
+  });
+
+  /// 月単位タスクの新しい枠を作成するメソッド
+  Future<Result<TaskList<QMonthlyTask>, Exception>> createMonthlyTaskRecord({
+    required int targetMonthInt,
   });
 
   /// タスク情報変更保存メソッド
@@ -72,10 +85,11 @@ abstract class DataSource {
   /// 新しいラベルの枠を作成し、その ID を返す
   Future<Result<int, Exception>> createNewLabel({
     required String title,
+    required QTask firstTask,
   });
 
   /// ラベルテーブルの情報を更新する
-  Future<Result<void, Exception>> saveLabels({required QLabel qLabel});
+  Future<Result<void, Exception>> saveLabels({required List<QLabel> qLabels});
 
   /// 日単位タスクをラベリング
   ///
@@ -157,49 +171,54 @@ abstract class DataSource {
     required DTask dTask,
   });
 
-  /// 日単位タスクを既存のラベルに登録
-  ///
-  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  ///
-  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  Future<Result<void, Exception>> addDailyTaskToLabel({
-    required int labelId,
-    required int targetId,
-  });
-
-  /// 週単位タスクを既存のラベルに登録
-  ///
-  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  ///
-  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  Future<Result<void, Exception>> addWeeklyTaskToLabel({
-    required int labelId,
-    required int targetId,
-  });
-
-  /// 月単位タスクを既存のラベルに登録
-  ///
-  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  ///
-  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  Future<Result<void, Exception>> addMonthlyTaskToLabel({
-    required int labelId,
-    required int targetId,
-  });
-
-  /// 年単位タスクを既存のラベルに登録
-  ///
-  /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  ///
-  /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  Future<Result<void, Exception>> addYearlyTaskToLabel({
-    required int labelId,
-    required int targetId,
-  });
+  // /// 日単位タスクを既存のラベルに登録
+  // ///
+  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  // ///
+  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  // Future<Result<void, Exception>> addDailyTaskToLabel({
+  //   required int labelId,
+  //   required int targetId,
+  // });
+  //
+  // /// 週単位タスクを既存のラベルに登録
+  // ///
+  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  // ///
+  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  // Future<Result<void, Exception>> addWeeklyTaskToLabel({
+  //   required int labelId,
+  //   required int targetId,
+  // });
+  //
+  // /// 月単位タスクを既存のラベルに登録
+  // ///
+  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  // ///
+  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  // Future<Result<void, Exception>> addMonthlyTaskToLabel({
+  //   required int labelId,
+  //   required int targetId,
+  // });
+  //
+  // /// 年単位タスクを既存のラベルに登録
+  // ///
+  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
+  // ///
+  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
+  // Future<Result<void, Exception>> addYearlyTaskToLabel({
+  //   required int labelId,
+  //   required int targetId,
+  // });
 
   /// 各種設定を初期化する
   Future<Result<QSettingsMap, Exception>> initSettings({
     required int length,
+  });
+
+  /// 指定ページの設定値の更新を保存する
+  Future<Result<void, Exception>> saveSettingChanges({
+    required QPageSetting qPageSetting,
   });
 
 // /// 既存のラベルを採用した枠を作るメソッド

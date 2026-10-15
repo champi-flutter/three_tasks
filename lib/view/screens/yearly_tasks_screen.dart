@@ -179,7 +179,7 @@ class YearlyTasksScreen extends StatelessWidget {
                             padding: EdgeInsets.all(4.0.r),
                             child: Column(
                               children: [
-                                // todo 「下書き保存」ボタン
+                                // todo 「上書き保存」ボタン
                                 _saveButton(),
 
                                 // todo 「達成されなかったタスク一覧」ボタン
@@ -333,7 +333,7 @@ class YearlyTasksScreen extends StatelessWidget {
     // setState(() {});
   }
 
-  // todo 「下書き保存」ボタン
+  // todo 「上書き保存」ボタン
   Widget _saveButton() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15.0.h, horizontal: 8.0.w),
@@ -351,7 +351,7 @@ class YearlyTasksScreen extends StatelessWidget {
           // todo ToastMessage「タスクを保存しました。」
         },
         child: Text(
-          "下書き保存",
+          "上書き保存",
           style: TextStyle(
             fontSize: 25.0.sp,
           ),
@@ -360,7 +360,7 @@ class YearlyTasksScreen extends StatelessWidget {
     );
   }
 
-  // todo 下書き保存メソッド
+  // todo 上書き保存メソッド
   _saveTasks() async {
     // この段階で表示されているリストの内容をデータベースに上書き保存
     var _firstTaskForThisYear = YearlyTask(

@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/use_case/input_boundary/save_label/save_label_changes_use_case.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
@@ -31,13 +31,16 @@ class SaveLabelChangesInteractor
   ///  - ラベルキャッシュの更新処理を呼び出す
   @override
   Future<void> execute({
-    required ELabel updatingELabel,
+    required List<ELabel> updatedELabels,
   }) =>
       _loading.loadAsync(() async {
         try {
           // リポジトリにタスクIDの指定ラベルへの追加を依頼する
           final Result<void, Exception> result =
-              await _repository.saveLabelChanges(eLabel: updatingELabel);
+              await _repository.saveLabelChanges(
+                changedLabels: updatedELabels,
+                shouldReflect: true,
+              );
           // 失敗を通知する
           switch (result) {
             // region switch

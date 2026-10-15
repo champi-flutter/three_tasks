@@ -1,5 +1,4 @@
 import 'package:custom_core_types/custom_core_types.dart';
-import 'package:three_tasks/entities/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/base/tasks_cache_handler_base_interface.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
 

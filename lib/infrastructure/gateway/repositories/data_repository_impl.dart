@@ -7,13 +7,13 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/entities/e_label/e_label.dart';
-import 'package:three_tasks/entities/e_setting/e_page_setting.dart';
-import 'package:three_tasks/entities/e_task/converter/to_e_task.dart';
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
+import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/labels_cache_handler.dart';
+import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/monthly_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/weekly_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/data_source_interface/data_source.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_label/c_label.dart';
@@ -47,9 +47,11 @@ class DataRepositoryImpl
     required LabelsCacheHandler labelsCacheHandler,
     required DailyTasksCacheHandler dailyTasksCacheHandler,
     required WeeklyTasksCacheHandler weeklyTasksCacheHandler,
+    required MonthlyTasksCacheHandler monthlyTasksCacheHandler,
   })  : _labelsCacheHandler = labelsCacheHandler,
         _dailyTasksCacheHandler = dailyTasksCacheHandler,
         _weeklyTasksCacheHandler = weeklyTasksCacheHandler,
+        _monthlyTasksCacheHandler = monthlyTasksCacheHandler,
         _dataSource = dataSource,
         notificationService = notificationService;
 
@@ -65,6 +67,9 @@ class DataRepositoryImpl
 
   /// 週単位タスクのキャッシュハンドラの呼び出し口
   final WeeklyTasksCacheHandler _weeklyTasksCacheHandler;
+
+  /// 月単位タスクのキャッシュハンドラの呼び出し口
+  final MonthlyTasksCacheHandler _monthlyTasksCacheHandler;
 
   /// 通知機能の呼び出し口
   @override
@@ -160,7 +165,7 @@ class DataRepositoryImpl
       // そうでない場合
       else {
         // 日付を指定して日単位タスクをフェッチ
-        final Result<List<FDailyTask>, Exception> result =
+        final Result<List<QDailyTask>, Exception> result =
             await _dataSource.getDailyTasksByDate(
           targetDateInt: targetDate.toIntIdentifier(),
         );
@@ -169,29 +174,39 @@ class DataRepositoryImpl
         switch (result) {
           // region
           case Success(
-              value: final List<FDailyTask> resultList,
+              value: final List<QDailyTask> resultList,
               methodName: final String? methodName,
             ):
             // DailyTasksCacheHandler.update の valueMap に当てはめる Map
-            final Map<int, DataEntry<int, EDailyTask>> valueMap = {};
+            final Map<int, DataEntry<int, CDailyTask>> valueMap = {};
 
             // データがまだなかった場合（キャッシュにもDBにもデータがなかった場合）
             if (resultList.isEmpty) {
               // 新しい日付の枠（空のタスク）を作って、受け取る
-              final Result<List<FDailyTask>, Exception> newDateData =
+              final Result<TaskList<QDailyTask>, Exception> newDateData =
                   await _createDailyTaskRecord(targetDate: targetDate);
 
               // 正常にフェッチできた場合、新しい日付の枠に作った空のタスクをストリームに流す
               switch (newDateData) {
                 // region
                 case Success(
-                    value: final List<FDailyTask> newDateRecord,
+                    value: final TaskList<QDailyTask> newDateRecord,
                   ):
                   // valueMap に 3 つの枠の情報を組み込む
-                  for (int i = 0; i < 3; i++) {
-                    // List<FDailyTask> を DataEntry<int, EDailyTask> に変換
-                    // する拡張メソッドを用いる
-                    valueMap[i] = newDateRecord.toDataEntry(i);
+                  for (final qTaskEntry in newDateRecord) {
+                    final int index = qTaskEntry.index;
+                    final targetQTask = qTaskEntry.value;
+                    // List<QDailyTask> を DataEntry<int, CDailyTask> に変換する
+                    valueMap[index] = DataEntry<int, CDailyTask>(
+                      id: targetQTask.id,
+                      value: CDailyTask(
+                        title: targetQTask.title,
+                        date: targetQTask.dateInt.toDate(),
+                        id: targetQTask.id,
+                        isChecked: targetQTask.isChecked,
+                        labelId: targetQTask.labelId,
+                      ),
+                    );
                   }
                 case Failure(
                     exception: final Exception exc,
@@ -209,11 +224,24 @@ class DataRepositoryImpl
                   "$queryExc\nデータの数が不適当です。（resultList.length = ${resultList.length}）",
                 );
               }
-              // valueMap に 3 つのタスクの情報を組み込む
-              for (int i = 0; i < 3; i++) {
-                // List<FDailyTask> を DataEntry<int, EDailyTask> に変換
-                // する拡張メソッドを用いる
-                valueMap[i] = resultList.toDataEntry(i);
+              // 要素数が 3 であることを確認したら
+              else {
+                // valueMap に 3 つのタスクの情報を組み込む
+                for (int i = 0; i < 3; i++) {
+                  final targetQTask = resultList[i];
+                  // List<QDailyTask> を DataEntry<int, EDailyTask> に変換
+                  // する拡張メソッドを用いる
+                  valueMap[i] = DataEntry<int, CDailyTask>(
+                    id: targetQTask.id,
+                    value: CDailyTask(
+                      title: targetQTask.title,
+                      date: targetQTask.dateInt.toDate(),
+                      id: targetQTask.id,
+                      isChecked: targetQTask.isChecked,
+                      labelId: targetQTask.labelId,
+                    ),
+                  );
+                }
               }
             }
             if (valueMap.isNotEmpty) {
@@ -334,6 +362,129 @@ class DataRepositoryImpl
     }
   }
 
+  /// 指定月の月単位タスクをフェッチするメソッド
+  Future<Result<void, Exception>> fetchMonthlyTasks({
+    required Month targetMonth,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      // targetMonth のデータがキャッシュに存在するかどうかを取得する
+      final bool isCached = _monthlyTasksCacheHandler.containsKey(targetMonth);
+
+      // キャッシュに存在する場合、その状態で output を呼び出す
+      if (isCached) {
+        await _monthlyTasksCacheHandler.outputCurrentCache();
+        return Success(null);
+      }
+      // そうでない場合
+      else {
+        // 月を指定して月単位タスクをフェッチ
+        final Result<List<QMonthlyTask>, Exception> result =
+            await _dataSource.getMonthlyTasks(
+          targetMonthInt: targetMonth.toIntIdentifier(),
+        );
+
+        // 取得した分のデータを加えたキャッシュを更新する
+        switch (result) {
+          // region
+          case Success(
+              value: final List<QMonthlyTask> resultList,
+              methodName: final String? methodName,
+            ):
+            // MonthlyTasksCacheHandler.update の valueMap に当てはめる Map
+            final Map<int, DataEntry<int, CMonthlyTask>> valueMap = {};
+
+            // データがまだなかった場合（キャッシュにもDBにもデータがなかった場合）
+            if (resultList.isEmpty) {
+              // 新しい日付の枠（空のタスク）を作って、受け取る
+              final Result<TaskList<QMonthlyTask>, Exception> newDateData =
+                  await _createMonthlyTaskRecord(targetMonth: targetMonth);
+
+              // 正常にフェッチできた場合、新しい日付の枠に作った空のタスクをストリームに流す
+              switch (newDateData) {
+                // region
+                case Success(
+                    value: final TaskList<QMonthlyTask> newDateRecord,
+                  ):
+                  // valueMap に 3 つの枠の情報を組み込む
+                  for (final qTaskEntry in newDateRecord) {
+                    final int index = qTaskEntry.index;
+                    final targetQTask = qTaskEntry.value;
+                    // List<QMonthlyTask> を DataEntry<int, CMonthlyTask> に変換する
+                    valueMap[index] = DataEntry<int, CMonthlyTask>(
+                      id: targetQTask.id,
+                      value: CMonthlyTask(
+                        title: targetQTask.title,
+                        month: targetQTask.monthInt.toMonth(),
+                        id: targetQTask.id,
+                        isChecked: targetQTask.isChecked,
+                        labelId: targetQTask.labelId,
+                      ),
+                    );
+                  }
+                case Failure(
+                    exception: final Exception exc,
+                  ):
+                  throw exc;
+                // endregion
+              }
+            }
+            // データソースにあったデータをキャッシュする
+            else {
+              // 要素数が 3 以外の場合はエラー
+              if (resultList.length != 3) {
+                final Exception queryExc = queryError(methodName: methodName);
+                throw Exception(
+                  "$queryExc\nデータの数が不適当です。（resultList.length = ${resultList.length}）",
+                );
+              }
+              // 要素数が 3 であることを確認したら
+              else {
+                // valueMap に 3 つのタスクの情報を組み込む
+                for (int i = 0; i < 3; i++) {
+                  final targetQTask = resultList[i];
+                  // List<QMonthlyTask> を DataEntry<int, EMonthlyTask> に変換
+                  // する拡張メソッドを用いる
+                  valueMap[i] = DataEntry<int, CMonthlyTask>(
+                    id: targetQTask.id,
+                    value: CMonthlyTask(
+                      title: targetQTask.title,
+                      month: targetQTask.monthInt.toMonth(),
+                      id: targetQTask.id,
+                      isChecked: targetQTask.isChecked,
+                      labelId: targetQTask.labelId,
+                    ),
+                  );
+                }
+              }
+            }
+            if (valueMap.isNotEmpty) {
+              // キャッシュを更新する
+              await _monthlyTasksCacheHandler.update(
+                key: targetMonth,
+                valueMap: valueMap,
+              );
+              return Success(null);
+            } else {
+              throw StateError(
+                "valueMap に情報が組み込まれていません。（DataRepository.fetchMonthlyTasks）",
+              );
+            }
+          case Failure(
+              exception: final Exception exc,
+              methodName: final String? methodName,
+            ):
+            final Exception queryExc = queryError(methodName: methodName);
+            throw Exception("$exc\n$queryExc");
+          // endregion
+        }
+      }
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "fetchMonthlyTasks");
+    }
+  }
+
   /// 各種設定値をフェッチする
   @override
   Future<Result<ESettingsMap, Exception>> fetchSettings() async {
@@ -401,13 +552,13 @@ class DataRepositoryImpl
   // todo 書き換え
 
   /// 日単位タスクの新しい日付の枠を作成するメソッド
-  Future<Result<List<FDailyTask>, Exception>> _createDailyTaskRecord({
+  Future<Result<TaskList<QDailyTask>, Exception>> _createDailyTaskRecord({
     required Date targetDate,
   })
   // 折りたたみ用
   async {
     // データソースに新しい日付の枠（レコード）の作成を要求する
-    final Result<List<FDailyTask>, Exception> result =
+    final Result<TaskList<QDailyTask>, Exception> result =
         await _dataSource.createDailyTaskRecord(
       targetDateInt: targetDate.toIntIdentifier(),
     );
@@ -422,6 +573,32 @@ class DataRepositoryImpl
         return Failure(
           queryError(details: "$error", methodName: methodName),
           methodName: "createDailyTaskRecord",
+        );
+    }
+  }
+
+  /// 月単位タスクの新しい日付の枠を作成するメソッド
+  Future<Result<TaskList<QMonthlyTask>, Exception>> _createMonthlyTaskRecord({
+    required Month targetMonth,
+  })
+  // 折りたたみ用
+  async {
+    // データソースに新しい月の枠（レコード）の作成を要求する
+    final Result<TaskList<QMonthlyTask>, Exception> result =
+    await _dataSource.createMonthlyTaskRecord(
+      targetMonthInt: targetMonth.toIntIdentifier(),
+    );
+
+    switch (result) {
+      case Success():
+        return result;
+      case Failure(
+      exception: final Exception error,
+      methodName: final String? methodName
+      ):
+        return Failure(
+          queryError(details: "$error", methodName: methodName),
+          methodName: "createMonthlyTaskRecord",
         );
     }
   }
@@ -553,7 +730,8 @@ class DataRepositoryImpl
 
   /// 週単位タスクの新しい枠を作成するメソッド
   ///
-  /// [WeeklyTaskList] における index と、生成した ID の Map を返す。
+  /// [WeeklyTaskList] における index と、生成した ID の Map （`Map<int, int>`）
+  /// を返す。
   Future<Result<Map<int, int>, Exception>> _createIdWithPlaceholder2(
     List<ListEntry<EWeeklyTask>> valuedPlaceholders,
   )
@@ -743,25 +921,34 @@ class DataRepositoryImpl
   // }
 
   /// ラベル情報変更保存メソッド
+  ///
+  ///  - [shouldReflect]: キャッシュに反映させるかどうか
   @override
   Future<Result<void, Exception>> saveLabelChanges({
-    required ELabel eLabel,
+    required List<ELabel> changedLabels,
+    required bool shouldReflect,
   })
   // 折りたたみ用
   async {
     // 保存用 DTO に変換する
-    final QLabel qLabel = EToQLabel.toQLabel(eLabel);
+    final List<QLabel> qLabels =
+        changedLabels.map<QLabel>(EToQLabel.toQLabel).toList();
     // データソースに保存する
-    final Result<void, Exception> result =
-        await _dataSource.saveLabels(qLabel: qLabel);
+    final Result<void, Exception> result = await _dataSource.saveLabels(
+      qLabels: qLabels,
+    );
     switch (result) {
       // region
       case Success():
-        final CLabel cLabel = EToCLabel.toCLabel(eLabel);
-        // キャッシュがなかった場合、update は行われないが、
-        // 必要になるのはフェッチのタイミングなので必ず行う必要はない
-        // （キャッシュがある場合は、整合性のために update が必要）
-        await _labelsCacheHandler.tryUpdateSingleLabel(cLabel);
+        // キャッシュへの反映を指定した場合
+        if (shouldReflect) {
+          final List<CLabel> cLabels =
+              changedLabels.map<CLabel>(EToCLabel.toCLabel).toList();
+          // キャッシュがなかった場合、update は行われないが、
+          // 必要になるのはフェッチのタイミングなので必ず行う必要はない
+          // （キャッシュがある場合は、整合性のために update が必要）
+          await _labelsCacheHandler.tryUpdateLabels(cLabels);
+        }
         return Success(null);
       case Failure(
           exception: final Exception exc,
@@ -775,19 +962,73 @@ class DataRepositoryImpl
 
   /// 新しいラベルの枠を作成し、その ID を返す
   @override
-  Future<Result<int, Exception>> createNewLabel({
+  Future<Result<void, Exception>> createNewLabel({
     required String title,
+    required ETask firstETask,
   })
   // 折りたたみ用
   async {
-    final Result<int, Exception> result =
-        await _dataSource.createNewLabel(title: title);
+    // 最初に登録するタスクの情報を、エンティティから クエリ用 DTO に移す
+    final QTask firstQTask = ToQTask.toQTask(firstETask);
+    // データソースに新しいラベルの枠を作って、その ID を取得する
+    final Result<int, Exception> result = await _dataSource.createNewLabel(
+      title: title,
+      firstTask: firstQTask,
+    );
 
     switch (result) {
-      case Success(value: final DLabeledTask label):
-        return label.labelId;
-      case Failure(exception: Exception error, methodName: String? methodName):
-      // todo エラーハンドリング（2026/05/23）＞＞
+      // region
+      case Success(value: final int newId):
+        // このメソッドの引数と、データソースから返された新しい ID から CLabel を用意する
+        final CLabel createdCLabel = switch (firstETask) {
+          // region
+          EDailyTask(id: final int firstTaskId) => CLabel(
+              title: title,
+              labelId: newId,
+              dailyIdList: [firstTaskId],
+              weeklyIdList: [],
+              monthlyIdList: [],
+              yearlyIdList: [],
+            ),
+          EWeeklyTask(id: final int firstTaskId) => CLabel(
+              title: title,
+              labelId: newId,
+              dailyIdList: [],
+              weeklyIdList: [firstTaskId],
+              monthlyIdList: [],
+              yearlyIdList: [],
+            ),
+          EMonthlyTask(id: final int firstTaskId) => CLabel(
+              title: title,
+              labelId: newId,
+              dailyIdList: [],
+              weeklyIdList: [],
+              monthlyIdList: [firstTaskId],
+              yearlyIdList: [],
+            ),
+          EYearlyTask(id: final int firstTaskId) => CLabel(
+              title: title,
+              labelId: newId,
+              dailyIdList: [],
+              weeklyIdList: [],
+              monthlyIdList: [],
+              yearlyIdList: [firstTaskId],
+            ),
+          // endregion
+        };
+        // キャッシュがなかった場合、update は行われないが、
+        // 必要になるのはフェッチのタイミングなので必ず行う必要はない
+        // （キャッシュがある場合は、整合性のために update が必要）
+        await _labelsCacheHandler.tryUpdateLabels([createdCLabel]);
+
+        return Success(null);
+      case Failure(
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
+        final Exception queryExc = queryError(methodName: methodName);
+        return Failure(Exception("$exc\n$queryExc"));
+      // endregion
     }
   }
 
@@ -968,9 +1209,9 @@ class DataRepositoryImpl
     final Result<QSettingsMap, Exception> result =
         await _dataSource.initSettings(length: length);
     switch (result) {
-    // region
+      // region
       case Success(value: final QSettingsMap resultMap):
-      // 返すデータの枠を用意する
+        // 返すデータの枠を用意する
         final Map<int, EPageSetting> returningMap = {};
         // 受け取ったデータを探索し、 returningMap に当てはめていく
         for (final qEntry in resultMap.entries) {
@@ -987,11 +1228,40 @@ class DataRepositoryImpl
         );
         return Success(eSettingsMap);
       case Failure(
-      exception: final Exception exc,
-      methodName: final String? methodName,
-      ):
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
         throw queryError(details: "$exc", methodName: methodName);
-    // endregion
+      // endregion
+    }
+  }
+
+  /// 設定値の変更を保存する
+  Future<Result<void, Exception>> saveSettingChanges({
+    required EPageSetting ePageSetting,
+  })
+  // 折りたたみ用
+  async {
+    // クエリ用 DTO を用意する
+    final QPageSetting qPageSetting = QPageSetting(
+      pageId: ePageSetting.pageIndex,
+      autoSave: ePageSetting.autoSave,
+    );
+    // データソースに保存する
+    final Result<void, Exception> result = await _dataSource.saveSettingChanges(
+      qPageSetting: qPageSetting,
+    );
+    switch (result) {
+      // region
+      case Success():
+        return Success(null);
+      case Failure(
+          exception: final Exception exc,
+          methodName: final String? methodName,
+        ):
+        final Exception queryExc = queryError(methodName: methodName);
+        return Failure(Exception("$exc\n$queryExc"));
+      // endregion
     }
   }
 }

@@ -8,6 +8,51 @@ part of 'presenter_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+
+@ProviderFor(monthlyTasksPresenter)
+const monthlyTasksPresenterProvider = MonthlyTasksPresenterProvider._();
+
+final class MonthlyTasksPresenterProvider extends $FunctionalProvider<
+    MonthlyTasksPresenter,
+    MonthlyTasksPresenter,
+    MonthlyTasksPresenter> with $Provider<MonthlyTasksPresenter> {
+  const MonthlyTasksPresenterProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'monthlyTasksPresenterProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$monthlyTasksPresenterHash();
+
+  @$internal
+  @override
+  $ProviderElement<MonthlyTasksPresenter> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  MonthlyTasksPresenter create(Ref ref) {
+    return monthlyTasksPresenter(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MonthlyTasksPresenter value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MonthlyTasksPresenter>(value),
+    );
+  }
+}
+
+String _$monthlyTasksPresenterHash() =>
+    r'07b2cad2c69ccc058f43185bc5a13527ddc46465';
+
 /// ラベルデータ反映クラス
 
 @ProviderFor(labelsPresenter)

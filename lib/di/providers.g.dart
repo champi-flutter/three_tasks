@@ -578,15 +578,21 @@ String _$weeklyTasksPresenterHash() =>
     r'289376b1ee10c2ce4a2b18f4940488f0cc4bd7c7';
 
 /// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
 
 @ProviderFor(tasksController)
 const tasksControllerProvider = TasksControllerFamily._();
 
 /// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
 
 final class TasksControllerProvider extends $FunctionalProvider<TasksController,
     TasksController, TasksController> with $Provider<TasksController> {
   /// 週単位タスク操作クラス
+  ///
+  /// 第2引数の [token] は、 [EditController] の Token 。
   const TasksControllerProvider._(
       {required TasksControllerFamily super.from,
       required Token super.argument})
@@ -644,6 +650,8 @@ final class TasksControllerProvider extends $FunctionalProvider<TasksController,
 String _$tasksControllerHash() => r'719b09eda231537b6771e78cca12292f9a71e7eb';
 
 /// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
 
 final class TasksControllerFamily extends $Family
     with $FunctionalFamilyOverride<TasksController, Token> {
@@ -657,6 +665,8 @@ final class TasksControllerFamily extends $Family
         );
 
   /// 週単位タスク操作クラス
+  ///
+  /// 第2引数の [token] は、 [EditController] の Token 。
 
   TasksControllerProvider call(
     Token token,
