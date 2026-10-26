@@ -9,6 +9,94 @@ part of 'use_case_providers.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
+@ProviderFor(watchDailyTasksUseCase)
+const watchDailyTasksUseCaseProvider = WatchDailyTasksUseCaseProvider._();
+
+final class WatchDailyTasksUseCaseProvider extends $FunctionalProvider<
+    WatchDailyTasksUseCase,
+    WatchDailyTasksUseCase,
+    WatchDailyTasksUseCase> with $Provider<WatchDailyTasksUseCase> {
+  const WatchDailyTasksUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'watchDailyTasksUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$watchDailyTasksUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<WatchDailyTasksUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WatchDailyTasksUseCase create(Ref ref) {
+    return watchDailyTasksUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WatchDailyTasksUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WatchDailyTasksUseCase>(value),
+    );
+  }
+}
+
+String _$watchDailyTasksUseCaseHash() =>
+    r'86dacbb14914e41057a1913f2379cfa3521fcb14';
+
+@ProviderFor(watchWeeklyTasksUseCase)
+const watchWeeklyTasksUseCaseProvider = WatchWeeklyTasksUseCaseProvider._();
+
+final class WatchWeeklyTasksUseCaseProvider extends $FunctionalProvider<
+    WatchWeeklyTasksUseCase,
+    WatchWeeklyTasksUseCase,
+    WatchWeeklyTasksUseCase> with $Provider<WatchWeeklyTasksUseCase> {
+  const WatchWeeklyTasksUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'watchWeeklyTasksUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$watchWeeklyTasksUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<WatchWeeklyTasksUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WatchWeeklyTasksUseCase create(Ref ref) {
+    return watchWeeklyTasksUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WatchWeeklyTasksUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WatchWeeklyTasksUseCase>(value),
+    );
+  }
+}
+
+String _$watchWeeklyTasksUseCaseHash() =>
+    r'3efece76dc38be1a77a504b0c30a26aa4a3c427f';
+
 @ProviderFor(watchMonthlyTasksUseCase)
 const watchMonthlyTasksUseCaseProvider = WatchMonthlyTasksUseCaseProvider._();
 
@@ -51,7 +139,228 @@ final class WatchMonthlyTasksUseCaseProvider extends $FunctionalProvider<
 }
 
 String _$watchMonthlyTasksUseCaseHash() =>
-    r'b00b977e36057799ecbd842e100b9e7dd59b7595';
+    r'82e2e6d3d89a95cff81254f583174820168a6546';
+
+@ProviderFor(watchYearlyTasksUseCase)
+const watchYearlyTasksUseCaseProvider = WatchYearlyTasksUseCaseProvider._();
+
+final class WatchYearlyTasksUseCaseProvider extends $FunctionalProvider<
+    WatchYearlyTasksUseCase,
+    WatchYearlyTasksUseCase,
+    WatchYearlyTasksUseCase> with $Provider<WatchYearlyTasksUseCase> {
+  const WatchYearlyTasksUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'watchYearlyTasksUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$watchYearlyTasksUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<WatchYearlyTasksUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WatchYearlyTasksUseCase create(Ref ref) {
+    return watchYearlyTasksUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WatchYearlyTasksUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WatchYearlyTasksUseCase>(value),
+    );
+  }
+}
+
+String _$watchYearlyTasksUseCaseHash() =>
+    r'8601eae12da0dabb4c2ca6dac09b02430874c304';
+
+@ProviderFor(saveTaskChangesUseCase)
+const saveTaskChangesUseCaseProvider = SaveTaskChangesUseCaseProvider._();
+
+final class SaveTaskChangesUseCaseProvider extends $FunctionalProvider<
+    SaveTaskChangesUseCase,
+    SaveTaskChangesUseCase,
+    SaveTaskChangesUseCase> with $Provider<SaveTaskChangesUseCase> {
+  const SaveTaskChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'saveTaskChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$saveTaskChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SaveTaskChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SaveTaskChangesUseCase create(Ref ref) {
+    return saveTaskChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SaveTaskChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SaveTaskChangesUseCase>(value),
+    );
+  }
+}
+
+String _$saveTaskChangesUseCaseHash() =>
+    r'a80ee68b9a366f3bbedf33e907944b2ff171e842';
+
+@ProviderFor(saveWeeklyTaskChangesUseCase)
+const saveWeeklyTaskChangesUseCaseProvider =
+    SaveWeeklyTaskChangesUseCaseProvider._();
+
+final class SaveWeeklyTaskChangesUseCaseProvider extends $FunctionalProvider<
+    SaveWeeklyTaskChangesUseCase,
+    SaveWeeklyTaskChangesUseCase,
+    SaveWeeklyTaskChangesUseCase> with $Provider<SaveWeeklyTaskChangesUseCase> {
+  const SaveWeeklyTaskChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'saveWeeklyTaskChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$saveWeeklyTaskChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SaveWeeklyTaskChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SaveWeeklyTaskChangesUseCase create(Ref ref) {
+    return saveWeeklyTaskChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SaveWeeklyTaskChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SaveWeeklyTaskChangesUseCase>(value),
+    );
+  }
+}
+
+String _$saveWeeklyTaskChangesUseCaseHash() =>
+    r'0f94fdee4ff3b766b791ff1f738e8e151518c63a';
+
+@ProviderFor(draftTaskChangesUseCase)
+const draftTaskChangesUseCaseProvider = DraftTaskChangesUseCaseProvider._();
+
+final class DraftTaskChangesUseCaseProvider extends $FunctionalProvider<
+    DraftTaskChangesUseCase,
+    DraftTaskChangesUseCase,
+    DraftTaskChangesUseCase> with $Provider<DraftTaskChangesUseCase> {
+  const DraftTaskChangesUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'draftTaskChangesUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$draftTaskChangesUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DraftTaskChangesUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DraftTaskChangesUseCase create(Ref ref) {
+    return draftTaskChangesUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DraftTaskChangesUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DraftTaskChangesUseCase>(value),
+    );
+  }
+}
+
+String _$draftTaskChangesUseCaseHash() =>
+    r'dc2e32d3a45e3429cdc9eb1fe168fef507db7811';
+
+@ProviderFor(discardDraftUseCase)
+const discardDraftUseCaseProvider = DiscardDraftUseCaseProvider._();
+
+final class DiscardDraftUseCaseProvider extends $FunctionalProvider<
+    DiscardDraftUseCase,
+    DiscardDraftUseCase,
+    DiscardDraftUseCase> with $Provider<DiscardDraftUseCase> {
+  const DiscardDraftUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'discardDraftUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$discardDraftUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DiscardDraftUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DiscardDraftUseCase create(Ref ref) {
+    return discardDraftUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DiscardDraftUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DiscardDraftUseCase>(value),
+    );
+  }
+}
+
+String _$discardDraftUseCaseHash() =>
+    r'e572efab7ffe7eff8f4b1f01be0c27d0c5520a81';
 
 @ProviderFor(fetchLabelUseCase)
 const fetchLabelUseCaseProvider = FetchLabelUseCaseProvider._();
@@ -183,50 +492,6 @@ final class RegisterNewLabelUseCaseProvider extends $FunctionalProvider<
 
 String _$registerNewLabelUseCaseHash() =>
     r'ac59dd21787109a2a085cba67713966242262079';
-
-@ProviderFor(draftTaskChangesUseCase)
-const draftTaskChangesUseCaseProvider = DraftTaskChangesUseCaseProvider._();
-
-final class DraftTaskChangesUseCaseProvider extends $FunctionalProvider<
-    DraftTaskChangesUseCase,
-    DraftTaskChangesUseCase,
-    DraftTaskChangesUseCase> with $Provider<DraftTaskChangesUseCase> {
-  const DraftTaskChangesUseCaseProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'draftTaskChangesUseCaseProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$draftTaskChangesUseCaseHash();
-
-  @$internal
-  @override
-  $ProviderElement<DraftTaskChangesUseCase> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  DraftTaskChangesUseCase create(Ref ref) {
-    return draftTaskChangesUseCase(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(DraftTaskChangesUseCase value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<DraftTaskChangesUseCase>(value),
-    );
-  }
-}
-
-String _$draftTaskChangesUseCaseHash() =>
-    r'a233166ad24349d01b19f8ff30b1c55c062da1ed';
 
 @ProviderFor(fetchSettingsUseCase)
 const fetchSettingsUseCaseProvider = FetchSettingsUseCaseProvider._();

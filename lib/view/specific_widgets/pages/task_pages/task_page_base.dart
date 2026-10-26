@@ -9,6 +9,9 @@ abstract class TaskPageBase extends ControlledPage{
   /// タスクの期間の単位（種別）
   TaskRec get rec;
 
+  /// このタスクの期間単位の前段階の名称
+  String get previousShortTitle;
+
   /// fixme これは [ControlledPage] に持たせてもいいかも（2026/10/10）＞＞
   int get pageIndex;
 }

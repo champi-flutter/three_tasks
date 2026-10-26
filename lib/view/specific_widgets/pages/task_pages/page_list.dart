@@ -7,12 +7,15 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/application_config.dart';
 import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_model/yearly_tasks_view_model/yearly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
-import 'package:three_tasks/view/specific_widgets/pages/this_months_page.dart';
-import 'package:three_tasks/view/specific_widgets/pages/this_weeks_page.dart';
-import 'package:three_tasks/view/specific_widgets/pages/todays_page.dart';
-import 'package:three_tasks/view/specific_widgets/pages/tomorrows_page.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_months_page.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_weeks_page.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_years_page.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/todays_page.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/tomorrows_page.dart';
 
 /// [ControlledPageView] が表示するページのリストを返す
 ///
@@ -46,7 +49,10 @@ PageMap<TaskPageBase> _pageMap({
         pageIndex: 3,
         scopeToken: scopeToken,
       ),
-      PageKey("yearly"):,
+      PageKey("yearly"): ThisYearsPage(
+        pageIndex: 4,
+        scopeToken: scopeToken,
+      ),
     });
 
 /// 現在のページが参照しているタスク VM の `state` を `ref.read` で一度だけ取得する
@@ -65,17 +71,17 @@ TaskList<VTask> getTaskStateOnCurrentPage(WidgetRef ref, {
         tomorrow,
       );
     case 2:
-    // todo （2026/10/13）＞＞
       return ref.read(weeklyTasksViewModelProvider.notifier).getCurrentStateAt(
         today,
       );
     case 3:
-    // todo （2026/10/13）＞＞
       return ref.read(monthlyTasksViewModelProvider.notifier).getCurrentStateAt(
         thisMonth,
       );
     case 4:
-    // todo （2026/10/13）＞＞
+      return ref.read(yearlyTasksViewModelProvider.notifier).getCurrentStateAt(
+        thisYear,
+      );
     default:
       throw RangeError(
         "[currentTaskState] 無効なインデックスです。\n（pageIndex = $pageIndex）",

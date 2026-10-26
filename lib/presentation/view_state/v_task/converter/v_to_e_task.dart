@@ -1,5 +1,5 @@
 
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 
 class VToETask{

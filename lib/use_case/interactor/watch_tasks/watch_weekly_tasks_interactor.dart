@@ -74,8 +74,10 @@ class WatchWeeklyTasksInteractor
       _streamHandler.listen(
         onData: _onData,
       );
-    } catch (_) {
-      throw Exception("購読エラー: WatchWeeklyTasksUseCase._initSubscription");
+    } catch (e, st) {
+      throw Exception(
+        "購読エラー: WatchWeeklyTasksUseCase._initSubscription\n$e\n$st",
+      );
     }
   }
 
@@ -125,5 +127,11 @@ class WatchWeeklyTasksInteractor
     } catch (e, st) {
       throw Exception("データ反映時...\n$e\n$st");
     }
+  }
+
+  /// todo このクラスの dispose
+  @override
+  void dispose() {
+    _streamHandler.dispose();
   }
 }

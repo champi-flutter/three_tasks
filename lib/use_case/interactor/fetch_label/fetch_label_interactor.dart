@@ -1,6 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_label/fetch_label_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/labels_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
@@ -34,10 +35,10 @@ class FetchLabelInteractor
   @override
   Future<void> execute() => _loading.loadAsync(() async {
         // リポジトリからデータを取得する
-        final Result<List<ELabel>, Exception> fetched =
+        final Result<LabelList<ELabel>, Exception> fetched =
             await _repository.fetchLabel();
         switch (fetched) {
-          case Success(value: final List<ELabel> successList):
+          case Success(value: final LabelList<ELabel> successList):
             // フェッチが成功した場合に、Presenter にデータを流す
             await _presenter.present(successList);
           case Failure(

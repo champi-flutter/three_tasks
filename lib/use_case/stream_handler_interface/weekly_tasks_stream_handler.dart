@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 
 /// 週単位タスクのキャッシュストリームを扱うクラス
 ///  - [listen]: ストリームを指定して購読を開始する。

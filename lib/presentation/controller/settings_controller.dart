@@ -25,10 +25,14 @@ class SettingsController {
     // 元のデータ（targetPageSetting）を元にエンティティの枠を用意する
     EPageSetting ePageSetting = EPageSetting(
       pageIndex: targetPageSetting.controlledIndex,
-      autoSave: targetPageSetting.autoSave,
+      primaryAutoSaves: targetPageSetting.primaryAutoSaves,
+      reviewAutoSaves: targetPageSetting.reviewAutoSaves,
     );
     // parameter に更新情報があった場合は、エンティティを書き換える
-    ePageSetting.update(newAutoSave: parameter.autoSave,);
+    ePageSetting.update(
+      primaryAutoSaves: parameter.primaryAutoSaves,
+      reviewAutoSaves: parameter.reviewAutoSaves,
+    );
     // 設定値変更保存フローを呼び出す
     await _saveSettingChangesUseCase.execute(ePageSetting: ePageSetting);
   }

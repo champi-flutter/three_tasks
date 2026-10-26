@@ -1,5 +1,5 @@
 
-import 'package:three_tasks/entities/e_label/e_label.dart';
+import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 
 /// [ELabel] エンティティから、 [VLabel] への変換ロジッククラス

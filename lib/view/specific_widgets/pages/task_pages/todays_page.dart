@@ -14,7 +14,7 @@ import 'package:three_tasks/view/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/draft_saving_button.dart';
 import 'package:three_tasks/view/specific_widgets/label_list_button.dart';
-import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 
 class TodaysPage extends TaskPageBase {
@@ -29,6 +29,9 @@ class TodaysPage extends TaskPageBase {
 
   @override
   final String shortTitle = "今日";
+
+  @override
+  final String previousShortTitle = "昨日";
 
   @override
   final TaskRec rec = TaskRec.day;

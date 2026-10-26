@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:data_converter/data_converter.dart';
@@ -6,17 +5,12 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/infrastructure/drivers/db/table/converter/q_to_table_task.dart';
 import 'package:three_tasks/infrastructure/drivers/db/table/converter/table_to_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/data_source_interface/data_source.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/f_task/f_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
-import 'package:three_tasks/main.dart';
 
 // テーブル
 import 'package:three_tasks/infrastructure/drivers/db/table/setting_tables.dart';
@@ -79,7 +73,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   QPageSetting _toQPageSetting(PageSetting pageSetting) {
     return QPageSetting(
       pageId: pageSetting.pageId,
-      autoSave: pageSetting.autoSave,
+      primaryAutoSaves: pageSetting.primaryAutoSaves,
+      reviewAutoSaves: pageSetting.reviewAutoSaves,
     );
   }
 
@@ -177,6 +172,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   /// 要求された月に該当するデータを返す。
   ///
   /// **【注意】** このデータは空の場合もある。
+  @override
   Future<Result<List<QMonthlyTask>, Exception>> getMonthlyTasks({
     required int targetMonthInt,
   })
@@ -191,6 +187,28 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       return Success(TableToQTask.toQMonthlyTaskList(rawDataList));
     } catch (e, st) {
       return Failure(Exception("$e\n$st"), methodName: "getMonthlyTasks");
+    }
+  }
+
+  /// `YearlyTask` フェッチメソッド
+  ///
+  /// 要求された年に該当するデータを返す。
+  ///
+  /// **【注意】** このデータは空の場合もある。
+  Future<Result<List<QYearlyTask>, Exception>> getYearlyTasks({
+    required int targetYear,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      // DB から該当月のタスクを取得
+      final List<YearlyTask> rawDataList = await managers.yearlyTasks
+          .filter((yearlyTask) => yearlyTask.year.equals(targetYear))
+          .get();
+      // クエリ用 DTO に変換して返す
+      return Success(TableToQTask.toQYearlyTaskList(rawDataList));
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "getYearlyTasks");
     }
   }
 
@@ -332,6 +350,36 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       return Success(returning);
     } catch (e, st) {
       return Failure(Exception("$e\n$st"), methodName: "createMonthlyTaskRecord");
+    }
+  }
+
+  /// 年単位タスクの新しい枠を作成するメソッド
+  @override
+  Future<Result<TaskList<QYearlyTask>, Exception>> createYearlyTaskRecord({
+    required int targetYear,
+  })
+  // 折りたたみ用
+  async {
+    try {
+      // 作成するタスクの枠
+      final List<QYearlyTask> qTaskList = [];
+      await transaction(() async {
+        // 空のタスクを3つ作る
+        for (int i = 0; i < 3; i++) {
+          final YearlyTask rawData =
+          await managers.yearlyTasks.createReturning((record) => record(
+            task: "",
+            year: targetYear,
+          ));
+          qTaskList.add(TableToQTask.toQYearlyTask(rawData));
+        }
+      });
+      final TaskList<QYearlyTask> returning =
+      TaskList<QYearlyTask>.fromIterable(qTaskList);
+      // Fetch 用の DTO に変換して返す
+      return Success(returning);
+    } catch (e, st) {
+      return Failure(Exception("$e\n$st"), methodName: "createYearlyTaskRecord");
     }
   }
 
@@ -511,575 +559,6 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     }
   }
 
-  /// 日単位タスクをラベリング
-  ///
-  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
-  @override
-  Future<Result<DLabeledTask, Exception>> labelDailyTask({
-    required String label,
-    required int newId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      LabeledTask? _labeledTask;
-      await transaction(() async {
-        // LabeledTasks に新しいレコードを作成
-        _labeledTask = await managers.labeledTasks.createReturning(
-          (record) => record(
-            label: label,
-            dailyIdList: Value(
-              Uint8List.fromList([newId]),
-            ),
-          ),
-        );
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.dayTasks
-            .filter((dayTask) => dayTask.id.equals(newId))
-            .update(
-              (dayTask) => dayTask(
-                labelId: Value(_labeledTask!.labeledId),
-              ),
-            );
-      });
-      if (_labeledTask != null) {
-        return Success(_dLabeledTask(_labeledTask!));
-      }
-      // transaction 内でエラーを投げると思われるが一応
-      else {
-        throw Exception("_labeledTask == null");
-      }
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingDailyTask");
-    }
-  }
-
-  /// 週単位タスクをラベリング
-  ///
-  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
-  @override
-  Future<Result<DLabeledTask, Exception>> labelWeeklyTask({
-    required String label,
-    required int newId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      LabeledTask? _labeledTask;
-      await transaction(() async {
-        // LabeledTasks に新しいレコードを作成
-        _labeledTask = await managers.labeledTasks.createReturning(
-          (record) => record(
-            label: label,
-            weeklyIdList: Value(
-              Uint8List.fromList([newId]),
-            ),
-          ),
-        );
-
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.weeklyTasks
-            .filter((weeklyTask) => weeklyTask.id.equals(newId))
-            .update(
-              (weeklyTask) => weeklyTask(
-                labelId: Value(_labeledTask!.labeledId),
-              ),
-            );
-      });
-      if (_labeledTask != null) {
-        return Success(_dLabeledTask(_labeledTask!));
-      }
-      // transaction 内でエラーを投げると思われるが一応
-      else {
-        throw Exception("_labeledTask == null");
-      }
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingWeeklyTask");
-    }
-  }
-
-  /// 月単位タスクをラベリング
-  ///
-  /// 例外がない場合は、新規レコードを [DLabeledTask] で返す。
-  @override
-  Future<Result<DLabeledTask, Exception>> labelMonthlyTask({
-    required String label,
-    required int newId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      LabeledTask? _labeledTask;
-      await transaction(() async {
-        // LabeledTasks に新しいレコードを作成
-        _labeledTask =
-            await managers.labeledTasks.createReturning((record) => record(
-                  label: label,
-                  monthlyIdList: Value(
-                    Uint8List.fromList([newId]),
-                  ),
-                ));
-
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.monthlyTasks
-            .filter((monthlyTask) => monthlyTask.id.equals(newId))
-            .update(
-              (monthlyTask) => monthlyTask(
-                labelId: Value(_labeledTask!.labeledId),
-              ),
-            );
-      });
-      if (_labeledTask != null) {
-        return Success(_dLabeledTask(_labeledTask!));
-      }
-      // transaction 内でエラーを投げると思われるが一応
-      else {
-        throw Exception("_labeledTask == null");
-      }
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingMonthlyTask");
-    }
-  }
-
-  /// 年単位タスクをラベリング
-  ///
-  /// 例外がない場合は、新規レコードの labelId を返す。
-  @override
-  Future<Result<DLabeledTask, Exception>> labelYearlyTask({
-    required String label,
-    required int newId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      LabeledTask? _labeledTask;
-      await transaction(() async {
-        // LabeledTasks に新しいレコードを作成
-        _labeledTask = await managers.labeledTasks.createReturning(
-          (record) => record(
-            label: label,
-            yearlyIdList: Value(
-              Uint8List.fromList([newId]),
-            ),
-          ),
-        );
-
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.yearlyTasks
-            .filter((yearlyTask) => yearlyTask.id.equals(newId))
-            .update(
-              (yearlyTask) => yearlyTask(
-                labelId: Value(_labeledTask!.labeledId),
-              ),
-            );
-      });
-      if (_labeledTask != null) {
-        return Success(_dLabeledTask(_labeledTask!));
-      }
-      // transaction 内でエラーを投げると思われるが一応
-      else {
-        throw Exception("_labeledTask == null");
-      }
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingYearlyTask");
-    }
-  }
-
-  /// 日単位タスクのラベルを解除
-  @override
-  Future<Result<void, Exception>> unlabelDailyTask({
-    required int labelId,
-    required int targetId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      await transaction(() async {
-        // ラベルを更新
-        await managers.labeledTasks
-            .filter((label) => label.labeledId.equals(labelId))
-            .update((record) {
-          // 元々保存されているIDリストを参照
-          final idList = [...record().dailyIdList.value];
-          // targetId を remove
-          idList.remove(targetId);
-          // IDリストを入れ替えた record を返す
-          return record(dailyIdList: Value(Uint8List.fromList(idList)));
-        });
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.dayTasks
-            .filter((dayTask) => dayTask.id.equals(targetId))
-            .update(
-              (dayTask) => dayTask(
-                labelId: Value(null),
-              ),
-            );
-      });
-      return Success(null);
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "unlabelingDailyTask");
-    }
-  }
-
-  /// 週単位タスクのラベルを解除
-  @override
-  Future<Result<void, Exception>> unlabelWeeklyTask({
-    required int labelId,
-    required int targetId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      await transaction(() async {
-        // ラベルを更新
-        await managers.labeledTasks
-            .filter((label) => label.labeledId.equals(labelId))
-            .update((record) {
-          // 元々保存されているIDリストを参照
-          final idList = [...record().weeklyIdList.value];
-          // targetId を remove
-          idList.remove(targetId);
-          // IDリストを入れ替えた record を返す
-          return record(weeklyIdList: Value(Uint8List.fromList(idList)));
-        });
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.weeklyTasks
-            .filter((weeklyTask) => weeklyTask.id.equals(targetId))
-            .update(
-              (weeklyTask) => weeklyTask(
-                labelId: Value(null),
-              ),
-            );
-      });
-      return Success(null);
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingWeeklyTask");
-    }
-  }
-
-  /// 月単位タスクのラベルを解除
-  @override
-  Future<Result<void, Exception>> unlabelMonthlyTask({
-    required int labelId,
-    required int targetId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      await transaction(() async {
-        // ラベルを更新
-        await managers.labeledTasks
-            .filter((label) => label.labeledId.equals(labelId))
-            .update((record) {
-          // 元々保存されているIDリストを参照
-          final idList = [...record().monthlyIdList.value];
-          // targetId を remove
-          idList.remove(targetId);
-          // IDリストを入れ替えた record を返す
-          return record(monthlyIdList: Value(Uint8List.fromList(idList)));
-        });
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.monthlyTasks
-            .filter((monthlyTask) => monthlyTask.id.equals(targetId))
-            .update(
-              (monthlyTask) => monthlyTask(
-                labelId: Value(null),
-              ),
-            );
-      });
-      return Success(null);
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingMonthlyTask");
-    }
-  }
-
-  /// 年単位タスクのラベルを解除
-  @override
-  Future<Result<void, Exception>> unlabelYearlyTask({
-    required int labelId,
-    required int targetId,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      await transaction(() async {
-        // ラベルを更新
-        await managers.labeledTasks
-            .filter((label) => label.labeledId.equals(labelId))
-            .update((record) {
-          // 元々保存されているIDリストを参照
-          final idList = [...record().yearlyIdList.value];
-          // targetId を remove
-          idList.remove(targetId);
-          // IDリストを入れ替えた record を返す
-          return record(yearlyIdList: Value(Uint8List.fromList(idList)));
-        });
-        // タスクIDに該当するタスクの labelId を更新
-        await managers.yearlyTasks
-            .filter((yearlyTask) => yearlyTask.id.equals(targetId))
-            .update(
-              (yearlyTask) => yearlyTask(
-                labelId: Value(null),
-              ),
-            );
-      });
-      return Success(null);
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "labelingYearlyTask");
-    }
-  }
-
-  /// 指定のラベルに、タスク ID を追加するメソッド
-  ///
-  /// 指定ラベル（[labelId]）に、指定タスクのID（[dTask.id]）を追加する。
-  @override
-  Future<Result<void, Exception>> addTaskIdToLabel({
-    required int labelId,
-    required DTask dTask,
-  })
-  // 折りたたみ用
-  async {
-    try {
-      await transaction(() async {
-        // 現時点でのレコードを取得する。
-        final currentRecord = await managers.labeledTasks
-            .filter((label) => label.labeledId.equals(labelId))
-            .getSingleOrNull();
-        if (currentRecord == null) {
-          throw Exception("対象のラベル ID が見つかりませんでした。");
-        }
-
-        // managers.labeledTasks.update に当てはめる形
-        final LabeledTasksCompanion updater;
-        // タスクの種類に対応した場所に dTask.id をあてはめる
-        switch (dTask) {
-          // region
-          case DDailyTask(id: final int taskId):
-            // 取得したレコードの dailyIdList の参照のコピー
-            final Uint8List? currentBlob = currentRecord.dailyIdList;
-            // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List? newBlob =
-                (currentBlob ?? Uint8List(0)).updateWith(taskId);
-            // update に返す形にあてはめる。
-            updater =
-                LabeledTasksCompanion(dailyIdList: Value.absentIfNull(newBlob));
-          case DWeeklyTask(id: final int taskId):
-            // 取得したレコードの weeklyIdList の参照のコピー
-            final Uint8List? currentBlob = currentRecord.weeklyIdList;
-            // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List newBlob =
-                (currentBlob ?? Uint8List(0)).updateWith(taskId);
-            // update に返す形にあてはめる。
-            updater = LabeledTasksCompanion(weeklyIdList: Value(newBlob));
-          case DMonthlyTask(id: final int taskId):
-            // 取得したレコードの monthlyIdList の参照のコピー
-            final Uint8List? currentBlob = currentRecord.monthlyIdList;
-            // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List newBlob =
-                (currentBlob ?? Uint8List(0)).updateWith(taskId);
-            // update に返す形にあてはめる。
-            updater = LabeledTasksCompanion(monthlyIdList: Value(newBlob));
-          case DYearlyTask(id: final int taskId):
-            // 取得したレコードの yearlyIdList の参照のコピー
-            final Uint8List? currentBlob = currentRecord.yearlyIdList;
-            // 拡張 codec を用いて、符号付き整数を Blob にあてはめる。
-            final Uint8List newBlob =
-                (currentBlob ?? Uint8List(0)).updateWith(taskId);
-            // update に返す形にあてはめる。
-            updater = LabeledTasksCompanion(yearlyIdList: Value(newBlob));
-          // endregion
-        }
-
-        // updater を適用する
-        await managers.labeledTasks
-            .filter((f) => f.labeledId.equals(labelId))
-            .update((_) => updater);
-      });
-      return Success(null);
-    } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "addTaskIdToLabel");
-    }
-  }
-
-  // /// 日単位タスクを既存のラベルに登録
-  // ///
-  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  // ///
-  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  // @override
-  // Future<Result<void, Exception>> addDailyTaskToLabel({
-  //   required int labelId,
-  //   required int targetId,
-  // })
-  // // 折りたたみ用
-  // async {
-  //   try {
-  //     await transaction(() async {
-  //       // ラベルを更新
-  //       await managers.labeledTasks
-  //           .filter((label) => label.labeledId.equals(labelId))
-  //           .update((record) {
-  //         // 元々保存されているIDリストを参照
-  //         final idList = [...record().dailyIdList.value];
-  //         // targetId を add
-  //         idList.add(targetId);
-  //         // IDリストを更新した record を返す
-  //         return record(dailyIdList: Value(Uint8List.fromList(idList)));
-  //       });
-  //       // タスクIDに該当するタスクの labelId を更新
-  //       await managers.dayTasks
-  //           .filter((dayTask) => dayTask.id.equals(targetId))
-  //           .update(
-  //             (dayTask) => dayTask(
-  //               labelId: Value(labelId),
-  //             ),
-  //           );
-  //     });
-  //     return Success(null);
-  //   } catch (e, st) {
-  //     return Failure(Exception("$e\n$st"),
-  //         methodName: "addingDailyTaskToLabel");
-  //   }
-  // }
-  //
-  // /// 週単位タスクを既存のラベルに登録
-  // ///
-  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  // ///
-  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  // @override
-  // Future<Result<void, Exception>> addWeeklyTaskToLabel({
-  //   required int labelId,
-  //   required int targetId,
-  // })
-  // // 折りたたみ用
-  // async {
-  //   try {
-  //     await transaction(() async {
-  //       // ラベルを更新
-  //       await managers.labeledTasks
-  //           .filter((label) => label.labeledId.equals(labelId))
-  //           .update((record) {
-  //         // 元々保存されているIDリストを参照
-  //         final idList = [...record().weeklyIdList.value];
-  //         // targetId を add
-  //         idList.add(targetId);
-  //         // IDリストを入れ替えた record を返す
-  //         return record(weeklyIdList: Value(Uint8List.fromList(idList)));
-  //       });
-  //       // タスクIDに該当するタスクの labelId を更新
-  //       await managers.weeklyTasks
-  //           .filter((weeklyTask) => weeklyTask.id.equals(targetId))
-  //           .update(
-  //             (weeklyTask) => weeklyTask(
-  //               labelId: Value(labelId),
-  //             ),
-  //           );
-  //     });
-  //     return Success(null);
-  //   } catch (e, st) {
-  //     return Failure(Exception("$e\n$st"), methodName: "labelingWeeklyTask");
-  //   }
-  // }
-  //
-  // /// 月単位タスクを既存のラベルに登録
-  // ///
-  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  // ///
-  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  // @override
-  // Future<Result<void, Exception>> addMonthlyTaskToLabel({
-  //   required int labelId,
-  //   required int targetId,
-  // })
-  // // 折りたたみ用
-  // async {
-  //   try {
-  //     await transaction(() async {
-  //       // ラベルを更新
-  //       await managers.labeledTasks
-  //           .filter((label) => label.labeledId.equals(labelId))
-  //           .update((record) {
-  //         // 元々保存されているIDリストを参照
-  //         final idList = [...record().monthlyIdList.value];
-  //         // targetId を add
-  //         idList.add(targetId);
-  //         // IDリストを入れ替えた record を返す
-  //         return record(monthlyIdList: Value(Uint8List.fromList(idList)));
-  //       });
-  //       // タスクIDに該当するタスクの labelId を更新
-  //       await managers.monthlyTasks
-  //           .filter((monthlyTask) => monthlyTask.id.equals(targetId))
-  //           .update(
-  //             (monthlyTask) => monthlyTask(
-  //               labelId: Value(labelId),
-  //             ),
-  //           );
-  //     });
-  //     return Success(null);
-  //   } catch (e, st) {
-  //     return Failure(Exception("$e\n$st"), methodName: "labelingMonthlyTask");
-  //   }
-  // }
-  //
-  // /// 年単位タスクを既存のラベルに登録
-  // ///
-  // /// 指定ラベル（[labelId]）に、指定タスクのID（[targetId]）を追加する。
-  // ///
-  // /// 指定タスクの [DTask.labelId] に指定ラベルを登録する。
-  // @override
-  // Future<Result<void, Exception>> addYearlyTaskToLabel({
-  //   required int labelId,
-  //   required int targetId,
-  // })
-  // // 折りたたみ用
-  // async {
-  //   try {
-  //     await transaction(() async {
-  //       // ラベルを更新
-  //       await managers.labeledTasks
-  //           .filter((label) => label.labeledId.equals(labelId))
-  //           .update((record) {
-  //         // 元々保存されているIDリストを参照
-  //         final idList = [...record().yearlyIdList.value];
-  //         // targetId を add
-  //         idList.add(targetId);
-  //         // IDリストを入れ替えた record を返す
-  //         return record(yearlyIdList: Value(Uint8List.fromList(idList)));
-  //       });
-  //       // タスクIDに該当するタスクの labelId を更新
-  //       await managers.yearlyTasks
-  //           .filter((yearlyTask) => yearlyTask.id.equals(targetId))
-  //           .update(
-  //             (yearlyTask) => yearlyTask(
-  //               labelId: Value(labelId),
-  //             ),
-  //           );
-  //     });
-  //     return Success(null);
-  //   } catch (e, st) {
-  //     return Failure(Exception("$e\n$st"), methodName: "labelingYearlyTask");
-  //   }
-  // }
-
-  // /// 既存のラベルを採用した枠を作るメソッド
-  // ///
-  // /// [newIdList] は呼び出し元で管理されているキャッシュを代入すること。
-  // @override
-  // Future<Result<void, Exception>> addDailyTaskInLabel(
-  //     {required List<int> newIdList})
-  // // 折りたたみ用
-  // async {
-  //   try {
-  //     await managers.labeledTasks.update((record) => record(
-  //           dailyIdList: Value(Uint8List.fromList(newIdList)),
-  //         ));
-  //     return Success(null);
-  //   } catch (e, st) {
-  //     return Failure(Exception("$e\n$st"), methodName: "addDailyTaskInLabel");
-  //   }
-  // }
-
   /// 各種設定を初期化する
   @override
   Future<Result<QSettingsMap, Exception>> initSettings({
@@ -1117,7 +596,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           .filter((record) => record.pageId.equals(qPageSetting.pageId))
           .update(
             (record) => record(
-              autoSave: Value(qPageSetting.autoSave),
+              primaryAutoSaves: Value(qPageSetting.primaryAutoSaves),
+              reviewAutoSaves: Value(qPageSetting.reviewAutoSaves),
             ),
           );
       return Success(null);

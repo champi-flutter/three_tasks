@@ -1,4 +1,5 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:flutter/foundation.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/labels_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_label/c_label.dart';
 
@@ -55,4 +56,18 @@ class LabelsCacheHandlerImpl extends SlidingTtlCacheHandler<int, List<CLabel>>
   Future<void> output(Map<int, List<CLabel>> dataMap) async {
     // 監視中の更新は無視する
   }
+
+  /// 現在キャッシュしているラベルのリストを返す
+  @override
+  List<CLabel> getLabelList()=> getAt(0)??<CLabel>[];
+
+  // @override
+  // @nonVirtual
+  // @protected
+  // List<CLabel>? getAt(int key)=>super.getAt(key);
+  //
+  // @override
+  // @nonVirtual
+  // @protected
+  // Map<int, List<CLabel>> getAll()=> super.getAll();
 }

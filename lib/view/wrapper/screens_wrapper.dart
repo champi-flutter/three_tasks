@@ -11,11 +11,11 @@ import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
-import 'package:three_tasks/view/screens/review_screen.dart';
+import 'package:three_tasks/view/specific_widgets/pages/screens/review_screen.dart';
 import 'package:three_tasks/view/screens/enumeration/screen_type.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
-import 'package:three_tasks/view/specific_widgets/pages/page_list.dart';
-import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/page_list.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
 
 class ScreensWrapper extends ConsumerWidget {
   ScreensWrapper({super.key});
@@ -40,6 +40,9 @@ class ScreensWrapper extends ConsumerWidget {
     // インデックスに対応するページ
     final currentPage = scopedPageList[currentPageIndex].value;
 
+    // 「明日のタスク」ページの場合は、レビュー画面への遷移ボタンを無効にする
+    final bool isReviewValid = currentPageIndex != 1;
+
     return UnfocusTapScrimScope(
       child: Scaffold(
         // appBar
@@ -53,11 +56,12 @@ class ScreensWrapper extends ConsumerWidget {
           ),
           actions: [
             // todo レビューボタン（2026/09/29）＞＞
-            _NavigationForReview(
-              taskRec: currentPage.rec,
+            if(isReviewValid)_NavigationForReview(
+              currentShortTitle: currentPage.shortTitle,
+              previousShortTitle: currentPage.previousShortTitle,
             ),
             // 自動保存オンオフスイッチ
-            AutoSaveSwitch(
+            AutoSaveSwitch.primary(
               pageIndex: currentPageIndex,
               // スイッチ切り替え時の保存処理
               onSwitched: (bool value) async {
@@ -219,7 +223,7 @@ class _ScreenBody extends ConsumerWidget {
     final settingsVMState = ref.watch(pageSettingsViewModelProvider);
     return settingsVMState.when(
       onReceived: (data) {
-        final bool willAutoSave = data[currentPageIndex].autoSave;
+        final bool willAutoSave = data[currentPageIndex].primaryAutoSaves;
 
         // riverpod_wrapper の ControlledPageView
         // （自動保存でない場合に未保存の編集を確認するラッパー付き）
@@ -258,16 +262,14 @@ class _ScreenBody extends ConsumerWidget {
 class _NavigationForReview extends StatelessWidget {
   const _NavigationForReview({
     super.key,
-    required this.taskRec,
+    required this.currentShortTitle,
+    required this.previousShortTitle,
   });
 
-  final TaskRec taskRec;
-
-  /// 「今日」「今週」「今月」「今年」
-  String get _currentStr => taskType.currentLabel;
+  final String currentShortTitle;
 
   /// 「昨日」「先週」「先月」「去年」
-  String get _previousStr => taskType.previousLabel;
+  final String previousShortTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -283,7 +285,7 @@ class _NavigationForReview extends StatelessWidget {
         PopupMenuItem(
           // todo サイズ確認
           child: Text(
-            "$_currentStrのタスクをレビュー",
+            "$currentShortTitleのタスクをレビュー",
             style: TextStyle(fontSize: 18.sp),
           ),
           onTap: () {
@@ -302,7 +304,7 @@ class _NavigationForReview extends StatelessWidget {
         PopupMenuItem(
           // todo サイズ確認
           child: Text(
-            "$_previousStrのタスクをレビュー",
+            "$previousShortTitleのタスクをレビュー",
             style: TextStyle(fontSize: 18.sp),
           ),
           onTap: () {

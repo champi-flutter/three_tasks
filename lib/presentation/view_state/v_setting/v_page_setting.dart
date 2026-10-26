@@ -9,29 +9,35 @@ class VPageSetting {
   /// このページのインデックス
   final int controlledIndex;
 
-  /// 自動保存オンオフ
-  final bool autoSave;
+  /// 対象ページの自動保存オンオフ
+  final bool primaryAutoSaves;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフ
+  final bool reviewAutoSaves;
 
   const VPageSetting({
     required this.controlledIndex,
-    required this.autoSave,
+    required this.primaryAutoSaves,
+    required this.reviewAutoSaves,
   });
 
   /// 仮データ
-  const VPageSetting.placeholder(this.controlledIndex) : autoSave = true;
+  const VPageSetting.placeholder(this.controlledIndex)
+      : primaryAutoSaves = true,
+        reviewAutoSaves = false;
 }
 
 /// 各ページにおける設定のハッシュマップ
 ///
 /// ページのインデックスを key として、 [VPageSetting] を参照する。
-class VSettingsMap
-    extends MapBase<int, VPageSetting> {
+class VSettingsMap extends MapBase<int, VPageSetting> {
   /// 設定の対象となるページの総数を引数にとり（[numberOfPages]）、空の枠
   /// （[VPageSetting.placeholder]）を確保するコンストラクタ
   VSettingsMap.initFromPageList({
     required int numberOfPages,
   }) : _source = {
-          for (int index= 0; index < numberOfPages; index++) index: VPageSetting.placeholder(index),
+          for (int index = 0; index < numberOfPages; index++)
+            index: VPageSetting.placeholder(index),
         };
 
   final Map<int, VPageSetting> _source;

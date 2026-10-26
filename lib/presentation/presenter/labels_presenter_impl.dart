@@ -15,14 +15,14 @@ class LabelsPresenterImpl implements LabelsPresenter {
   /// [LabelsViewModel] の呼び出し口
   final LabelsViewModel _viewModel;
 
-  @override
-  Future<void> presentWith(ELabel newLabel) async {
-    final LabelList<VLabel> adaptedData = newData.mapValues<VLabel>(EToVLabel.toVLabel).toListAs(LabelList.fromIterable);
-    _viewModel.update(adaptedData);
-  }
+  // @override
+  // Future<void> present(ELabel newLabel) async {
+  //   final LabelList<VLabel> adaptedData = newLabel.mapValues<VLabel>(EToVLabel.toVLabel).toListAs(LabelList.fromIterable);
+  //   _viewModel.update(adaptedData);
+  // }
 
   @override
-  Future<void> presentAll(LabelList<ELabel> newData) async {
+  Future<void> present(LabelList<ELabel> newData) async {
     final LabelList<VLabel> adaptedData = newData.mapValues<VLabel>(EToVLabel.toVLabel).toListAs(LabelList.fromIterable);
     _viewModel.update(adaptedData);
   }

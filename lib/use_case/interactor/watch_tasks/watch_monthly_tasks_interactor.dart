@@ -7,7 +7,7 @@ import 'package:three_tasks/use_case/output_boundary/monthly_tasks_presenter.dar
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/monthly_tasks_stream_handler.dart';
 
-/// 日単位タスクの監視フローを実装するクラス
+/// 月単位タスクの監視フローを実装するクラス
 class WatchMonthlyTasksInteractor
     with NotificationFromUseCase
     implements WatchMonthlyTasksUseCase {

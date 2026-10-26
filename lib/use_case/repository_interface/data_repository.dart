@@ -1,19 +1,17 @@
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
-import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
-import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
 
 /// データ層へのアクセスポート
 abstract class DataRepository {
 
   // todo フェッチ
   /// ラベルデータをフェッチするメソッド
-  Future<Result<List<ELabel>, Exception>> fetchLabel();
+  Future<Result<LabelList<ELabel>, Exception>> fetchLabel();
 
   /// 指定日付の日単位タスクをフェッチするメソッド
   Future<Result<void, Exception>> fetchDailyTasks({
@@ -35,21 +33,9 @@ abstract class DataRepository {
     required Month targetMonth,
   });
 
-  /// 指定日付（[firstDateList]）の週単位タスクをフェッチするメソッド
-  ///
-  /// 複数の日付を指定可能。
-  Future<Result<void, Exception>> fetchWeeklyTaskList({
-    required List<Date> firstDateList,
-  });
-
-  // /// 日単位タスクの新しい日付の枠を作成するメソッド
-  // Future<Result<Map<Date, List<EDailyTask>>, Exception>> createDailyTaskRecord({
-  //   required List<Date> dateList,
-  // });
-
-  /// 週単位タスクの新しい枠を作成するメソッド
-  Future<Result<List<EWeeklyTask>, Exception>> createWeeklyTaskRecord({
-    required List<Date> firstDateList,
+  /// 指定年の月単位タスクをフェッチするメソッド
+  Future<Result<void, Exception>> fetchYearlyTasks({
+    required int targetYear,
   });
 
   /// 各種設定値をフェッチする
@@ -63,22 +49,16 @@ abstract class DataRepository {
   });
 
   /// 週タスク固有の情報変更保存メソッド
+  ///
+  /// `ListEntry<EWeeklyTask>` の可変長リストを渡す
   Future<Result<void, Exception>> saveWeeklyTaskChanges({
-    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
+    required List<ListEntry<EWeeklyTask>> updatingETaskList,
   });
 
   /// 週単位タスクの firstDate を書き換えるメソッド
   Future<Result<void, Exception>> updateWeeklyTasksFirstDate({
     required Map<int, Date> idFirstDateMap,
   });
-
-  // /// タスクタイトル保存メソッド
-  // Future<Result<void, Exception>> saveTaskTitles({
-  //   required List<ETask> newTaskList,
-  // });
-
-  // /// タスクのチェック変更保存メソッド
-  // Future<Result<void, Exception>> saveCheck({required DTask newTask});
 
   /// ラベル情報変更保存メソッド
   ///
@@ -94,25 +74,8 @@ abstract class DataRepository {
     required ETask firstETask,
   });
 
-  /// タスクラベル化メソッド
-  ///
-  /// 新規ラベルの ID を返す。
-  ///
-  /// 例外が発生した場合は、`null` を返す。
-  Future<int?> labeling({required DTask dTask});
-
-  /// タスクを既存のラベルに登録
-  ///
-  /// 指定ラベル（[labelId]）に、指定タスクのID（[dTask.id]）を追加する。
-  ///
-  /// 指定タスクのラベル情報（[dTask.labelId]）に、指定ラベルを加える。
-  Future<Result<void, Exception>> addTaskIdToLabel({
-    required DTask dTask,
-    required int labelId,
-  });
-
   /// 新しい値を当てはめずに、現在のキャッシュを流す
-  Future<Result<void, Exception>> outputCurrentCache(TaskRec rec);
+  Future<Result<void, Exception>> outputCurrentTaskCache(TaskRec rec);
 
   /// 各種設定を初期化する
   Future<Result<ESettingsMap, Exception>> initSettings({

@@ -1,5 +1,5 @@
 
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
 
 /// [CTask] から値を取り出して [ETask] へ変換する

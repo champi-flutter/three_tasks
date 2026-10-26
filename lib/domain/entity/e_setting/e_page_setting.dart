@@ -1,4 +1,3 @@
-
 import 'dart:collection';
 
 import 'package:collection/collection.dart';
@@ -9,22 +8,37 @@ class EPageSetting {
   /// このページのインデックス
   final int pageIndex;
 
-  /// 自動保存オンオフ
-  bool autoSave;
+  /// 対象ページの自動保存オンオフ
+  bool _primaryAutoSaves;
+
+  /// 対象ページの自動保存オンオフ
+  bool get primaryAutoSaves => _primaryAutoSaves;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフ
+  bool _reviewAutoSaves;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフ
+  bool get reviewAutoSaves => _reviewAutoSaves;
 
   EPageSetting({
     required this.pageIndex,
-    required this.autoSave,
-  });
+    required bool primaryAutoSaves,
+    required bool reviewAutoSaves,
+  })  : _primaryAutoSaves = primaryAutoSaves,
+        _reviewAutoSaves = reviewAutoSaves;
 
   /// パラメータを更新する
   void update({
-    bool? newAutoSave,
+    bool? primaryAutoSaves,
+    bool? reviewAutoSaves,
   })
   // 折りたたみ用
   {
-    if(newAutoSave != null){
-      autoSave = newAutoSave;
+    if (primaryAutoSaves != null) {
+      _primaryAutoSaves = primaryAutoSaves;
+    }
+    if (reviewAutoSaves != null) {
+      _reviewAutoSaves = reviewAutoSaves;
     }
   }
 }
@@ -35,13 +49,13 @@ class EPageSetting {
 class ESettingsMap extends MapBase<int, EPageSetting> {
   /// 直接参照していい [Map] から作るコンストラクタ
   ESettingsMap.fromMapCopy(
-      Map<int, EPageSetting> map,
-      ) : _source = map;
+    Map<int, EPageSetting> map,
+  ) : _source = map;
 
   /// 生の（直接参照してはいけない） [Map] から作るコンストラクタ
   ESettingsMap.fromRawMap(
-      Map<int, EPageSetting> rawMap,
-      ) : _source = Map.of(rawMap);
+    Map<int, EPageSetting> rawMap,
+  ) : _source = Map.of(rawMap);
 
   final Map<int, EPageSetting> _source;
 
@@ -71,7 +85,11 @@ class ESettingsMap extends MapBase<int, EPageSetting> {
   @override
   void clear() {
     for (int index = 0; index < _source.length; index++) {
-      _source[index] = EPageSetting(pageIndex: index, autoSave: true);
+      _source[index] = EPageSetting(
+        pageIndex: index,
+        primaryAutoSaves: true,
+        reviewAutoSaves: false,
+      );
     }
   }
 

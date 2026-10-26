@@ -8,12 +8,16 @@ class QPageSetting {
   /// このページの識別子
   final int pageId;
 
-  /// 自動保存オンオフ
-  final bool autoSave;
+  /// 対象ページの自動保存オンオフ
+  final bool primaryAutoSaves;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフ
+  final bool reviewAutoSaves;
 
   const QPageSetting({
     required this.pageId,
-    required this.autoSave,
+    required this.primaryAutoSaves,
+    required this.reviewAutoSaves,
   });
 }
 
@@ -60,7 +64,9 @@ class QSettingsMap extends MapBase<int, QPageSetting> {
   @override
   void clear() {
     for (int index = 0; index < _source.length; index++) {
-      _source[index] = QPageSetting(pageId: index, autoSave: true);
+      _source[index] = QPageSetting(pageId: index, primaryAutoSaves: true,
+        reviewAutoSaves: false,
+      );
     }
   }
 

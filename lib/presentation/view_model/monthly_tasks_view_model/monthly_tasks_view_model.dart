@@ -3,7 +3,6 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

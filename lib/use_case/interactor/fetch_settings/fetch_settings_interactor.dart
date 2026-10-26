@@ -43,7 +43,7 @@ class FetchSettingsInteractor
               // 想定通りのデータをフェッチできた場合
               if (validLength == resultMap.length) {
                 // Presenter に渡す
-                await _presenter.present(resultMap);
+                await _presenter.presentAll(resultMap);
               }
               // データがまだなかった場合（アプリ初起動時）
               else if (resultMap.isEmpty) {
@@ -82,7 +82,7 @@ class FetchSettingsInteractor
         // 想定通りのデータをフェッチできた場合
         if (length == resultMap.length) {
           // Presenter に渡す
-          await _presenter.present(resultMap);
+          await _presenter.presentAll(resultMap);
         }
         // その他は実装エラー
         else {

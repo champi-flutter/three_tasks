@@ -11,4 +11,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 abstract class WatchWeeklyTasksUseCase {
   /// 監視フローを開始
   Future<void> initAt(Date targetDate) ;
+
+  /// todo このクラスの dispose
+  void dispose();
 }

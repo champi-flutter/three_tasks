@@ -1,4 +1,3 @@
-
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,13 +7,24 @@ import 'package:three_tasks/presentation/controller/dto/setting_control_paramete
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
 
+enum _SwitchType { primary, review }
+
 /// 「自動保存オンオフ」スイッチ
 class AutoSaveSwitch extends ConsumerWidget {
-  const AutoSaveSwitch({
+
+  /// 対象ページの自動保存オンオフを切り替えるスイッチのコンストラクタ
+  const AutoSaveSwitch.primary({
     super.key,
     required this.pageIndex,
     required this.onSwitched,
-  });
+  }) : _type = _SwitchType.primary;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフを切り替えるスイッチのコンストラクタ
+  const AutoSaveSwitch.review({
+    super.key,
+    required this.pageIndex,
+    required this.onSwitched,
+  }) : _type = _SwitchType.review;
 
   /// 現在表示されているページのインデックス
   final int pageIndex;
@@ -22,17 +32,21 @@ class AutoSaveSwitch extends ConsumerWidget {
   /// 対象ページの自動保存オンオフを変更した際に呼ばれるコールバック
   final Future<void> Function(bool) onSwitched;
 
+  final _SwitchType _type;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // PageSettingsViewModel を監視する
     final state = ref.watch(pageSettingsViewModelProvider);
 
     return state.when(
-      onReceived: (data){
+      onReceived: (data) {
         final VPageSetting targetPageSetting = data[pageIndex];
         // 現在指定されている pageIndex における「自動保存オンオフ」
-        final bool willAutoSave = targetPageSetting.autoSave;
-        return  Row(
+        final bool willAutoSave = (_type == _SwitchType.primary)
+            ? targetPageSetting.primaryAutoSaves
+            : targetPageSetting.reviewAutoSaves;
+        return Row(
           children: [
             const UtilizedText(
               "自動保存",
@@ -47,8 +61,12 @@ class AutoSaveSwitch extends ConsumerWidget {
                 // 設定値を変更する
                 await ref.read(settingsControllerProvider).controlPageSettings(
                   targetPageSetting: targetPageSetting,
-                  parameter: PageSettingControlParameter(
-                    autoSave: value,
+                  parameter: (_type == _SwitchType.primary)
+                      ? PageSettingControlParameter(
+                    primaryAutoSaves: value,
+                  )
+                      : PageSettingControlParameter(
+                    reviewAutoSaves: value,
                   ),
                 );
                 await onSwitched(value);
@@ -58,8 +76,8 @@ class AutoSaveSwitch extends ConsumerWidget {
         );
       },
       // todo 読み込み時のスイッチ（2026/10/07）＞＞
-      onLoading: ,
-      onError: ,
+      onLoading:,
+      onError:,
     );
   }
 }

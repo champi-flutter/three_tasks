@@ -868,7 +868,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "640c5dfd15a38a121d051b8e6c0c01f926b59258"
+      resolved-ref: b40ab009a05ae344fd0194e66896d34b4061ea46
       url: "https://github.com/champi-flutter/riverpod_wrapper.git"
     source: git
     version: "1.3.2+12"

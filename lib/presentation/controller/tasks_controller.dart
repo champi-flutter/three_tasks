@@ -73,10 +73,11 @@ class TasksController {
     // あとで TaskList<ETask> に当てはめるリスト
     final List<ETask> tempTaskList = [];
     // あとで WeeklyTaskList<EWeeklyTask> に当てはめるリスト
-    final List<EWeeklyTask> tempWeeklyTaskList = [];
+    final Map<UniqueWeek, List<EWeeklyTask>> tempWeeklyTaskListMap = {};
     // 渡された情報を tempTaskList （または tempWeeklyTaskList ）に当てはめるプロセス
     for (final ListEntry<VTask> vTaskEntry in state) {
       ETask eTask = VToETask.toETask(vTaskEntry.value);
+      // 対象インデックスのエンティティを更新する
       if (vTaskEntry.index == position) {
         eTask.update(
           newTitle: parameter.newTitle,
@@ -86,7 +87,7 @@ class TasksController {
       }
       // 週タスクの場合
       if (eTask is EWeeklyTask) {
-        tempWeeklyTaskList.add(eTask);
+        tempWeeklyTaskListMap.addNullable(key: eTask.week, value: eTask);
       }
       // 週タスク以外の場合
       else {
@@ -104,10 +105,17 @@ class TasksController {
           updatingETaskList: updatingETaskList);
     }
     // 週タスクの場合
-    else if (tempWeeklyTaskList.isNotEmpty) {
+    else if (tempWeeklyTaskListMap.isNotEmpty) {
+
+      for(final weeklyTaskListEntry in tempWeeklyTaskListMap.entries){
+
+      }
+
+      tempWeeklyTaskListMap.map((week, eTask){});
+
       // tempWeeklyList を WeeklyTaskList<EWeeklyTask> に適用する
       final WeeklyTaskList<EWeeklyTask> updatingETaskList =
-          WeeklyTaskList.fromIterable(tempWeeklyTaskList);
+          WeeklyTaskList.fromIterable(tempWeeklyTaskListMap);
 
       // SaveTaskChangesUseCase を起動する
       await _saveWeeklyTaskChangesUseCase.execute(

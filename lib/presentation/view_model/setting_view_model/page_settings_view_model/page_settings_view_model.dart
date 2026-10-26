@@ -32,9 +32,11 @@ class PageSettingsViewModel extends _$PageSettingsViewModel {
 
     final VSettingsMap updatingMap = state.data;
 
-    updatingMap[newSetting.controlledIndex] = newSetting;
+    if(updatingMap[newSetting.controlledIndex] != newSetting) {
+      updatingMap[newSetting.controlledIndex] = newSetting;
 
-    state = LazyViewState.data(updatingMap);
+      state = LazyViewState.data(updatingMap);
+    }
   }
 
   /// この VM の [state] を Map で更新する

@@ -5,24 +5,23 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/disc
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 下書き破棄フローを実装するクラス
-class DiscardDraftInteractor with NotificationFromUseCase implements DiscardDraftUseCase {
-  // /// 日単位タスクのキャッシュハンドラ
-  // final DailyTasksCacheHandler _dailyTasksCacheHandler;
-  //
-  // /// 週単位タスクのキャッシュハンドラ
-  // final WeeklyTasksCacheHandler _weeklyTasksCacheHandler;
-  //
-  // /// 月単位タスクのキャッシュハンドラ
-  // final MonthlyTasksCacheHandler _monthlyTasksCacheHandler;
-  //
-  // /// 年単位タスクのキャッシュハンドラ
-  // final YearlyTasksCacheHandler _yearlyTasksCacheHandler;
+class DiscardDraftInteractor
+    with NotificationFromUseCase
+    implements DiscardDraftUseCase {
+  // todo コンストラクタ
+  DiscardDraftInteractor({
+    required DataRepository dataRepository,
+    required LoadingService loadingService,
+    required NotificationService notificationService,
+  })  : _repository = dataRepository,
+        _loading = loadingService,
+        notificationService = notificationService;
 
   /// [DataRepository] の呼び出し口
   final DataRepository _repository;
 
   /// ローディングの呼び出し口
-  final LoadingService _loadingService;
+  final LoadingService _loading;
 
   @override
   final NotificationService notificationService;
@@ -30,20 +29,20 @@ class DiscardDraftInteractor with NotificationFromUseCase implements DiscardDraf
   /// 下書き破棄フローを実装
   @override
   Future<void> execute({required TaskRec taskRec}) =>
-      _loadingService.loadAsync(() async {
+      _loading.loadAsync(() async {
         final Result<void, Exception> result =
-            await _repository.outputCurrentCache(taskRec);
+            await _repository.outputCurrentTaskCache(taskRec);
         switch (result) {
-        // region
+          // region
           case Success():
             break;
           case Failure(
-          exception: final Exception exc,
-          methodName: final String? methodName,
-          ):
+              exception: final Exception exc,
+              methodName: final String? methodName,
+            ):
             final Exception fetchExc = fetchError(methodName: methodName);
             throw Exception("$exc\n$fetchExc");
-        // endregion
+          // endregion
         }
       });
 }

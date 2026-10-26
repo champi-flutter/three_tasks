@@ -25,4 +25,15 @@ abstract class LabelsCacheHandler implements CacheHandlerBaseInterface<int, List
   ///
   /// key は `0` の 1 つのみで管理する。
   Future<bool> tryUpdateLabels(List<CLabel> data);
+
+  /// 現在キャッシュしているラベルのリストを返す
+  List<CLabel> getLabelList();
+
+  @override
+  @protected
+  List<CLabel>? getAt(int key);
+
+  @override
+  @protected
+  Map<int, List<CLabel>> getAll();
 }

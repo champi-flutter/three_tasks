@@ -2,8 +2,13 @@
 
 class PageSettingControlParameter {
   const PageSettingControlParameter({
-    this.autoSave,
+    this.primaryAutoSaves,
+    this.reviewAutoSaves,
   });
 
-  final bool? autoSave;
+  /// 対象ページの自動保存オンオフ
+  final bool? primaryAutoSaves;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフ
+  final bool? reviewAutoSaves;
 }

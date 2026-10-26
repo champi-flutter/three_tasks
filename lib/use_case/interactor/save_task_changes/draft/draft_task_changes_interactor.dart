@@ -3,9 +3,10 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draft_task_changes_use_case.dart';
-import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
-import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
+import 'package:three_tasks/use_case/output_boundary/monthly_tasks_presenter.dart';
+import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
+import 'package:three_tasks/use_case/output_boundary/yearly_tasks_presenter.dart';
 
 /// タスク情報の変更を下書きとして保有する処理フローを実装するクラス
 class DraftTaskChangesInteractor
@@ -16,13 +17,28 @@ class DraftTaskChangesInteractor
     required NotificationService notificationService,
     required LoadingService loadingService,
     required DailyTasksPresenter dailyTasksPresenter,
+    required WeeklyTasksPresenter weeklyTasksPresenter,
+    required MonthlyTasksPresenter monthlyTasksPresenter,
+    required YearlyTasksPresenter yearlyTasksPresenter,
   })  : _dailyTasksPresenter = dailyTasksPresenter,
+        _weeklyTasksPresenter = weeklyTasksPresenter,
+        _monthlyTasksPresenter = monthlyTasksPresenter,
+        _yearlyTasksPresenter = yearlyTasksPresenter,
         notificationService = notificationService,
         _loadingService = loadingService;
 
   // todo 依存先
-  /// 受信データを反映させるポートのインスタンス
+  /// 日単位タスクの受信データを反映させるポート
   final DailyTasksPresenter _dailyTasksPresenter;
+
+  /// 週単位タスクの受信データを反映させるポート
+  final WeeklyTasksPresenter _weeklyTasksPresenter;
+
+  /// 月単位タスクの受信データを反映させるポート
+  final MonthlyTasksPresenter _monthlyTasksPresenter;
+
+  /// 年単位タスクの受信データを反映させるポート
+  final YearlyTasksPresenter _yearlyTasksPresenter;
 
   /// ローディングの呼び出し口
   final LoadingService _loadingService;
@@ -78,9 +94,9 @@ class DraftTaskChangesInteractor
         tallyDailyTasksMap.map(
       (key, tasks) => MapEntry(key, TaskList<EDailyTask>.fromIterable(tasks)),
     );
-    final Map<UniqueWeek, TaskList<EWeeklyTask>> eWeeklyTasksMap =
+    final Map<UniqueWeek, WeeklyTaskList<EWeeklyTask>> eWeeklyTasksMap =
         tallyWeeklyTasksMap.map(
-      (key, tasks) => MapEntry(key, TaskList<EWeeklyTask>.fromIterable(tasks)),
+      (key, tasks) => MapEntry(key, WeeklyTaskList.fromIterable(tasks)),
     );
     final Map<Month, TaskList<EMonthlyTask>> eMonthlyTasksMap =
         tallyMonthlyTasksMap.map(

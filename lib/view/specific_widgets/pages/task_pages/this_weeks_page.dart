@@ -1,3 +1,4 @@
+
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -7,31 +8,34 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
-import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
+import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/draft_saving_button.dart';
 import 'package:three_tasks/view/specific_widgets/label_list_button.dart';
-import 'package:three_tasks/view/specific_widgets/pages/task_page_base.dart';
+import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 
-class ThisMonthsPage extends TaskPageBase {
+class ThisWeeksPage extends TaskPageBase {
 
-  ThisMonthsPage({
+  ThisWeeksPage({
     required this.pageIndex,
     required this.scopeToken,
   });
 
   @override
-  final String title = "今月のタスク";
+  final String title = "今週のタスク";
 
   @override
-  final String shortTitle = "今月";
+  final String shortTitle = "今週";
 
   @override
-  final TaskRec rec = TaskRec.month;
+  final String previousShortTitle = "先週";
+
+  @override
+  final TaskRec rec = TaskRec.week;
 
   @override
   final int pageIndex;
@@ -43,12 +47,12 @@ class ThisMonthsPage extends TaskPageBase {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // VMを監視
-    final monthlyTasksViewModelState =
-    ref.watch(monthlyTasksViewModelProvider.select((state) => state[thisMonth]));
+    final weeklyTasksViewModelState =
+    ref.watch(weeklyTasksViewModelProvider.select((state) => state[today]));
 
     // ローディング表示は riverpod_wrapper の LoadingService に任せるので、
     // `.when` は使わず、 `.data` を直接参照する
-    final TaskList<VMonthlyTask> taskState = monthlyTasksViewModelState.data;
+    final TaskList<VWeeklyTask> taskState = weeklyTasksViewModelState.data;
 
     // 自動保存オンオフを監視する
     final bool willAutoSave = ref.watch(pageSettingsViewModelProvider.select((state)=>state.data[pageIndex].autoSave));
@@ -66,7 +70,7 @@ class ThisMonthsPage extends TaskPageBase {
             // 余白
             SizedBox(height: 30.0.h.h),
 
-            // 「今月のタスク」欄
+            // 「今週のタスク」欄
             TasksView.checkbox(
               taskState: taskState,
               willAutoSave: willAutoSave,
@@ -102,7 +106,7 @@ class ThisMonthsPage extends TaskPageBase {
                       Navigator.of(context).pushWithUnfocus(
                         MaterialPageRoute(
                           builder: (context) => HistoryScreen(
-                              formatAtNavigation: TaskFormat.month),
+                              formatAtNavigation: TaskFormat.date),
                         ),
                       );
                     },
@@ -122,15 +126,15 @@ class ThisMonthsPage extends TaskPageBase {
   void _greatReset() {}
 }
 
-/// printメソッド [this_months_page.dart]
+/// printメソッド [this_weeks_page.dart]
 void _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {
   if (kDebugMode) {
     print("");
-    print("[this_months_page.dart]　" + s1);
-    if (s2 != null) print("[this_months_page.dart]　" + s2);
-    if (s3 != null) print("[this_months_page.dart]　" + s3);
-    if (s4 != null) print("[this_months_page.dart]　" + s4);
-    if (s5 != null) print("[this_months_page.dart]　" + s5);
+    print("[this_weeks_page.dart]　" + s1);
+    if (s2 != null) print("[this_weeks_page.dart]　" + s2);
+    if (s3 != null) print("[this_weeks_page.dart]　" + s3);
+    if (s4 != null) print("[this_weeks_page.dart]　" + s4);
+    if (s5 != null) print("[this_weeks_page.dart]　" + s5);
     print("");
   }
 }

@@ -45,7 +45,7 @@ final class PageSettingsViewModelProvider extends $NotifierProvider<
 }
 
 String _$pageSettingsViewModelHash() =>
-    r'54d249fe809494f3fdd5b83aac4305307247927b';
+    r'4baf7038d784450df1b2810777da05f21a0ab561';
 
 /// 各ページの設定
 

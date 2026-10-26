@@ -8,6 +8,106 @@ part of 'controller_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
+/// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
+
+@ProviderFor(tasksController)
+const tasksControllerProvider = TasksControllerFamily._();
+
+/// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
+
+final class TasksControllerProvider extends $FunctionalProvider<TasksController,
+    TasksController, TasksController> with $Provider<TasksController> {
+  /// 週単位タスク操作クラス
+  ///
+  /// 第2引数の [token] は、 [EditController] の Token 。
+  const TasksControllerProvider._(
+      {required TasksControllerFamily super.from,
+      required Token super.argument})
+      : super(
+          retry: null,
+          name: r'tasksControllerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$tasksControllerHash();
+
+  @override
+  String toString() {
+    return r'tasksControllerProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<TasksController> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  TasksController create(Ref ref) {
+    final argument = this.argument as Token;
+    return tasksController(
+      ref,
+      argument,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(TasksController value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<TasksController>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TasksControllerProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$tasksControllerHash() => r'719b09eda231537b6771e78cca12292f9a71e7eb';
+
+/// 週単位タスク操作クラス
+///
+/// 第2引数の [token] は、 [EditController] の Token 。
+
+final class TasksControllerFamily extends $Family
+    with $FunctionalFamilyOverride<TasksController, Token> {
+  const TasksControllerFamily._()
+      : super(
+          retry: null,
+          name: r'tasksControllerProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  /// 週単位タスク操作クラス
+  ///
+  /// 第2引数の [token] は、 [EditController] の Token 。
+
+  TasksControllerProvider call(
+    Token token,
+  ) =>
+      TasksControllerProvider._(argument: token, from: this);
+
+  @override
+  String toString() => r'tasksControllerProvider';
+}
+
 /// ラベルのコントローラ
 ///
 /// 第2引数の [token] は、 [EditController] の Token 。

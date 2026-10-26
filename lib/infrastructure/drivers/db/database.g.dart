@@ -1792,18 +1792,29 @@ class $PageSettingsTable extends PageSettings
   late final GeneratedColumn<int> pageId = GeneratedColumn<int>(
       'page_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _autoSaveMeta =
-      const VerificationMeta('autoSave');
+  static const VerificationMeta _primaryAutoSavesMeta =
+      const VerificationMeta('primaryAutoSaves');
   @override
-  late final GeneratedColumn<bool> autoSave = GeneratedColumn<bool>(
-      'auto_save', aliasedName, false,
+  late final GeneratedColumn<bool> primaryAutoSaves = GeneratedColumn<bool>(
+      'primary_auto_saves', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("auto_save" IN (0, 1))'),
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("primary_auto_saves" IN (0, 1))'),
       defaultValue: Constant(true));
+  static const VerificationMeta _reviewAutoSavesMeta =
+      const VerificationMeta('reviewAutoSaves');
   @override
-  List<GeneratedColumn> get $columns => [pageId, autoSave];
+  late final GeneratedColumn<bool> reviewAutoSaves = GeneratedColumn<bool>(
+      'review_auto_saves', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("review_auto_saves" IN (0, 1))'),
+      defaultValue: Constant(false));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [pageId, primaryAutoSaves, reviewAutoSaves];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1820,9 +1831,17 @@ class $PageSettingsTable extends PageSettings
     } else if (isInserting) {
       context.missing(_pageIdMeta);
     }
-    if (data.containsKey('auto_save')) {
-      context.handle(_autoSaveMeta,
-          autoSave.isAcceptableOrUnknown(data['auto_save']!, _autoSaveMeta));
+    if (data.containsKey('primary_auto_saves')) {
+      context.handle(
+          _primaryAutoSavesMeta,
+          primaryAutoSaves.isAcceptableOrUnknown(
+              data['primary_auto_saves']!, _primaryAutoSavesMeta));
+    }
+    if (data.containsKey('review_auto_saves')) {
+      context.handle(
+          _reviewAutoSavesMeta,
+          reviewAutoSaves.isAcceptableOrUnknown(
+              data['review_auto_saves']!, _reviewAutoSavesMeta));
     }
     return context;
   }
@@ -1835,8 +1854,10 @@ class $PageSettingsTable extends PageSettings
     return PageSetting(
       pageId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}page_id'])!,
-      autoSave: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}auto_save'])!,
+      primaryAutoSaves: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool, data['${effectivePrefix}primary_auto_saves'])!,
+      reviewAutoSaves: attachedDatabase.typeMapping.read(
+          DriftSqlType.bool, data['${effectivePrefix}review_auto_saves'])!,
     );
   }
 
@@ -1850,21 +1871,29 @@ class PageSetting extends DataClass implements Insertable<PageSetting> {
   /// 各ページの識別子
   final int pageId;
 
-  /// 自動保存オンオフ
-  final bool autoSave;
-  const PageSetting({required this.pageId, required this.autoSave});
+  /// 対象ページの自動保存オンオフ
+  final bool primaryAutoSaves;
+
+  /// 対象ページに対応するレビュー画面の自動保存オンオフ
+  final bool reviewAutoSaves;
+  const PageSetting(
+      {required this.pageId,
+      required this.primaryAutoSaves,
+      required this.reviewAutoSaves});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['page_id'] = Variable<int>(pageId);
-    map['auto_save'] = Variable<bool>(autoSave);
+    map['primary_auto_saves'] = Variable<bool>(primaryAutoSaves);
+    map['review_auto_saves'] = Variable<bool>(reviewAutoSaves);
     return map;
   }
 
   PageSettingsCompanion toCompanion(bool nullToAbsent) {
     return PageSettingsCompanion(
       pageId: Value(pageId),
-      autoSave: Value(autoSave),
+      primaryAutoSaves: Value(primaryAutoSaves),
+      reviewAutoSaves: Value(reviewAutoSaves),
     );
   }
 
@@ -1873,7 +1902,8 @@ class PageSetting extends DataClass implements Insertable<PageSetting> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PageSetting(
       pageId: serializer.fromJson<int>(json['pageId']),
-      autoSave: serializer.fromJson<bool>(json['autoSave']),
+      primaryAutoSaves: serializer.fromJson<bool>(json['primaryAutoSaves']),
+      reviewAutoSaves: serializer.fromJson<bool>(json['reviewAutoSaves']),
     );
   }
   @override
@@ -1881,18 +1911,27 @@ class PageSetting extends DataClass implements Insertable<PageSetting> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'pageId': serializer.toJson<int>(pageId),
-      'autoSave': serializer.toJson<bool>(autoSave),
+      'primaryAutoSaves': serializer.toJson<bool>(primaryAutoSaves),
+      'reviewAutoSaves': serializer.toJson<bool>(reviewAutoSaves),
     };
   }
 
-  PageSetting copyWith({int? pageId, bool? autoSave}) => PageSetting(
+  PageSetting copyWith(
+          {int? pageId, bool? primaryAutoSaves, bool? reviewAutoSaves}) =>
+      PageSetting(
         pageId: pageId ?? this.pageId,
-        autoSave: autoSave ?? this.autoSave,
+        primaryAutoSaves: primaryAutoSaves ?? this.primaryAutoSaves,
+        reviewAutoSaves: reviewAutoSaves ?? this.reviewAutoSaves,
       );
   PageSetting copyWithCompanion(PageSettingsCompanion data) {
     return PageSetting(
       pageId: data.pageId.present ? data.pageId.value : this.pageId,
-      autoSave: data.autoSave.present ? data.autoSave.value : this.autoSave,
+      primaryAutoSaves: data.primaryAutoSaves.present
+          ? data.primaryAutoSaves.value
+          : this.primaryAutoSaves,
+      reviewAutoSaves: data.reviewAutoSaves.present
+          ? data.reviewAutoSaves.value
+          : this.reviewAutoSaves,
     );
   }
 
@@ -1900,52 +1939,63 @@ class PageSetting extends DataClass implements Insertable<PageSetting> {
   String toString() {
     return (StringBuffer('PageSetting(')
           ..write('pageId: $pageId, ')
-          ..write('autoSave: $autoSave')
+          ..write('primaryAutoSaves: $primaryAutoSaves, ')
+          ..write('reviewAutoSaves: $reviewAutoSaves')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(pageId, autoSave);
+  int get hashCode => Object.hash(pageId, primaryAutoSaves, reviewAutoSaves);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is PageSetting &&
           other.pageId == this.pageId &&
-          other.autoSave == this.autoSave);
+          other.primaryAutoSaves == this.primaryAutoSaves &&
+          other.reviewAutoSaves == this.reviewAutoSaves);
 }
 
 class PageSettingsCompanion extends UpdateCompanion<PageSetting> {
   final Value<int> pageId;
-  final Value<bool> autoSave;
+  final Value<bool> primaryAutoSaves;
+  final Value<bool> reviewAutoSaves;
   final Value<int> rowid;
   const PageSettingsCompanion({
     this.pageId = const Value.absent(),
-    this.autoSave = const Value.absent(),
+    this.primaryAutoSaves = const Value.absent(),
+    this.reviewAutoSaves = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   PageSettingsCompanion.insert({
     required int pageId,
-    this.autoSave = const Value.absent(),
+    this.primaryAutoSaves = const Value.absent(),
+    this.reviewAutoSaves = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : pageId = Value(pageId);
   static Insertable<PageSetting> custom({
     Expression<int>? pageId,
-    Expression<bool>? autoSave,
+    Expression<bool>? primaryAutoSaves,
+    Expression<bool>? reviewAutoSaves,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (pageId != null) 'page_id': pageId,
-      if (autoSave != null) 'auto_save': autoSave,
+      if (primaryAutoSaves != null) 'primary_auto_saves': primaryAutoSaves,
+      if (reviewAutoSaves != null) 'review_auto_saves': reviewAutoSaves,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   PageSettingsCompanion copyWith(
-      {Value<int>? pageId, Value<bool>? autoSave, Value<int>? rowid}) {
+      {Value<int>? pageId,
+      Value<bool>? primaryAutoSaves,
+      Value<bool>? reviewAutoSaves,
+      Value<int>? rowid}) {
     return PageSettingsCompanion(
       pageId: pageId ?? this.pageId,
-      autoSave: autoSave ?? this.autoSave,
+      primaryAutoSaves: primaryAutoSaves ?? this.primaryAutoSaves,
+      reviewAutoSaves: reviewAutoSaves ?? this.reviewAutoSaves,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1956,8 +2006,11 @@ class PageSettingsCompanion extends UpdateCompanion<PageSetting> {
     if (pageId.present) {
       map['page_id'] = Variable<int>(pageId.value);
     }
-    if (autoSave.present) {
-      map['auto_save'] = Variable<bool>(autoSave.value);
+    if (primaryAutoSaves.present) {
+      map['primary_auto_saves'] = Variable<bool>(primaryAutoSaves.value);
+    }
+    if (reviewAutoSaves.present) {
+      map['review_auto_saves'] = Variable<bool>(reviewAutoSaves.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1969,7 +2022,8 @@ class PageSettingsCompanion extends UpdateCompanion<PageSetting> {
   String toString() {
     return (StringBuffer('PageSettingsCompanion(')
           ..write('pageId: $pageId, ')
-          ..write('autoSave: $autoSave, ')
+          ..write('primaryAutoSaves: $primaryAutoSaves, ')
+          ..write('reviewAutoSaves: $reviewAutoSaves, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2972,13 +3026,15 @@ typedef $$LabeledTasksTableProcessedTableManager = ProcessedTableManager<
 typedef $$PageSettingsTableCreateCompanionBuilder = PageSettingsCompanion
     Function({
   required int pageId,
-  Value<bool> autoSave,
+  Value<bool> primaryAutoSaves,
+  Value<bool> reviewAutoSaves,
   Value<int> rowid,
 });
 typedef $$PageSettingsTableUpdateCompanionBuilder = PageSettingsCompanion
     Function({
   Value<int> pageId,
-  Value<bool> autoSave,
+  Value<bool> primaryAutoSaves,
+  Value<bool> reviewAutoSaves,
   Value<int> rowid,
 });
 
@@ -2994,8 +3050,13 @@ class $$PageSettingsTableFilterComposer
   ColumnFilters<int> get pageId => $composableBuilder(
       column: $table.pageId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<bool> get autoSave => $composableBuilder(
-      column: $table.autoSave, builder: (column) => ColumnFilters(column));
+  ColumnFilters<bool> get primaryAutoSaves => $composableBuilder(
+      column: $table.primaryAutoSaves,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get reviewAutoSaves => $composableBuilder(
+      column: $table.reviewAutoSaves,
+      builder: (column) => ColumnFilters(column));
 }
 
 class $$PageSettingsTableOrderingComposer
@@ -3010,8 +3071,13 @@ class $$PageSettingsTableOrderingComposer
   ColumnOrderings<int> get pageId => $composableBuilder(
       column: $table.pageId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<bool> get autoSave => $composableBuilder(
-      column: $table.autoSave, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<bool> get primaryAutoSaves => $composableBuilder(
+      column: $table.primaryAutoSaves,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get reviewAutoSaves => $composableBuilder(
+      column: $table.reviewAutoSaves,
+      builder: (column) => ColumnOrderings(column));
 }
 
 class $$PageSettingsTableAnnotationComposer
@@ -3026,8 +3092,11 @@ class $$PageSettingsTableAnnotationComposer
   GeneratedColumn<int> get pageId =>
       $composableBuilder(column: $table.pageId, builder: (column) => column);
 
-  GeneratedColumn<bool> get autoSave =>
-      $composableBuilder(column: $table.autoSave, builder: (column) => column);
+  GeneratedColumn<bool> get primaryAutoSaves => $composableBuilder(
+      column: $table.primaryAutoSaves, builder: (column) => column);
+
+  GeneratedColumn<bool> get reviewAutoSaves => $composableBuilder(
+      column: $table.reviewAutoSaves, builder: (column) => column);
 }
 
 class $$PageSettingsTableTableManager extends RootTableManager<
@@ -3057,22 +3126,26 @@ class $$PageSettingsTableTableManager extends RootTableManager<
               $$PageSettingsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> pageId = const Value.absent(),
-            Value<bool> autoSave = const Value.absent(),
+            Value<bool> primaryAutoSaves = const Value.absent(),
+            Value<bool> reviewAutoSaves = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PageSettingsCompanion(
             pageId: pageId,
-            autoSave: autoSave,
+            primaryAutoSaves: primaryAutoSaves,
+            reviewAutoSaves: reviewAutoSaves,
             rowid: rowid,
           ),
           createCompanionCallback: ({
             required int pageId,
-            Value<bool> autoSave = const Value.absent(),
+            Value<bool> primaryAutoSaves = const Value.absent(),
+            Value<bool> reviewAutoSaves = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               PageSettingsCompanion.insert(
             pageId: pageId,
-            autoSave: autoSave,
+            primaryAutoSaves: primaryAutoSaves,
+            reviewAutoSaves: reviewAutoSaves,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

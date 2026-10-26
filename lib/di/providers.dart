@@ -1,4 +1,3 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/infrastructure_providers/cache_handler_providers.dart';
@@ -24,8 +23,8 @@ import 'package:three_tasks/use_case/interactor/notify_access/notify_daily_tasks
 import 'package:three_tasks/use_case/interactor/save_task_changes/draft/discard_draft_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/save_task_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_task_changes/save_weekly_task_changes_interactor.dart';
-import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_daily_tasks_interactor.dart';
-import 'package:three_tasks/use_case/interactor/watch_tasks_interactor/watch_weekly_tasks_interactor.dart';
+import 'package:three_tasks/use_case/interactor/watch_tasks/watch_daily_tasks_interactor.dart';
+import 'package:three_tasks/use_case/interactor/watch_tasks/watch_weekly_tasks_interactor.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
@@ -40,18 +39,6 @@ import 'package:three_tasks/presentation/presenter/weekly_tasks_presenter_impl.d
 part 'providers.g.dart';
 
 // todo DB
-@riverpod
-DataSource dataSource(Ref ref) => MyDatabase();
-
-// todo Gateway
-@riverpod
-DataRepository dataRepository(Ref ref) => DataRepositoryImpl(
-      dataSource: ref.watch(dataSourceProvider),
-      notificationService: ref.watch(notificationServiceProvider),
-      dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider),
-      weeklyTasksCacheHandler: ref.watch(weeklyTasksCacheHandlerProvider),
-      labelsCacheHandler: ref.watch(labelsCacheHandlerProvider),
-    );
 
 // todo UseCase
 @riverpod
@@ -61,49 +48,6 @@ ToastCount toastCount(Ref ref) => ToastCount();
 @riverpod
 LabeledTasksService labeledTasksService(Ref ref) => LabeledTasksService(ref);
 
-/// タスク書き換え処理フロー
-@riverpod
-SaveTaskChangesUseCase saveTaskChangesUseCase(Ref ref) =>
-    SaveTaskChangesInteractor(
-      dataRepository: ref.watch(dataRepositoryProvider),
-      notificationService: ref.watch(notificationServiceProvider),
-      loadingService: ref.watch(loadingServiceProvider),
-    );
-
-/// 週単位タスク書き換え処理フロー
-@riverpod
-SaveWeeklyTaskChangesUseCase saveWeeklyTaskChangesUseCase(Ref ref) =>
-    SaveWeeklyTaskChangesInteractor(
-      dataRepository: ref.watch(dataRepositoryProvider),
-      notificationService: ref.watch(notificationServiceProvider),
-      loadingService: ref.watch(loadingServiceProvider),
-    );
-
-/// 日単位タスクの監視フロー
-@riverpod
-WatchDailyTasksUseCase watchDailyTasksUseCase(Ref ref) {
-  final instance = WatchDailyTasksInteractor(
-    dailyTasksPresenter: ref.watch(dailyTasksPresenterProvider),
-    dailyTasksStreamHandler: ref.watch(dailyTasksStreamHandlerProvider),
-    notificationService: ref.watch(notificationServiceProvider),
-    dataRepository: ref.watch(dataRepositoryProvider),
-    loadingService: ref.watch(loadingServiceProvider),
-  );
-  ref.onDispose(instance.dispose);
-  return instance;
-}
-
-/// 週単位タスクの監視フロー
-@riverpod
-WatchWeeklyTasksUseCase watchWeeklyTasksUseCase(Ref ref) {
-  return WatchWeeklyTasksInteractor(
-    notificationService: ref.watch(notificationServiceProvider),
-    dataRepository: ref.watch(dataRepositoryProvider),
-    weeklyTasksPresenter: ref.watch(weeklyTasksPresenterProvider),
-    weeklyTasksStreamHandler: ref.watch(weeklyTasksStreamHandlerProvider),
-    loadingService: ref.watch(loadingServiceProvider),
-  );
-}
 
 /// 日単位タスクのアクセス通知フロー
 @riverpod
@@ -111,36 +55,6 @@ NotifyDailyTasksAccessUseCase notifyDailyTasksAccessUseCase(Ref ref) =>
     NotifyDailyTasksAccessInteractor(
         dailyTasksCacheHandler: ref.watch(dailyTasksCacheHandlerProvider));
 
-/// 下書き破棄フロー
-@riverpod
-DiscardDraftUseCase discardDraftUseCase(Ref ref) => DiscardDraftInteractor();
-
-/// 日単位タスク監視反映ポート
-@riverpod
-DailyTasksPresenter dailyTasksPresenter(Ref ref) => DailyTasksPresenterImpl(
-      dailyTasksViewModel: ref.watch(dailyTasksViewModelProvider.notifier),
-      notificationService: ref.watch(notificationServiceProvider),
-    );
-
-/// 週単位タスク監視反映ポート
-@riverpod
-WeeklyTasksPresenter weeklyTasksPresenter(Ref ref) => WeeklyTasksPresenterImpl(
-      notificationService: ref.watch(notificationServiceProvider),
-      weeklyTasksViewModel: ref.watch(weeklyTasksViewModelProvider.notifier),
-    );
-
-/// 週単位タスク操作クラス
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
-@riverpod
-TasksController tasksController(Ref ref, Token token) => TasksController(
-      saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),
-      draftTaskChangesUseCase: ref.watch(draftTaskChangesUseCaseProvider),
-      discardDraftUseCase: ref.watch(discardDraftUseCaseProvider),
-      saveWeeklyTaskChangesUseCase:
-          ref.watch(saveWeeklyTaskChangesUseCaseProvider),
-      editController: ref.watch(editControllerProvider(token)),
-    );
 
 // /// 週単位タスク操作クラス
 // @riverpod
@@ -151,41 +65,8 @@ TasksController tasksController(Ref ref, Token token) => TasksController(
 //     );
 
 // キャッシュハンドラ
-/// 日単位タスクのキャッシュストリームハンドラ
-@riverpod
-DailyTasksCacheHandler dailyTasksCacheHandler(Ref ref) =>
-    DailyTasksCacheHandlerImpl(
-      dailyTasksStreamHandler: ref.watch(dailyTasksStreamHandlerProvider),
-    );
-
-/// 週単位タスクのキャッシュストリームハンドラ
-@riverpod
-WeeklyTasksCacheHandler weeklyTasksCacheHandler(Ref ref) =>
-    WeeklyTasksCacheHandlerImpl(
-      weeklyTasksStreamHandler: ref.watch(weeklyTasksStreamHandlerProvider),
-    );
 
 // ストリームハンドラ
-
-/// 日単位タスクのキャッシュストリームハンドラ
-@riverpod
-DailyTasksStreamHandler dailyTasksStreamHandler(Ref ref) {
-  final instance = DailyTasksStreamHandlerImpl(
-      loadingService: ref.watch(loadingServiceProvider));
-
-  ref.onDispose(instance.dispose);
-  return instance;
-}
-
-/// 日単位タスクのキャッシュストリームハンドラ
-@riverpod
-WeeklyTasksStreamHandler weeklyTasksStreamHandler(Ref ref) {
-  final instance = WeeklyTasksStreamHandlerImpl(
-      loadingService: ref.watch(loadingServiceProvider));
-
-  ref.onDispose(instance.dispose);
-  return instance;
-}
 
 // todo ViewModel（状態なし）
 // /// 通知管理クラス
