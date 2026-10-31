@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
+import 'package:three_tasks/data_foundation/review_base/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
@@ -10,6 +11,7 @@ sealed class ETask extends TaskBase {
     required this.title,
     required this.isChecked,
     required this.labelId,
+    required this.review,
   });
 
   /// 一意の識別子
@@ -26,6 +28,9 @@ sealed class ETask extends TaskBase {
   /// ラベル未登録の状態を null => -1 に変更
   int labelId;
 
+  /// タスクのレビュー
+  Review review;
+
   /// タスクの期間の単位
   TaskRec get rec;
 
@@ -37,17 +42,25 @@ sealed class ETask extends TaskBase {
     String? newTitle,
     bool? newChecked,
     int? newLabelId,
+    String? newResult,
+    String? newNext,
   })
   // 折りたたみ用
   {
-    if(newTitle != null){
+    if (newTitle != null) {
       title = newTitle;
     }
-    if(newChecked!=null){
+    if (newChecked != null) {
       isChecked = newChecked;
     }
-    if(newLabelId!=null){
+    if (newLabelId != null) {
       labelId = newLabelId;
+    }
+    if (newResult != null || newNext != null) {
+      review = Review(
+        result: newResult ?? review.result,
+        next: newNext ?? review.next,
+      );
     }
   }
 }
@@ -61,6 +74,7 @@ class EDailyTask extends ETask with DailyTaskBase {
     required super.title,
     required super.isChecked,
     required super.labelId,
+    required super.review,
     required this.date,
   });
 
@@ -81,6 +95,7 @@ class EWeeklyTask extends ETask with WeeklyTaskBase {
     required super.title,
     required super.isChecked,
     required super.labelId,
+    required super.review,
     required this.week,
   });
 
@@ -94,7 +109,8 @@ class EWeeklyTask extends ETask with WeeklyTaskBase {
   bool get isPlaceHolder2 => id == -2;
 
   /// placeholder2 の初期値から変更されたかどうか
-  bool get _isPlaceholder2Changed => !(title== ""&&isChecked== false&&labelId== -1);
+  bool get _isPlaceholder2Changed =>
+      !(title == "" && isChecked == false && labelId == -1);
 
   /// 編集可能な仮データかどうか
   bool get canReplace {
@@ -119,6 +135,7 @@ class EWeeklyTask extends ETask with WeeklyTaskBase {
       title: title,
       isChecked: isChecked,
       labelId: labelId,
+      review: review,
     );
   }
 }
@@ -132,6 +149,7 @@ class EMonthlyTask extends ETask with MonthlyTaskBase {
     required super.title,
     required super.isChecked,
     required super.labelId,
+    required super.review,
     required this.month,
   });
 
@@ -151,6 +169,7 @@ class EYearlyTask extends ETask with YearlyTaskBase {
     required super.title,
     required super.isChecked,
     required super.labelId,
+    required super.review,
     required this.year,
   });
 

@@ -10,7 +10,7 @@ import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/yearly_tasks_view_model/yearly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/view/screens/history_screen.dart';
+import 'package:three_tasks/view/specific_widgets/pages/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/draft_saving_button.dart';
 import 'package:three_tasks/view/specific_widgets/label_list_button.dart';

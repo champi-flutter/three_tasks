@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:data_converter/data_converter.dart';
-import 'package:three_tasks/entities/e_task/e_task.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 
 /// [QTask] から値を取り出して [ETask] へ変換する
@@ -25,6 +25,7 @@ class QToETask {
       isChecked: dailyTask.isChecked,
       labelId: dailyTask.labelId,
       date: adaptedDate,
+      review: dailyTask.review,
     );
   }
 
@@ -41,6 +42,7 @@ class QToETask {
       isChecked: weeklyTask.isChecked,
       labelId: weeklyTask.labelId,
       week: adaptedWeek,
+      review: weeklyTask.review,
     );
   }
 
@@ -54,6 +56,7 @@ class QToETask {
       isChecked: monthlyTask.isChecked,
       labelId: monthlyTask.labelId,
       month: adaptedMonth,
+      review: monthlyTask.review,
     );
   }
 
@@ -64,6 +67,7 @@ class QToETask {
       isChecked: yearlyTask.isChecked,
       labelId: yearlyTask.labelId,
       year: yearlyTask.year,
+      review: yearlyTask.review,
     );
   }
 //

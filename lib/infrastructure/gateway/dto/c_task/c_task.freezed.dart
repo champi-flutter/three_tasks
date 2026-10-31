@@ -19,6 +19,7 @@ mixin _$CDailyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of CDailyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -37,16 +38,17 @@ mixin _$CDailyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId);
+      Object.hash(runtimeType, title, date, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -56,7 +58,13 @@ abstract mixin class $CDailyTaskCopyWith<$Res> {
           CDailyTask value, $Res Function(CDailyTask) _then) =
       _$CDailyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, Date date, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      Date date,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -76,6 +84,7 @@ class _$CDailyTaskCopyWithImpl<$Res> implements $CDailyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -98,6 +107,10 @@ class _$CDailyTaskCopyWithImpl<$Res> implements $CDailyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -195,16 +208,16 @@ extension CDailyTaskPatterns on CDailyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, Date date, int id, bool isChecked, int labelId)?
+    TResult Function(String title, Date date, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _CDailyTask() when $default != null:
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.date, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -225,15 +238,15 @@ extension CDailyTaskPatterns on CDailyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, Date date, int id, bool isChecked, int labelId)
+    TResult Function(String title, Date date, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CDailyTask():
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.date, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -253,15 +266,15 @@ extension CDailyTaskPatterns on CDailyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, Date date, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, Date date, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CDailyTask() when $default != null:
-        return $default(
-            _that.title, _that.date, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.date, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -276,7 +289,8 @@ class _CDailyTask extends CDailyTask {
       required this.date,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -289,6 +303,8 @@ class _CDailyTask extends CDailyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of CDailyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -308,16 +324,17 @@ class _CDailyTask extends CDailyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId);
+      Object.hash(runtimeType, title, date, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -329,7 +346,13 @@ abstract mixin class _$CDailyTaskCopyWith<$Res>
       __$CDailyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, Date date, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      Date date,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -349,6 +372,7 @@ class __$CDailyTaskCopyWithImpl<$Res> implements _$CDailyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_CDailyTask(
       title: null == title
@@ -371,6 +395,10 @@ class __$CDailyTaskCopyWithImpl<$Res> implements _$CDailyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -382,6 +410,7 @@ mixin _$CWeeklyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of CWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -400,16 +429,17 @@ mixin _$CWeeklyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, week, id, isChecked, labelId);
+      Object.hash(runtimeType, title, week, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -420,7 +450,12 @@ abstract mixin class $CWeeklyTaskCopyWith<$Res> {
       _$CWeeklyTaskCopyWithImpl;
   @useResult
   $Res call(
-      {String title, UniqueWeek week, int id, bool isChecked, int labelId});
+      {String title,
+      UniqueWeek week,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -440,6 +475,7 @@ class _$CWeeklyTaskCopyWithImpl<$Res> implements $CWeeklyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -462,6 +498,10 @@ class _$CWeeklyTaskCopyWithImpl<$Res> implements $CWeeklyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -559,16 +599,16 @@ extension CWeeklyTaskPatterns on CWeeklyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, UniqueWeek week, int id, bool isChecked, int labelId)?
+    TResult Function(String title, UniqueWeek week, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _CWeeklyTask() when $default != null:
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.week, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -589,15 +629,15 @@ extension CWeeklyTaskPatterns on CWeeklyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, UniqueWeek week, int id, bool isChecked, int labelId)
+    TResult Function(String title, UniqueWeek week, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CWeeklyTask():
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.week, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -617,15 +657,15 @@ extension CWeeklyTaskPatterns on CWeeklyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, UniqueWeek week, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, UniqueWeek week, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CWeeklyTask() when $default != null:
-        return $default(
-            _that.title, _that.week, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.week, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -640,7 +680,8 @@ class _CWeeklyTask extends CWeeklyTask {
       required this.week,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -653,6 +694,8 @@ class _CWeeklyTask extends CWeeklyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of CWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -672,16 +715,17 @@ class _CWeeklyTask extends CWeeklyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, week, id, isChecked, labelId);
+      Object.hash(runtimeType, title, week, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -694,7 +738,12 @@ abstract mixin class _$CWeeklyTaskCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String title, UniqueWeek week, int id, bool isChecked, int labelId});
+      {String title,
+      UniqueWeek week,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -714,6 +763,7 @@ class __$CWeeklyTaskCopyWithImpl<$Res> implements _$CWeeklyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_CWeeklyTask(
       title: null == title
@@ -736,6 +786,10 @@ class __$CWeeklyTaskCopyWithImpl<$Res> implements _$CWeeklyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -747,6 +801,7 @@ mixin _$CMonthlyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of CMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -766,16 +821,17 @@ mixin _$CMonthlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, month, id, isChecked, labelId);
+      Object.hash(runtimeType, title, month, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -785,7 +841,13 @@ abstract mixin class $CMonthlyTaskCopyWith<$Res> {
           CMonthlyTask value, $Res Function(CMonthlyTask) _then) =
       _$CMonthlyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, Month month, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      Month month,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -805,6 +867,7 @@ class _$CMonthlyTaskCopyWithImpl<$Res> implements $CMonthlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -827,6 +890,10 @@ class _$CMonthlyTaskCopyWithImpl<$Res> implements $CMonthlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -924,16 +991,16 @@ extension CMonthlyTaskPatterns on CMonthlyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, Month month, int id, bool isChecked, int labelId)?
+    TResult Function(String title, Month month, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _CMonthlyTask() when $default != null:
-        return $default(
-            _that.title, _that.month, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.month, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -954,15 +1021,15 @@ extension CMonthlyTaskPatterns on CMonthlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, Month month, int id, bool isChecked, int labelId)
+    TResult Function(String title, Month month, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CMonthlyTask():
-        return $default(
-            _that.title, _that.month, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.month, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -982,15 +1049,15 @@ extension CMonthlyTaskPatterns on CMonthlyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, Month month, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, Month month, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CMonthlyTask() when $default != null:
-        return $default(
-            _that.title, _that.month, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.month, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -1005,7 +1072,8 @@ class _CMonthlyTask extends CMonthlyTask {
       required this.month,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -1018,6 +1086,8 @@ class _CMonthlyTask extends CMonthlyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of CMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1037,16 +1107,17 @@ class _CMonthlyTask extends CMonthlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, month, id, isChecked, labelId);
+      Object.hash(runtimeType, title, month, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -1058,7 +1129,13 @@ abstract mixin class _$CMonthlyTaskCopyWith<$Res>
       __$CMonthlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, Month month, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      Month month,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -1079,6 +1156,7 @@ class __$CMonthlyTaskCopyWithImpl<$Res>
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_CMonthlyTask(
       title: null == title
@@ -1101,6 +1179,10 @@ class __$CMonthlyTaskCopyWithImpl<$Res>
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -1112,6 +1194,7 @@ mixin _$CYearlyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of CYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1130,16 +1213,17 @@ mixin _$CYearlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, year, id, isChecked, labelId);
+      Object.hash(runtimeType, title, year, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -1149,7 +1233,13 @@ abstract mixin class $CYearlyTaskCopyWith<$Res> {
           CYearlyTask value, $Res Function(CYearlyTask) _then) =
       _$CYearlyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, int year, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int year,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -1169,6 +1259,7 @@ class _$CYearlyTaskCopyWithImpl<$Res> implements $CYearlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -1191,6 +1282,10 @@ class _$CYearlyTaskCopyWithImpl<$Res> implements $CYearlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -1288,16 +1383,16 @@ extension CYearlyTaskPatterns on CYearlyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, int year, int id, bool isChecked, int labelId)?
+    TResult Function(String title, int year, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _CYearlyTask() when $default != null:
-        return $default(
-            _that.title, _that.year, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.year, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -1318,15 +1413,15 @@ extension CYearlyTaskPatterns on CYearlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, int year, int id, bool isChecked, int labelId)
+    TResult Function(String title, int year, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CYearlyTask():
-        return $default(
-            _that.title, _that.year, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.year, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1346,15 +1441,15 @@ extension CYearlyTaskPatterns on CYearlyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, int year, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, int year, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _CYearlyTask() when $default != null:
-        return $default(
-            _that.title, _that.year, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.year, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -1369,7 +1464,8 @@ class _CYearlyTask extends CYearlyTask {
       required this.year,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -1382,6 +1478,8 @@ class _CYearlyTask extends CYearlyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of CYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1401,16 +1499,17 @@ class _CYearlyTask extends CYearlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, year, id, isChecked, labelId);
+      Object.hash(runtimeType, title, year, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'CYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'CYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -1422,7 +1521,13 @@ abstract mixin class _$CYearlyTaskCopyWith<$Res>
       __$CYearlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, int year, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int year,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -1442,6 +1547,7 @@ class __$CYearlyTaskCopyWithImpl<$Res> implements _$CYearlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_CYearlyTask(
       title: null == title
@@ -1464,6 +1570,10 @@ class __$CYearlyTaskCopyWithImpl<$Res> implements _$CYearlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }

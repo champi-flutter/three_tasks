@@ -21,7 +21,7 @@ class CToETask {
       title: dailyTask.title,
       isChecked: dailyTask.isChecked,
       labelId: dailyTask.labelId,
-      date: dailyTask.date,
+      date: dailyTask.date, review: dailyTask.review,
     );
   }
 
@@ -32,6 +32,7 @@ class CToETask {
       isChecked: weeklyTask.isChecked,
       labelId: weeklyTask.labelId,
       week: weeklyTask.week,
+      review: weeklyTask.review,
     );
   }
 
@@ -42,6 +43,7 @@ class CToETask {
       isChecked: monthlyTask.isChecked,
       labelId: monthlyTask.labelId,
       month: monthlyTask.month,
+      review: monthlyTask.review,
     );
   }
 
@@ -52,6 +54,7 @@ class CToETask {
       isChecked: yearlyTask.isChecked,
       labelId: yearlyTask.labelId,
       year: yearlyTask.year,
+      review: yearlyTask.review,
     );
   }
 }

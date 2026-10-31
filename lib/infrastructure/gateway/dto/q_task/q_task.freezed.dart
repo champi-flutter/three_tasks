@@ -19,6 +19,7 @@ mixin _$QDailyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of QDailyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -37,16 +38,17 @@ mixin _$QDailyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId);
+      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -56,7 +58,13 @@ abstract mixin class $QDailyTaskCopyWith<$Res> {
           QDailyTask value, $Res Function(QDailyTask) _then) =
       _$QDailyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, int dateInt, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int dateInt,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -76,6 +84,7 @@ class _$QDailyTaskCopyWithImpl<$Res> implements $QDailyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -98,6 +107,10 @@ class _$QDailyTaskCopyWithImpl<$Res> implements $QDailyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -195,8 +208,8 @@ extension QDailyTaskPatterns on QDailyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, int dateInt, int id, bool isChecked, int labelId)?
+    TResult Function(String title, int dateInt, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
@@ -204,7 +217,7 @@ extension QDailyTaskPatterns on QDailyTask {
     switch (_that) {
       case _QDailyTask() when $default != null:
         return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
-            _that.labelId);
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -225,15 +238,15 @@ extension QDailyTaskPatterns on QDailyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, int dateInt, int id, bool isChecked, int labelId)
+    TResult Function(String title, int dateInt, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QDailyTask():
         return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
-            _that.labelId);
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -253,15 +266,15 @@ extension QDailyTaskPatterns on QDailyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, int dateInt, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, int dateInt, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QDailyTask() when $default != null:
         return $default(_that.title, _that.dateInt, _that.id, _that.isChecked,
-            _that.labelId);
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -276,7 +289,8 @@ class _QDailyTask extends QDailyTask {
       required this.dateInt,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -289,6 +303,8 @@ class _QDailyTask extends QDailyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of QDailyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -308,16 +324,17 @@ class _QDailyTask extends QDailyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId);
+      Object.hash(runtimeType, title, dateInt, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QDailyTask(title: $title, dateInt: $dateInt, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -329,7 +346,13 @@ abstract mixin class _$QDailyTaskCopyWith<$Res>
       __$QDailyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, int dateInt, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int dateInt,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -349,6 +372,7 @@ class __$QDailyTaskCopyWithImpl<$Res> implements _$QDailyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_QDailyTask(
       title: null == title
@@ -371,6 +395,10 @@ class __$QDailyTaskCopyWithImpl<$Res> implements _$QDailyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -382,6 +410,7 @@ mixin _$QWeeklyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of QWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -401,16 +430,17 @@ mixin _$QWeeklyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, firstDateInt, id, isChecked, labelId);
+  int get hashCode => Object.hash(
+      runtimeType, title, firstDateInt, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -421,7 +451,12 @@ abstract mixin class $QWeeklyTaskCopyWith<$Res> {
       _$QWeeklyTaskCopyWithImpl;
   @useResult
   $Res call(
-      {String title, int firstDateInt, int id, bool isChecked, int labelId});
+      {String title,
+      int firstDateInt,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -441,6 +476,7 @@ class _$QWeeklyTaskCopyWithImpl<$Res> implements $QWeeklyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -463,6 +499,10 @@ class _$QWeeklyTaskCopyWithImpl<$Res> implements $QWeeklyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -561,7 +601,7 @@ extension QWeeklyTaskPatterns on QWeeklyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String title, int firstDateInt, int id, bool isChecked,
-            int labelId)?
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
@@ -569,7 +609,7 @@ extension QWeeklyTaskPatterns on QWeeklyTask {
     switch (_that) {
       case _QWeeklyTask() when $default != null:
         return $default(_that.title, _that.firstDateInt, _that.id,
-            _that.isChecked, _that.labelId);
+            _that.isChecked, _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -590,15 +630,15 @@ extension QWeeklyTaskPatterns on QWeeklyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, int firstDateInt, int id, bool isChecked, int labelId)
+    TResult Function(String title, int firstDateInt, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QWeeklyTask():
         return $default(_that.title, _that.firstDateInt, _that.id,
-            _that.isChecked, _that.labelId);
+            _that.isChecked, _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -619,14 +659,14 @@ extension QWeeklyTaskPatterns on QWeeklyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String title, int firstDateInt, int id, bool isChecked,
-            int labelId)?
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QWeeklyTask() when $default != null:
         return $default(_that.title, _that.firstDateInt, _that.id,
-            _that.isChecked, _that.labelId);
+            _that.isChecked, _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -641,7 +681,8 @@ class _QWeeklyTask extends QWeeklyTask {
       required this.firstDateInt,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -654,6 +695,8 @@ class _QWeeklyTask extends QWeeklyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of QWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -674,16 +717,17 @@ class _QWeeklyTask extends QWeeklyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, firstDateInt, id, isChecked, labelId);
+  int get hashCode => Object.hash(
+      runtimeType, title, firstDateInt, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QWeeklyTask(title: $title, firstDateInt: $firstDateInt, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -696,7 +740,12 @@ abstract mixin class _$QWeeklyTaskCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {String title, int firstDateInt, int id, bool isChecked, int labelId});
+      {String title,
+      int firstDateInt,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -716,6 +765,7 @@ class __$QWeeklyTaskCopyWithImpl<$Res> implements _$QWeeklyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_QWeeklyTask(
       title: null == title
@@ -738,6 +788,10 @@ class __$QWeeklyTaskCopyWithImpl<$Res> implements _$QWeeklyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -749,6 +803,7 @@ mixin _$QMonthlyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of QMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -769,16 +824,17 @@ mixin _$QMonthlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, monthInt, id, isChecked, labelId);
+      Object.hash(runtimeType, title, monthInt, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QMonthlyTask(title: $title, monthInt: $monthInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QMonthlyTask(title: $title, monthInt: $monthInt, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -788,7 +844,13 @@ abstract mixin class $QMonthlyTaskCopyWith<$Res> {
           QMonthlyTask value, $Res Function(QMonthlyTask) _then) =
       _$QMonthlyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, int monthInt, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int monthInt,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -808,6 +870,7 @@ class _$QMonthlyTaskCopyWithImpl<$Res> implements $QMonthlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -830,6 +893,10 @@ class _$QMonthlyTaskCopyWithImpl<$Res> implements $QMonthlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -927,8 +994,8 @@ extension QMonthlyTaskPatterns on QMonthlyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, int monthInt, int id, bool isChecked, int labelId)?
+    TResult Function(String title, int monthInt, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
@@ -936,7 +1003,7 @@ extension QMonthlyTaskPatterns on QMonthlyTask {
     switch (_that) {
       case _QMonthlyTask() when $default != null:
         return $default(_that.title, _that.monthInt, _that.id, _that.isChecked,
-            _that.labelId);
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -957,15 +1024,15 @@ extension QMonthlyTaskPatterns on QMonthlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, int monthInt, int id, bool isChecked, int labelId)
+    TResult Function(String title, int monthInt, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QMonthlyTask():
         return $default(_that.title, _that.monthInt, _that.id, _that.isChecked,
-            _that.labelId);
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -985,15 +1052,15 @@ extension QMonthlyTaskPatterns on QMonthlyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, int monthInt, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, int monthInt, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QMonthlyTask() when $default != null:
         return $default(_that.title, _that.monthInt, _that.id, _that.isChecked,
-            _that.labelId);
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -1008,7 +1075,8 @@ class _QMonthlyTask extends QMonthlyTask {
       required this.monthInt,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -1021,6 +1089,8 @@ class _QMonthlyTask extends QMonthlyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of QMonthlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1041,16 +1111,17 @@ class _QMonthlyTask extends QMonthlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, monthInt, id, isChecked, labelId);
+      Object.hash(runtimeType, title, monthInt, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QMonthlyTask(title: $title, monthInt: $monthInt, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QMonthlyTask(title: $title, monthInt: $monthInt, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -1062,7 +1133,13 @@ abstract mixin class _$QMonthlyTaskCopyWith<$Res>
       __$QMonthlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, int monthInt, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int monthInt,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -1083,6 +1160,7 @@ class __$QMonthlyTaskCopyWithImpl<$Res>
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_QMonthlyTask(
       title: null == title
@@ -1105,6 +1183,10 @@ class __$QMonthlyTaskCopyWithImpl<$Res>
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -1116,6 +1198,7 @@ mixin _$QYearlyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
 
   /// Create a copy of QYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1134,16 +1217,17 @@ mixin _$QYearlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, year, id, isChecked, labelId);
+      Object.hash(runtimeType, title, year, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -1153,7 +1237,13 @@ abstract mixin class $QYearlyTaskCopyWith<$Res> {
           QYearlyTask value, $Res Function(QYearlyTask) _then) =
       _$QYearlyTaskCopyWithImpl;
   @useResult
-  $Res call({String title, int year, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int year,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -1173,6 +1263,7 @@ class _$QYearlyTaskCopyWithImpl<$Res> implements $QYearlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -1195,6 +1286,10 @@ class _$QYearlyTaskCopyWithImpl<$Res> implements $QYearlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }
@@ -1292,16 +1387,16 @@ extension QYearlyTaskPatterns on QYearlyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(
-            String title, int year, int id, bool isChecked, int labelId)?
+    TResult Function(String title, int year, int id, bool isChecked,
+            int labelId, Review review)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _QYearlyTask() when $default != null:
-        return $default(
-            _that.title, _that.year, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.year, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return orElse();
     }
@@ -1322,15 +1417,15 @@ extension QYearlyTaskPatterns on QYearlyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(
-            String title, int year, int id, bool isChecked, int labelId)
+    TResult Function(String title, int year, int id, bool isChecked,
+            int labelId, Review review)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QYearlyTask():
-        return $default(
-            _that.title, _that.year, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.year, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1350,15 +1445,15 @@ extension QYearlyTaskPatterns on QYearlyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(
-            String title, int year, int id, bool isChecked, int labelId)?
+    TResult? Function(String title, int year, int id, bool isChecked,
+            int labelId, Review review)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _QYearlyTask() when $default != null:
-        return $default(
-            _that.title, _that.year, _that.id, _that.isChecked, _that.labelId);
+        return $default(_that.title, _that.year, _that.id, _that.isChecked,
+            _that.labelId, _that.review);
       case _:
         return null;
     }
@@ -1373,7 +1468,8 @@ class _QYearlyTask extends QYearlyTask {
       required this.year,
       required this.id,
       required this.isChecked,
-      required this.labelId})
+      required this.labelId,
+      required this.review})
       : super._();
 
   @override
@@ -1386,6 +1482,8 @@ class _QYearlyTask extends QYearlyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
 
   /// Create a copy of QYearlyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -1405,16 +1503,17 @@ class _QYearlyTask extends QYearlyTask {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
-            (identical(other.labelId, labelId) || other.labelId == labelId));
+            (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, title, year, id, isChecked, labelId);
+      Object.hash(runtimeType, title, year, id, isChecked, labelId, review);
 
   @override
   String toString() {
-    return 'QYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId)';
+    return 'QYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review)';
   }
 }
 
@@ -1426,7 +1525,13 @@ abstract mixin class _$QYearlyTaskCopyWith<$Res>
       __$QYearlyTaskCopyWithImpl;
   @override
   @useResult
-  $Res call({String title, int year, int id, bool isChecked, int labelId});
+  $Res call(
+      {String title,
+      int year,
+      int id,
+      bool isChecked,
+      int labelId,
+      Review review});
 }
 
 /// @nodoc
@@ -1446,6 +1551,7 @@ class __$QYearlyTaskCopyWithImpl<$Res> implements _$QYearlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
   }) {
     return _then(_QYearlyTask(
       title: null == title
@@ -1468,6 +1574,10 @@ class __$QYearlyTaskCopyWithImpl<$Res> implements _$QYearlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
     ));
   }
 }

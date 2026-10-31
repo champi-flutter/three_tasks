@@ -25,7 +25,9 @@ ControlledPageList<TaskPageBase> pageList({
 }) =>
     ControlledPageList.fromPageConfig(
       pageConfig: pageConfig,
-      pageMap: _pageMap(scopeToken: scopeToken,),
+      pageMap: _pageMap(
+        scopeToken: scopeToken,
+      ),
     );
 
 /// ドメイン層で定義されたページの key と実際のページクラスを紐づける Map
@@ -56,7 +58,8 @@ PageMap<TaskPageBase> _pageMap({
     });
 
 /// 現在のページが参照しているタスク VM の `state` を `ref.read` で一度だけ取得する
-TaskList<VTask> getTaskStateOnCurrentPage(WidgetRef ref, {
+TaskList<VTask> getTaskStateOnCurrentPage(
+  WidgetRef ref, {
   required int pageIndex,
 })
 // 折りたたみ用
@@ -64,24 +67,50 @@ TaskList<VTask> getTaskStateOnCurrentPage(WidgetRef ref, {
   switch (pageIndex) {
     case 0:
       return ref.read(dailyTasksViewModelProvider.notifier).getCurrentStateAt(
-        today,
-      );
+            today,
+          );
     case 1:
       return ref.read(dailyTasksViewModelProvider.notifier).getCurrentStateAt(
-        tomorrow,
-      );
+            tomorrow,
+          );
     case 2:
       return ref.read(weeklyTasksViewModelProvider.notifier).getCurrentStateAt(
-        today,
-      );
+            today,
+          );
     case 3:
       return ref.read(monthlyTasksViewModelProvider.notifier).getCurrentStateAt(
-        thisMonth,
-      );
+            thisMonth,
+          );
     case 4:
       return ref.read(yearlyTasksViewModelProvider.notifier).getCurrentStateAt(
-        thisYear,
+            thisYear,
+          );
+    default:
+      throw RangeError(
+        "[currentTaskState] 無効なインデックスです。\n（pageIndex = $pageIndex）",
       );
+  }
+}
+
+
+/// 現在のページが参照しているタスク VM の `state` を監視する
+LazyViewState<TaskList<VTask>> watchTaskStateOnCurrentPage(
+    WidgetRef ref, {
+      required int pageIndex,
+    })
+// 折りたたみ用
+{
+  switch (pageIndex) {
+    case 0:
+      return ref.watch(dailyTasksViewModelProvider.select((state)=>state[today]));
+    case 1:
+      return ref.watch(dailyTasksViewModelProvider.select((state)=>state[tomorrow]));
+    case 2:
+      return ref.watch(weeklyTasksViewModelProvider.select((state)=>state[today]));;
+    case 3:
+      return ref.watch(monthlyTasksViewModelProvider.select((state)=>state[thisMonth]));;
+    case 4:
+      return ref.watch(yearlyTasksViewModelProvider.select((state)=>state[thisYear]));;
     default:
       throw RangeError(
         "[currentTaskState] 無効なインデックスです。\n（pageIndex = $pageIndex）",

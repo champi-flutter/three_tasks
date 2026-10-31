@@ -11,6 +11,7 @@ import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
+import 'package:three_tasks/view/specific_widgets/common_design/common_scaffold.dart';
 import 'package:three_tasks/view/specific_widgets/pages/screens/review_screen.dart';
 import 'package:three_tasks/view/screens/enumeration/screen_type.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
@@ -44,57 +45,41 @@ class ScreensWrapper extends ConsumerWidget {
     final bool isReviewValid = currentPageIndex != 1;
 
     return UnfocusTapScrimScope(
-      child: Scaffold(
-        // appBar
-        appBar: AppBar(
-          toolbarHeight: 56.h,
-          centerTitle: true,
-          // todo サイズ確認
-          title: UtilizedText(
-            currentPage.title,
-            fontSize: 21,
+      child: CommonScaffold(
+        title: currentPage.title,
+        appBarActions: [
+          // todo レビューボタン（2026/09/29）＞＞
+          if(isReviewValid)_NavigationForReview(
+            currentShortTitle: currentPage.shortTitle,
+            previousShortTitle: currentPage.previousShortTitle,
           ),
-          actions: [
-            // todo レビューボタン（2026/09/29）＞＞
-            if(isReviewValid)_NavigationForReview(
-              currentShortTitle: currentPage.shortTitle,
-              previousShortTitle: currentPage.previousShortTitle,
-            ),
-            // 自動保存オンオフスイッチ
-            AutoSaveSwitch.primary(
-              pageIndex: currentPageIndex,
-              // スイッチ切り替え時の保存処理
-              onSwitched: (bool value) async {
-                // 自動保存オフ => オン の場合
-                if (value) {
-                  // 現在のページが参照しているタスク VM の state を ref.read で
-                  // 一度だけ取得する
-                  final taskState = getTaskStateOnCurrentPage(
-                    ref,
-                    pageIndex: currentPageIndex,
-                  );
-                  // タスクの下書きを保存する
-                  await ref.read(tasksControllerProvider(scopeToken)).saveCurrent(
-                    taskState: taskState,
-                  );
-                  // ラベルの変更の下書きを保存する
-                  await ref.read(labelsControllerProvider(scopeToken)).saveDraft();
-                }
-                // 自動保存オン => オフ の場合
-                else {
-                  // 追加の処理はなし
-                }
-              },
-            ),
-          ],
-        ),
-        // drawer
-        drawer: ScaffoldMenuBar(
-          termsUrl: PrivateConfig.termsUrl,
-          privacyPolicyUrl: PrivateConfig.privacyPolicyUrl,
-        ),
-        resizeToAvoidBottomInset: false,
-
+          // 自動保存オンオフスイッチ
+          AutoSaveSwitch.primary(
+            pageIndex: currentPageIndex,
+            // スイッチ切り替え時の保存処理
+            onSwitched: (bool value) async {
+              // 自動保存オフ => オン の場合
+              if (value) {
+                // 現在のページが参照しているタスク VM の state を ref.read で
+                // 一度だけ取得する
+                final taskState = getTaskStateOnCurrentPage(
+                  ref,
+                  pageIndex: currentPageIndex,
+                );
+                // タスクの下書きを保存する
+                await ref.read(tasksControllerProvider(scopeToken)).saveCurrent(
+                  taskState: taskState,
+                );
+                // ラベルの変更の下書きを保存する
+                await ref.read(labelsControllerProvider(scopeToken)).saveDraft();
+              }
+              // 自動保存オン => オフ の場合
+              else {
+                // 追加の処理はなし
+              }
+            },
+          ),
+        ],
         body: Column(
           children: [
             // 画面遷移用の Chip

@@ -35,8 +35,6 @@ import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/converter/to_task_save_parameter.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
 import 'package:three_tasks/infrastructure/type_extension/e_task_data_entry.dart';
-import 'package:three_tasks/use_case/input_parameter/label_update_parameter/label_update_parameter.dart';
-import 'package:three_tasks/use_case/input_parameter/task_update_parameter/task_update_parameter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 class DataRepositoryImpl
@@ -215,6 +213,7 @@ class DataRepositoryImpl
                         id: targetQTask.id,
                         isChecked: targetQTask.isChecked,
                         labelId: targetQTask.labelId,
+                        review: targetQTask.review,
                       ),
                     );
                   }
@@ -249,6 +248,7 @@ class DataRepositoryImpl
                       id: targetQTask.id,
                       isChecked: targetQTask.isChecked,
                       labelId: targetQTask.labelId,
+                      review: targetQTask.review,
                     ),
                   );
                 }
@@ -336,6 +336,7 @@ class DataRepositoryImpl
                 id: qTask.id,
                 isChecked: qTask.isChecked,
                 labelId: qTask.labelId,
+                review: qTask.review,
               ),
             );
             // キャッシュハンドラに渡す Map に上の DataEntry を追加する
@@ -431,6 +432,7 @@ class DataRepositoryImpl
                         id: targetQTask.id,
                         isChecked: targetQTask.isChecked,
                         labelId: targetQTask.labelId,
+                        review: targetQTask.review,
                       ),
                     );
                   }
@@ -465,6 +467,7 @@ class DataRepositoryImpl
                       id: targetQTask.id,
                       isChecked: targetQTask.isChecked,
                       labelId: targetQTask.labelId,
+                      review: targetQTask.review,
                     ),
                   );
                 }
@@ -555,6 +558,7 @@ class DataRepositoryImpl
                         id: targetQTask.id,
                         isChecked: targetQTask.isChecked,
                         labelId: targetQTask.labelId,
+                        review: targetQTask.review,
                       ),
                     );
                   }
@@ -589,6 +593,7 @@ class DataRepositoryImpl
                       id: targetQTask.id,
                       isChecked: targetQTask.isChecked,
                       labelId: targetQTask.labelId,
+                      review: targetQTask.review,
                     ),
                   );
                 }
@@ -764,13 +769,6 @@ class DataRepositoryImpl
         );
     }
   }
-
-  /// クエリエラーの [Exception] のテンプレート
-  Exception _queryError({
-    String? details,
-    required String? methodName,
-  }) =>
-      Exception("QUERY_ERROR: DataSource.${methodName ?? "??"}\n$details");
 
   /// タスク情報変更保存メソッド
   @override

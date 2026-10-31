@@ -42,6 +42,7 @@ class ToCTask {
         isChecked: isChecked,
         labelId: labelId,
         date: dailyTask.date,
+        review: dailyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
@@ -65,6 +66,7 @@ class ToCTask {
         isChecked: isChecked,
         labelId: labelId,
         week: weeklyTask.week,
+        review: weeklyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
@@ -87,6 +89,7 @@ class ToCTask {
         isChecked: isChecked,
         labelId: labelId,
         month: monthlyTask.month,
+        review: monthlyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
@@ -109,6 +112,7 @@ class ToCTask {
         isChecked: isChecked,
         labelId: labelId,
         year: yearlyTask.year,
+        review: yearlyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる

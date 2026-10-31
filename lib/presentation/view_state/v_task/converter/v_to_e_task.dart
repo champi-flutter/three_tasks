@@ -17,6 +17,7 @@ class VToETask{
     title: vTask.title,
     isChecked: vTask.isChecked,
     labelId: vTask.labelId,
+    review: vTask.review,
     date: vTask.date,
   );
 
@@ -25,6 +26,7 @@ class VToETask{
     title: vTask.title,
     isChecked: vTask.isChecked,
     labelId: vTask.labelId,
+    review: vTask.review,
     week: vTask.week,
   );
 
@@ -33,6 +35,7 @@ class VToETask{
     title: vTask.title,
     isChecked: vTask.isChecked,
     labelId: vTask.labelId,
+    review: vTask.review,
     month: vTask.month,
   );
 
@@ -41,6 +44,7 @@ class VToETask{
     title: vTask.title,
     isChecked: vTask.isChecked,
     labelId: vTask.labelId,
+    review: vTask.review,
     year: vTask.year,
   );
 }

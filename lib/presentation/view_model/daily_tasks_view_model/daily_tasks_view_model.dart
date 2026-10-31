@@ -3,7 +3,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/di/providers.dart';
+import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -11,8 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'daily_tasks_view_model.g.dart';
 
 @riverpod
-class DailyTasksViewModel extends _$DailyTasksViewModel
-    with NotificationFromViewModel {
+class DailyTasksViewModel extends _$DailyTasksViewModel{
   // todo 初期化
   @override
   LazyMapViewState<Date, TaskList<VDailyTask>> build() {
@@ -39,13 +38,13 @@ class DailyTasksViewModel extends _$DailyTasksViewModel
   WatchDailyTasksUseCase get _watchDailyTasksUseCase =>
       ref.read(watchDailyTasksUseCaseProvider);
 
-  /// アクセス通知フローへのアクセス
+  // /// アクセス通知フローへのアクセス
   // NotifyDailyTasksAccessUseCase get _notifyDailyTasksAccessUseCase => ref.read();
 
-  /// 通知機能の呼び出し口
-  @override
-  NotificationService get notificationService =>
-      ref.read(notificationServiceProvider);
+  // /// 通知機能の呼び出し口
+  // @override
+  // NotificationService get notificationService =>
+  //     ref.read(notificationServiceProvider);
 
   /// 監視フローを開始する
   void _startWatching(Date targetDate) => _watchDailyTasksUseCase.initAt(targetDate);

@@ -1,3 +1,4 @@
+import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,15 +10,27 @@ import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 
+enum _ButtonType { primary, review }
+
 /// 「上書き保存」ボタン
 class DraftSavingButton extends ConsumerWidget {
-  const DraftSavingButton({
+  /// タスクを保存するコンストラクタ
+  const DraftSavingButton.primary({
     super.key,
     required this.isValid,
     required this.taskState,
-    required this.tasksViewStyle,
+    // required this.tasksViewStyle,
     required this.scopeToken,
-  });
+  }) : _type = _ButtonType.primary;
+
+  /// レビューを保存するコンストラクタ
+  const DraftSavingButton.review({
+    super.key,
+    required this.isValid,
+    required this.taskState,
+    // required this.tasksViewStyle,
+    required this.scopeToken,
+  }) : _type = _ButtonType.review;
 
   /// このボタンが有効かどうか
   final bool isValid;
@@ -25,26 +38,41 @@ class DraftSavingButton extends ConsumerWidget {
   /// 対象の [VTask] のリスト
   final TaskList<VTask> taskState;
 
-  /// このボタンがあるページの [TasksView] の表示形式
-  final TasksViewStyle tasksViewStyle;
+  // /// このボタンがあるページの [TasksView] の表示形式
+  // final TasksViewStyle tasksViewStyle;
 
   /// このボタンがあるページの管理元のスコープの [Token]
   final Token scopeToken;
 
+  final _ButtonType _type;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return BottomButton.async(
-      text: "上書き保存",
-      isValid: isValid,
-      onPressedAsync: () async {
-        // タスクの下書きを保存する
-        await ref.read(tasksControllerProvider(scopeToken)).saveCurrent(
-          taskState: taskState,
-        );
-        // ラベルの変更の下書きを保存する
-        await ref.read(labelsControllerProvider(scopeToken)).saveDraft();
-      },
-    );
+    return switch(_type){
+      _ButtonType.primary =>
+          BottomButton.async(
+            text: "上書き保存",
+            isValid: isValid,
+            onPressedAsync: () async {
+              // タスクの下書きを保存する
+              await ref.read(tasksControllerProvider(scopeToken)).saveCurrent(
+                taskState: taskState,
+              );
+              // ラベルの変更の下書きを保存する
+              await ref.read(labelsControllerProvider(scopeToken)).saveDraft();
+            },
+          ),
+      _ButtonType.review =>
+          TextButton(
+            child: UtilizedText("保存", fontSize: 18,),
+            onPressed: () async {
+              // レビューの下書きを保存する
+              await ref.read(reviewControllerProvider(scopeToken)).saveCurrent(
+                taskState: taskState,
+              );
+            },
+          ),
+    };
   }
 }
 

@@ -207,13 +207,13 @@ class _TaskField extends HookConsumerWidget {
         textFocusController.focusNode.unfocus();
       },
       maxLines: null,
+      textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         labelText: "タスク${position + 1}",
         // contentPadding: EdgeInsets.all(0),
       ),
       controller: textFocusController.controller,
       style: TextStyle(fontSize: 17.0.sp),
-      textInputAction: TextInputAction.done,
       // エンターキー等で、入力完了によってフォーカスが外れるようにする
       onSubmitted: (_) {
         textFocusController.focusNode.unfocus();

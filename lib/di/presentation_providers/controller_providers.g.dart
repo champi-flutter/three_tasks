@@ -8,22 +8,12 @@ part of 'controller_providers.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 週単位タスク操作クラス
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
 
 @ProviderFor(tasksController)
 const tasksControllerProvider = TasksControllerFamily._();
 
-/// 週単位タスク操作クラス
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
-
 final class TasksControllerProvider extends $FunctionalProvider<TasksController,
     TasksController, TasksController> with $Provider<TasksController> {
-  /// 週単位タスク操作クラス
-  ///
-  /// 第2引数の [token] は、 [EditController] の Token 。
   const TasksControllerProvider._(
       {required TasksControllerFamily super.from,
       required Token super.argument})
@@ -80,10 +70,6 @@ final class TasksControllerProvider extends $FunctionalProvider<TasksController,
 
 String _$tasksControllerHash() => r'719b09eda231537b6771e78cca12292f9a71e7eb';
 
-/// 週単位タスク操作クラス
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
-
 final class TasksControllerFamily extends $Family
     with $FunctionalFamilyOverride<TasksController, Token> {
   const TasksControllerFamily._()
@@ -95,10 +81,6 @@ final class TasksControllerFamily extends $Family
           isAutoDispose: true,
         );
 
-  /// 週単位タスク操作クラス
-  ///
-  /// 第2引数の [token] は、 [EditController] の Token 。
-
   TasksControllerProvider call(
     Token token,
   ) =>
@@ -108,24 +90,96 @@ final class TasksControllerFamily extends $Family
   String toString() => r'tasksControllerProvider';
 }
 
-/// ラベルのコントローラ
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
+@ProviderFor(reviewController)
+const reviewControllerProvider = ReviewControllerFamily._();
+
+final class ReviewControllerProvider extends $FunctionalProvider<
+    ReviewController,
+    ReviewController,
+    ReviewController> with $Provider<ReviewController> {
+  const ReviewControllerProvider._(
+      {required ReviewControllerFamily super.from,
+      required Token super.argument})
+      : super(
+          retry: null,
+          name: r'reviewControllerProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$reviewControllerHash();
+
+  @override
+  String toString() {
+    return r'reviewControllerProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<ReviewController> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ReviewController create(Ref ref) {
+    final argument = this.argument as Token;
+    return reviewController(
+      ref,
+      argument,
+    );
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ReviewController value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ReviewController>(value),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ReviewControllerProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$reviewControllerHash() => r'dbd4a8aebdc990552ff2f195ea5eab39cdbe69ea';
+
+final class ReviewControllerFamily extends $Family
+    with $FunctionalFamilyOverride<ReviewController, Token> {
+  const ReviewControllerFamily._()
+      : super(
+          retry: null,
+          name: r'reviewControllerProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  ReviewControllerProvider call(
+    Token token,
+  ) =>
+      ReviewControllerProvider._(argument: token, from: this);
+
+  @override
+  String toString() => r'reviewControllerProvider';
+}
 
 @ProviderFor(labelsController)
 const labelsControllerProvider = LabelsControllerFamily._();
-
-/// ラベルのコントローラ
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
 
 final class LabelsControllerProvider extends $FunctionalProvider<
     LabelsController,
     LabelsController,
     LabelsController> with $Provider<LabelsController> {
-  /// ラベルのコントローラ
-  ///
-  /// 第2引数の [token] は、 [EditController] の Token 。
   const LabelsControllerProvider._(
       {required LabelsControllerFamily super.from,
       required Token super.argument})
@@ -182,10 +236,6 @@ final class LabelsControllerProvider extends $FunctionalProvider<
 
 String _$labelsControllerHash() => r'dd253c84a0bd564aa26d3874fb56ca925d909b1f';
 
-/// ラベルのコントローラ
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
-
 final class LabelsControllerFamily extends $Family
     with $FunctionalFamilyOverride<LabelsController, Token> {
   const LabelsControllerFamily._()
@@ -196,10 +246,6 @@ final class LabelsControllerFamily extends $Family
           $allTransitiveDependencies: null,
           isAutoDispose: true,
         );
-
-  /// ラベルのコントローラ
-  ///
-  /// 第2引数の [token] は、 [EditController] の Token 。
 
   LabelsControllerProvider call(
     Token token,

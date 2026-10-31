@@ -26,7 +26,7 @@ part 'database.g.dart';
   WeeklyTasks,
   MonthlyTasks,
   YearlyTasks,
-  Reviews,
+  // Reviews,
   LabeledTasks,
   PageSettings,
 ])
@@ -276,7 +276,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         for (int i = 0; i < 3; i++) {
           final DayTask rawData =
               await managers.dayTasks.createReturning((record) => record(
-                    task: "",
+                    title: "",
                     date: targetDateInt,
                   ));
           qTaskList.add(TableToQTask.toQDailyTask(rawData));
@@ -308,7 +308,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         for (int index in indexList) {
           final int createdId =
               await managers.weeklyTasks.create((record) => record(
-                    task: "",
+                title: "",
                     // カラムの型の変換に対応
                     firstDate: today.toIntIdentifier(),
                   ));
@@ -338,7 +338,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         for (int i = 0; i < 3; i++) {
           final MonthlyTask rawData =
           await managers.monthlyTasks.createReturning((record) => record(
-            task: "",
+            title: "",
             month: targetMonthInt,
           ));
           qTaskList.add(TableToQTask.toQMonthlyTask(rawData));
@@ -368,7 +368,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         for (int i = 0; i < 3; i++) {
           final YearlyTask rawData =
           await managers.yearlyTasks.createReturning((record) => record(
-            task: "",
+            title: "",
             year: targetYear,
           ));
           qTaskList.add(TableToQTask.toQYearlyTask(rawData));
@@ -499,7 +499,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     // ややこしいので省略しないが、「=>』と同じ意味
     return managers.dayTasks
         .filter(
-          (f) => f.task.equals(unnecessaryDayTask.task),
+          (f) => f.title.equals(unnecessaryDayTask.title),
         )
         .delete();
   }
@@ -688,46 +688,58 @@ class MyDatabase extends _$MyDatabase implements DataSource {
             await m.addColumn(monthlyTasks, monthlyTasks.labelId);
             await m.addColumn(yearlyTasks, yearlyTasks.labelId);
           }
-          if (from < 22) {
-            await m.createTable(reviews);
-
-            // --- DayTasks からのデータ移行 ---
-            // DayTasksの識別子を 1 とする (1 を 32ビット左シフトし、id と結合)
-            await customStatement('''
-            INSERT INTO reviews (taskBitId, result, improvement)
-            SELECT (1 << 32) | id, result, improvement FROM day_tasks
-            WHERE result IS NOT NULL OR improvement IS NOT NULL;
-          ''');
-
-            // --- WeeklyTasks からのデータ移行 ---
-            // WeeklyTasksの識別子を 2 とする (2 を 32ビット左シフトし、id と結合)
-            await customStatement('''
-            INSERT INTO reviews (taskBitId, result, improvement)
-            SELECT (2 << 32) | id, result, improvement FROM weekly_tasks
-            WHERE result IS NOT NULL OR improvement IS NOT NULL;
-          ''');
-
-            // --- MonthlyTasks からのデータ移行 ---
-            // MonthlyTasksの識別子を 2 とする (2 を 32ビット左シフトし、id と結合)
-            await customStatement('''
-            INSERT INTO reviews (taskBitId, result, improvement)
-            SELECT (3 << 32) | id, result, improvement FROM monthly_tasks
-            WHERE result IS NOT NULL OR improvement IS NOT NULL;
-          ''');
-
-            // --- YearlyTasks からのデータ移行 ---
-            // YearlyTasksの識別子を 2 とする (2 を 32ビット左シフトし、id と結合)
-            await customStatement('''
-            INSERT INTO reviews (taskBitId, result, improvement)
-            SELECT (4 << 32) | id, result, improvement FROM yearly_tasks
-            WHERE result IS NOT NULL OR improvement IS NOT NULL;
-          ''');
-
-            // 3. 各Tasksテーブルから古いカラムを削除
-            await m.alterTable(TableMigration(dayTasks));
-            await m.alterTable(TableMigration(weeklyTasks));
-            await m.alterTable(TableMigration(monthlyTasks));
-            await m.alterTable(TableMigration(yearlyTasks));
+          // region review 分けるか問題
+          // if (from < 22) {
+          //   await m.createTable(reviews);
+          //
+          //   // --- DayTasks からのデータ移行 ---
+          //   // DayTasksの識別子を 1 とする (1 を 32ビット左シフトし、id と結合)
+          //   await customStatement('''
+          //   INSERT INTO reviews (taskBitId, result, improvement)
+          //   SELECT (1 << 32) | id, result, improvement FROM day_tasks
+          //   WHERE result IS NOT NULL OR improvement IS NOT NULL;
+          // ''');
+          //
+          //   // --- WeeklyTasks からのデータ移行 ---
+          //   // WeeklyTasksの識別子を 2 とする (2 を 32ビット左シフトし、id と結合)
+          //   await customStatement('''
+          //   INSERT INTO reviews (taskBitId, result, improvement)
+          //   SELECT (2 << 32) | id, result, improvement FROM weekly_tasks
+          //   WHERE result IS NOT NULL OR improvement IS NOT NULL;
+          // ''');
+          //
+          //   // --- MonthlyTasks からのデータ移行 ---
+          //   // MonthlyTasksの識別子を 2 とする (2 を 32ビット左シフトし、id と結合)
+          //   await customStatement('''
+          //   INSERT INTO reviews (taskBitId, result, improvement)
+          //   SELECT (3 << 32) | id, result, improvement FROM monthly_tasks
+          //   WHERE result IS NOT NULL OR improvement IS NOT NULL;
+          // ''');
+          //
+          //   // --- YearlyTasks からのデータ移行 ---
+          //   // YearlyTasksの識別子を 2 とする (2 を 32ビット左シフトし、id と結合)
+          //   await customStatement('''
+          //   INSERT INTO reviews (taskBitId, result, improvement)
+          //   SELECT (4 << 32) | id, result, improvement FROM yearly_tasks
+          //   WHERE result IS NOT NULL OR improvement IS NOT NULL;
+          // ''');
+          //
+          //   // 3. 各Tasksテーブルから古いカラムを削除
+          //   await m.alterTable(TableMigration(dayTasks));
+          //   await m.alterTable(TableMigration(weeklyTasks));
+          //   await m.alterTable(TableMigration(monthlyTasks));
+          //   await m.alterTable(TableMigration(yearlyTasks));
+          // }
+          // endregion
+          if(from < 23){
+            await m.renameColumn(dayTasks, "task", dayTasks.title);
+            await m.renameColumn(weeklyTasks, "task", weeklyTasks.title);
+            await m.renameColumn(monthlyTasks, "task", monthlyTasks.title);
+            await m.renameColumn(yearlyTasks, "task", yearlyTasks.title);
+            await m.renameColumn(dayTasks, "improvement", dayTasks.next);
+            await m.renameColumn(weeklyTasks, "improvement", weeklyTasks.next);
+            await m.renameColumn(monthlyTasks, "improvement", monthlyTasks.next);
+            await m.renameColumn(yearlyTasks, "improvement", yearlyTasks.next);
           }
           // if (from < 2) {
           //   await m.addColumn(dayTasks, dayTasks.id);

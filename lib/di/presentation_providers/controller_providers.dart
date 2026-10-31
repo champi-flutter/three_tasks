@@ -3,6 +3,7 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/controller/labels_controller.dart';
+import 'package:three_tasks/presentation/controller/review_controller.dart';
 import 'package:three_tasks/presentation/controller/settings_controller.dart';
 import 'package:three_tasks/presentation/controller/tasks_controller.dart';
 import 'package:three_tasks/presentation/view_model/labels_draft/labels_draft_handler.dart';
@@ -10,9 +11,9 @@ import 'package:three_tasks/presentation/view_model/labels_draft/labels_draft_ha
 part 'controller_providers.g.dart';
 
 
-/// 週単位タスク操作クラス
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
+// タスク操作クラス
+//
+// 第2引数の [token] は、 [EditController] の Token 。
 @riverpod
 TasksController tasksController(Ref ref, Token token) => TasksController(
   saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),
@@ -23,9 +24,22 @@ TasksController tasksController(Ref ref, Token token) => TasksController(
   editController: ref.watch(editControllerProvider(token)),
 );
 
-/// ラベルのコントローラ
-///
-/// 第2引数の [token] は、 [EditController] の Token 。
+// レビュー操作クラス
+//
+// 第2引数の [token] は、 [EditController] の Token 。
+@riverpod
+ReviewController reviewController(Ref ref, Token token) => ReviewController(
+  saveTaskChangesUseCase: ref.watch(saveTaskChangesUseCaseProvider),
+  draftTaskChangesUseCase: ref.watch(draftTaskChangesUseCaseProvider),
+  discardDraftUseCase: ref.watch(discardDraftUseCaseProvider),
+  saveWeeklyTaskChangesUseCase:
+  ref.watch(saveWeeklyTaskChangesUseCaseProvider),
+  editController: ref.watch(editControllerProvider(token)),
+);
+
+// ラベルのコントローラ
+//
+// 第2引数の [token] は、 [EditController] の Token 。
 @riverpod
 LabelsController labelsController(Ref ref, Token token) => LabelsController(
       saveLabelChangesUseCase: ref.watch(saveLabelChangesUseCaseProvider),

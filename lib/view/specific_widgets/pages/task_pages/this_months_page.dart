@@ -10,7 +10,7 @@ import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/view/screens/history_screen.dart';
+import 'package:three_tasks/view/specific_widgets/pages/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/draft_saving_button.dart';
 import 'package:three_tasks/view/specific_widgets/label_list_button.dart';
@@ -54,7 +54,7 @@ class ThisMonthsPage extends TaskPageBase {
     final TaskList<VMonthlyTask> taskState = monthlyTasksViewModelState.data;
 
     // 自動保存オンオフを監視する
-    final bool willAutoSave = ref.watch(pageSettingsViewModelProvider.select((state)=>state.data[pageIndex].autoSave));
+    final bool willAutoSave = ref.watch(pageSettingsViewModelProvider.select((state)=>state.data[pageIndex].primaryAutoSaves));
 
     // 現在表示している画面に、未保存の編集があるかどうか
     final isEdited = ref.watch(editViewModelProvider(scopeToken));
@@ -85,7 +85,7 @@ class ThisMonthsPage extends TaskPageBase {
               child: Column(
                 children: [
                   // 「上書き保存」ボタン
-                  DraftSavingButton(
+                  DraftSavingButton.primary(
                     // 自動保存オフかつ、編集未保存の場合にのみ有効
                     isValid: isEdited && !willAutoSave,
                     taskState: taskState,

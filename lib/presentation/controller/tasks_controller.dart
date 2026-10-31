@@ -107,24 +107,29 @@ class TasksController {
     // 週タスクの場合
     else if (tempWeeklyTaskListMap.isNotEmpty) {
 
-      for(final weeklyTaskListEntry in tempWeeklyTaskListMap.entries){
+      // UniqueWeek が Comparable を実装しているため、`..sort()` で古い順にする
+      final sortedKeys = tempWeeklyTaskListMap.keys.toList()..sort();
 
+      // 1つのリストにまとめる
+      final List<EWeeklyTask> combinedList = [];
+
+      // 古い順のキーに対応するリストを順番に追加していく
+      for (final key in sortedKeys) {
+        final list = tempWeeklyTaskListMap[key];
+        // 一応
+        if (list != null) {
+          combinedList.addAll(list);
+        }
       }
-
-      tempWeeklyTaskListMap.map((week, eTask){});
 
       // tempWeeklyList を WeeklyTaskList<EWeeklyTask> に適用する
       final WeeklyTaskList<EWeeklyTask> updatingETaskList =
-          WeeklyTaskList.fromIterable(tempWeeklyTaskListMap);
+          WeeklyTaskList.fromIterable(combinedList);
 
       // SaveTaskChangesUseCase を起動する
       await _saveWeeklyTaskChangesUseCase.execute(
         updatingETaskList: updatingETaskList,
       );
-    }
-    // 必ず上の2つのどちらかになる
-    else {
-      // todo エラーハンドリング（2026/09/23）＞＞
     }
   }
 
@@ -184,25 +189,25 @@ class TasksController {
     }
   }
 
-  // /// タスク変更パラメータを指定してタスク変更保存フロー（[SaveTaskChangesUseCase]）
-  // /// を呼び出す
-  // Future<void> saveTaskChanges({
-  //   required List<TaskControlParameter> controlInfo,
-  // })
-  // // 折りたたみ用
-  // async {
-  //   // [TaskControlParameter] から ETask 型の新しいデータに変換する
-  //   final TaskList<ETask> updateInfo = controlInfo
-  //       .map<ETask>(SetNewETask.toETask)
-  //       .toListAs(TaskList<ETask>.fromIterable);
-  //   // SaveTaskChangesUseCase を起動する
-  //   await _saveTaskChangesUseCase.execute(updatingETaskList: updateInfo);
-  // }
-
   /// 下書きを破棄する
   Future<void> discardDraft({required TaskRec taskRec}) async{
     // 編集未保存フラグをおろす
     _editController.notifyDiscarded();
     await _discardDraftUseCase.execute(taskRec: taskRec);
   }
+
+// /// タスク変更パラメータを指定してタスク変更保存フロー（[SaveTaskChangesUseCase]）
+// /// を呼び出す
+// Future<void> saveTaskChanges({
+//   required List<TaskControlParameter> controlInfo,
+// })
+// // 折りたたみ用
+// async {
+//   // [TaskControlParameter] から ETask 型の新しいデータに変換する
+//   final TaskList<ETask> updateInfo = controlInfo
+//       .map<ETask>(SetNewETask.toETask)
+//       .toListAs(TaskList<ETask>.fromIterable);
+//   // SaveTaskChangesUseCase を起動する
+//   await _saveTaskChangesUseCase.execute(updatingETaskList: updateInfo);
+// }
 }

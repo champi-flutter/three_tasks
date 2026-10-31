@@ -12,6 +12,7 @@ class EToVTask {
         title: dailyTask.title,
         isChecked: dailyTask.isChecked,
         labelId: dailyTask.labelId,
+        review: dailyTask.review,
         date: dailyTask.date,
         isFetched: dailyTask.isFetched,
       );
@@ -25,6 +26,7 @@ class EToVTask {
         isChecked: weeklyTask.isChecked,
         labelId: weeklyTask.labelId,
         week: weeklyTask.week,
+        review: weeklyTask.review,
         isFetched: weeklyTask.isFetched,
         canReplace: weeklyTask.isPlaceHolder2,
       );
@@ -34,6 +36,7 @@ class EToVTask {
         title: monthlyTask.title,
         isChecked: monthlyTask.isChecked,
         labelId: monthlyTask.labelId,
+        review: monthlyTask.review,
         month: monthlyTask.month,
         isFetched: monthlyTask.isFetched,
       );
@@ -43,6 +46,7 @@ class EToVTask {
         title: yearlyTask.title,
         isChecked: yearlyTask.isChecked,
         labelId: yearlyTask.labelId,
+        review: yearlyTask.review,
         year: yearlyTask.year,
         isFetched: yearlyTask.isFetched,
       );

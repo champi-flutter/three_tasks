@@ -19,6 +19,7 @@ mixin _$VDailyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
   bool get isFetched;
 
   /// Create a copy of VDailyTask
@@ -39,17 +40,18 @@ mixin _$VDailyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId, isFetched);
+  int get hashCode => Object.hash(
+      runtimeType, title, date, id, isChecked, labelId, review, isFetched);
 
   @override
   String toString() {
-    return 'VDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched)';
+    return 'VDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched)';
   }
 }
 
@@ -65,6 +67,7 @@ abstract mixin class $VDailyTaskCopyWith<$Res> {
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched});
 }
 
@@ -85,6 +88,7 @@ class _$VDailyTaskCopyWithImpl<$Res> implements $VDailyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
   }) {
     return _then(_self.copyWith(
@@ -108,6 +112,10 @@ class _$VDailyTaskCopyWithImpl<$Res> implements $VDailyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -210,7 +218,7 @@ extension VDailyTaskPatterns on VDailyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String title, Date date, int id, bool isChecked,
-            int labelId, bool isFetched)?
+            int labelId, Review review, bool isFetched)?
         $default, {
     required TResult orElse(),
   }) {
@@ -218,7 +226,7 @@ extension VDailyTaskPatterns on VDailyTask {
     switch (_that) {
       case _VDailyTask() when $default != null:
         return $default(_that.title, _that.date, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         return orElse();
     }
@@ -240,14 +248,14 @@ extension VDailyTaskPatterns on VDailyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String title, Date date, int id, bool isChecked,
-            int labelId, bool isFetched)
+            int labelId, Review review, bool isFetched)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VDailyTask():
         return $default(_that.title, _that.date, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -268,14 +276,14 @@ extension VDailyTaskPatterns on VDailyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String title, Date date, int id, bool isChecked,
-            int labelId, bool isFetched)?
+            int labelId, Review review, bool isFetched)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VDailyTask() when $default != null:
         return $default(_that.title, _that.date, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         return null;
     }
@@ -291,6 +299,7 @@ class _VDailyTask extends VDailyTask {
       required this.id,
       required this.isChecked,
       required this.labelId,
+      required this.review,
       required this.isFetched})
       : super._();
 
@@ -304,6 +313,8 @@ class _VDailyTask extends VDailyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
   @override
   final bool isFetched;
 
@@ -326,17 +337,18 @@ class _VDailyTask extends VDailyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, date, id, isChecked, labelId, isFetched);
+  int get hashCode => Object.hash(
+      runtimeType, title, date, id, isChecked, labelId, review, isFetched);
 
   @override
   String toString() {
-    return 'VDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched)';
+    return 'VDailyTask(title: $title, date: $date, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched)';
   }
 }
 
@@ -354,6 +366,7 @@ abstract mixin class _$VDailyTaskCopyWith<$Res>
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched});
 }
 
@@ -374,6 +387,7 @@ class __$VDailyTaskCopyWithImpl<$Res> implements _$VDailyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
   }) {
     return _then(_VDailyTask(
@@ -397,6 +411,10 @@ class __$VDailyTaskCopyWithImpl<$Res> implements _$VDailyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -412,6 +430,7 @@ mixin _$VWeeklyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
   bool get isFetched;
   bool get canReplace;
 
@@ -433,6 +452,7 @@ mixin _$VWeeklyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched) &&
             (identical(other.canReplace, canReplace) ||
@@ -440,12 +460,12 @@ mixin _$VWeeklyTask {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, title, week, id, isChecked, labelId, isFetched, canReplace);
+  int get hashCode => Object.hash(runtimeType, title, week, id, isChecked,
+      labelId, review, isFetched, canReplace);
 
   @override
   String toString() {
-    return 'VWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched, canReplace: $canReplace)';
+    return 'VWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched, canReplace: $canReplace)';
   }
 }
 
@@ -461,6 +481,7 @@ abstract mixin class $VWeeklyTaskCopyWith<$Res> {
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched,
       bool canReplace});
 }
@@ -482,6 +503,7 @@ class _$VWeeklyTaskCopyWithImpl<$Res> implements $VWeeklyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
     Object? canReplace = null,
   }) {
@@ -506,6 +528,10 @@ class _$VWeeklyTaskCopyWithImpl<$Res> implements $VWeeklyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -612,7 +638,7 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String title, UniqueWeek week, int id, bool isChecked,
-            int labelId, bool isFetched, bool canReplace)?
+            int labelId, Review review, bool isFetched, bool canReplace)?
         $default, {
     required TResult orElse(),
   }) {
@@ -620,7 +646,7 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
     switch (_that) {
       case _VWeeklyTask() when $default != null:
         return $default(_that.title, _that.week, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched, _that.canReplace);
+            _that.labelId, _that.review, _that.isFetched, _that.canReplace);
       case _:
         return orElse();
     }
@@ -642,14 +668,14 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String title, UniqueWeek week, int id, bool isChecked,
-            int labelId, bool isFetched, bool canReplace)
+            int labelId, Review review, bool isFetched, bool canReplace)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VWeeklyTask():
         return $default(_that.title, _that.week, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched, _that.canReplace);
+            _that.labelId, _that.review, _that.isFetched, _that.canReplace);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -670,14 +696,14 @@ extension VWeeklyTaskPatterns on VWeeklyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String title, UniqueWeek week, int id, bool isChecked,
-            int labelId, bool isFetched, bool canReplace)?
+            int labelId, Review review, bool isFetched, bool canReplace)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VWeeklyTask() when $default != null:
         return $default(_that.title, _that.week, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched, _that.canReplace);
+            _that.labelId, _that.review, _that.isFetched, _that.canReplace);
       case _:
         return null;
     }
@@ -693,6 +719,7 @@ class _VWeeklyTask extends VWeeklyTask {
       required this.id,
       required this.isChecked,
       required this.labelId,
+      required this.review,
       required this.isFetched,
       required this.canReplace})
       : super._();
@@ -707,6 +734,8 @@ class _VWeeklyTask extends VWeeklyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
   @override
   final bool isFetched;
   @override
@@ -731,6 +760,7 @@ class _VWeeklyTask extends VWeeklyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched) &&
             (identical(other.canReplace, canReplace) ||
@@ -738,12 +768,12 @@ class _VWeeklyTask extends VWeeklyTask {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, title, week, id, isChecked, labelId, isFetched, canReplace);
+  int get hashCode => Object.hash(runtimeType, title, week, id, isChecked,
+      labelId, review, isFetched, canReplace);
 
   @override
   String toString() {
-    return 'VWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched, canReplace: $canReplace)';
+    return 'VWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched, canReplace: $canReplace)';
   }
 }
 
@@ -761,6 +791,7 @@ abstract mixin class _$VWeeklyTaskCopyWith<$Res>
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched,
       bool canReplace});
 }
@@ -782,6 +813,7 @@ class __$VWeeklyTaskCopyWithImpl<$Res> implements _$VWeeklyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
     Object? canReplace = null,
   }) {
@@ -806,6 +838,10 @@ class __$VWeeklyTaskCopyWithImpl<$Res> implements _$VWeeklyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -825,6 +861,7 @@ mixin _$VMonthlyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
   bool get isFetched;
 
   /// Create a copy of VMonthlyTask
@@ -846,17 +883,18 @@ mixin _$VMonthlyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, month, id, isChecked, labelId, isFetched);
+  int get hashCode => Object.hash(
+      runtimeType, title, month, id, isChecked, labelId, review, isFetched);
 
   @override
   String toString() {
-    return 'VMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched)';
+    return 'VMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched)';
   }
 }
 
@@ -872,6 +910,7 @@ abstract mixin class $VMonthlyTaskCopyWith<$Res> {
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched});
 }
 
@@ -892,6 +931,7 @@ class _$VMonthlyTaskCopyWithImpl<$Res> implements $VMonthlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
   }) {
     return _then(_self.copyWith(
@@ -915,6 +955,10 @@ class _$VMonthlyTaskCopyWithImpl<$Res> implements $VMonthlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -1017,7 +1061,7 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String title, Month month, int id, bool isChecked,
-            int labelId, bool isFetched)?
+            int labelId, Review review, bool isFetched)?
         $default, {
     required TResult orElse(),
   }) {
@@ -1025,7 +1069,7 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
     switch (_that) {
       case _VMonthlyTask() when $default != null:
         return $default(_that.title, _that.month, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         return orElse();
     }
@@ -1047,14 +1091,14 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String title, Month month, int id, bool isChecked,
-            int labelId, bool isFetched)
+            int labelId, Review review, bool isFetched)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VMonthlyTask():
         return $default(_that.title, _that.month, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1075,14 +1119,14 @@ extension VMonthlyTaskPatterns on VMonthlyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String title, Month month, int id, bool isChecked,
-            int labelId, bool isFetched)?
+            int labelId, Review review, bool isFetched)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VMonthlyTask() when $default != null:
         return $default(_that.title, _that.month, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         return null;
     }
@@ -1098,6 +1142,7 @@ class _VMonthlyTask extends VMonthlyTask {
       required this.id,
       required this.isChecked,
       required this.labelId,
+      required this.review,
       required this.isFetched})
       : super._();
 
@@ -1111,6 +1156,8 @@ class _VMonthlyTask extends VMonthlyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
   @override
   final bool isFetched;
 
@@ -1133,17 +1180,18 @@ class _VMonthlyTask extends VMonthlyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, month, id, isChecked, labelId, isFetched);
+  int get hashCode => Object.hash(
+      runtimeType, title, month, id, isChecked, labelId, review, isFetched);
 
   @override
   String toString() {
-    return 'VMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched)';
+    return 'VMonthlyTask(title: $title, month: $month, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched)';
   }
 }
 
@@ -1161,6 +1209,7 @@ abstract mixin class _$VMonthlyTaskCopyWith<$Res>
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched});
 }
 
@@ -1182,6 +1231,7 @@ class __$VMonthlyTaskCopyWithImpl<$Res>
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
   }) {
     return _then(_VMonthlyTask(
@@ -1205,6 +1255,10 @@ class __$VMonthlyTaskCopyWithImpl<$Res>
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -1220,6 +1274,7 @@ mixin _$VYearlyTask {
   int get id;
   bool get isChecked;
   int get labelId;
+  Review get review;
   bool get isFetched;
 
   /// Create a copy of VYearlyTask
@@ -1240,17 +1295,18 @@ mixin _$VYearlyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, year, id, isChecked, labelId, isFetched);
+  int get hashCode => Object.hash(
+      runtimeType, title, year, id, isChecked, labelId, review, isFetched);
 
   @override
   String toString() {
-    return 'VYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched)';
+    return 'VYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched)';
   }
 }
 
@@ -1266,6 +1322,7 @@ abstract mixin class $VYearlyTaskCopyWith<$Res> {
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched});
 }
 
@@ -1286,6 +1343,7 @@ class _$VYearlyTaskCopyWithImpl<$Res> implements $VYearlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
   }) {
     return _then(_self.copyWith(
@@ -1309,6 +1367,10 @@ class _$VYearlyTaskCopyWithImpl<$Res> implements $VYearlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
@@ -1411,7 +1473,7 @@ extension VYearlyTaskPatterns on VYearlyTask {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
     TResult Function(String title, int year, int id, bool isChecked,
-            int labelId, bool isFetched)?
+            int labelId, Review review, bool isFetched)?
         $default, {
     required TResult orElse(),
   }) {
@@ -1419,7 +1481,7 @@ extension VYearlyTaskPatterns on VYearlyTask {
     switch (_that) {
       case _VYearlyTask() when $default != null:
         return $default(_that.title, _that.year, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         return orElse();
     }
@@ -1441,14 +1503,14 @@ extension VYearlyTaskPatterns on VYearlyTask {
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
     TResult Function(String title, int year, int id, bool isChecked,
-            int labelId, bool isFetched)
+            int labelId, Review review, bool isFetched)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VYearlyTask():
         return $default(_that.title, _that.year, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -1469,14 +1531,14 @@ extension VYearlyTaskPatterns on VYearlyTask {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
     TResult? Function(String title, int year, int id, bool isChecked,
-            int labelId, bool isFetched)?
+            int labelId, Review review, bool isFetched)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _VYearlyTask() when $default != null:
         return $default(_that.title, _that.year, _that.id, _that.isChecked,
-            _that.labelId, _that.isFetched);
+            _that.labelId, _that.review, _that.isFetched);
       case _:
         return null;
     }
@@ -1492,6 +1554,7 @@ class _VYearlyTask extends VYearlyTask {
       required this.id,
       required this.isChecked,
       required this.labelId,
+      required this.review,
       required this.isFetched})
       : super._();
 
@@ -1505,6 +1568,8 @@ class _VYearlyTask extends VYearlyTask {
   final bool isChecked;
   @override
   final int labelId;
+  @override
+  final Review review;
   @override
   final bool isFetched;
 
@@ -1527,17 +1592,18 @@ class _VYearlyTask extends VYearlyTask {
             (identical(other.isChecked, isChecked) ||
                 other.isChecked == isChecked) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
+            (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, title, year, id, isChecked, labelId, isFetched);
+  int get hashCode => Object.hash(
+      runtimeType, title, year, id, isChecked, labelId, review, isFetched);
 
   @override
   String toString() {
-    return 'VYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, isFetched: $isFetched)';
+    return 'VYearlyTask(title: $title, year: $year, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched)';
   }
 }
 
@@ -1555,6 +1621,7 @@ abstract mixin class _$VYearlyTaskCopyWith<$Res>
       int id,
       bool isChecked,
       int labelId,
+      Review review,
       bool isFetched});
 }
 
@@ -1575,6 +1642,7 @@ class __$VYearlyTaskCopyWithImpl<$Res> implements _$VYearlyTaskCopyWith<$Res> {
     Object? id = null,
     Object? isChecked = null,
     Object? labelId = null,
+    Object? review = null,
     Object? isFetched = null,
   }) {
     return _then(_VYearlyTask(
@@ -1598,6 +1666,10 @@ class __$VYearlyTaskCopyWithImpl<$Res> implements _$VYearlyTaskCopyWith<$Res> {
           ? _self.labelId
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
+      review: null == review
+          ? _self.review
+          : review // ignore: cast_nullable_to_non_nullable
+              as Review,
       isFetched: null == isFetched
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable

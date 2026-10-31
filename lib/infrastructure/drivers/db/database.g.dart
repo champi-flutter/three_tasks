@@ -8,16 +8,11 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $DayTasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _taskMeta = const VerificationMeta('task');
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
-  late final GeneratedColumn<String> task = GeneratedColumn<String>(
-      'task', aliasedName, false,
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _dateMeta = const VerificationMeta('date');
-  @override
-  late final GeneratedColumn<int> date = GeneratedColumn<int>(
-      'date', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -45,8 +40,24 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(-1));
+  static const VerificationMeta _resultMeta = const VerificationMeta('result');
   @override
-  List<GeneratedColumn> get $columns => [task, date, id, isChecked, labelId];
+  late final GeneratedColumn<String> result = GeneratedColumn<String>(
+      'result', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nextMeta = const VerificationMeta('next');
+  @override
+  late final GeneratedColumn<String> next = GeneratedColumn<String>(
+      'next', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<int> date = GeneratedColumn<int>(
+      'date', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [title, id, isChecked, labelId, result, next, date];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -57,17 +68,11 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('task')) {
+    if (data.containsKey('title')) {
       context.handle(
-          _taskMeta, task.isAcceptableOrUnknown(data['task']!, _taskMeta));
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
     } else if (isInserting) {
-      context.missing(_taskMeta);
-    }
-    if (data.containsKey('date')) {
-      context.handle(
-          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
-    } else if (isInserting) {
-      context.missing(_dateMeta);
+      context.missing(_titleMeta);
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
@@ -80,6 +85,20 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
       context.handle(_labelIdMeta,
           labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
     }
+    if (data.containsKey('result')) {
+      context.handle(_resultMeta,
+          result.isAcceptableOrUnknown(data['result']!, _resultMeta));
+    }
+    if (data.containsKey('next')) {
+      context.handle(
+          _nextMeta, next.isAcceptableOrUnknown(data['next']!, _nextMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+          _dateMeta, date.isAcceptableOrUnknown(data['date']!, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
     return context;
   }
 
@@ -89,16 +108,20 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
   DayTask map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return DayTask(
-      task: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}task'])!,
-      date: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}date'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       isChecked: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_checked'])!,
       labelId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}label_id'])!,
+      result: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}result']),
+      next: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}next']),
+      date: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}date'])!,
     );
   }
 
@@ -109,35 +132,48 @@ class $DayTasksTable extends DayTasks with TableInfo<$DayTasksTable, DayTask> {
 }
 
 class DayTask extends DataClass implements Insertable<DayTask> {
-  final String task;
-  final int date;
+  final String title;
   final int id;
   final bool isChecked;
   final int labelId;
+  final String? result;
+  final String? next;
+  final int date;
   const DayTask(
-      {required this.task,
-      required this.date,
+      {required this.title,
       required this.id,
       required this.isChecked,
-      required this.labelId});
+      required this.labelId,
+      this.result,
+      this.next,
+      required this.date});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['task'] = Variable<String>(task);
-    map['date'] = Variable<int>(date);
+    map['title'] = Variable<String>(title);
     map['id'] = Variable<int>(id);
     map['is_checked'] = Variable<bool>(isChecked);
     map['label_id'] = Variable<int>(labelId);
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(result);
+    }
+    if (!nullToAbsent || next != null) {
+      map['next'] = Variable<String>(next);
+    }
+    map['date'] = Variable<int>(date);
     return map;
   }
 
   DayTasksCompanion toCompanion(bool nullToAbsent) {
     return DayTasksCompanion(
-      task: Value(task),
-      date: Value(date),
+      title: Value(title),
       id: Value(id),
       isChecked: Value(isChecked),
       labelId: Value(labelId),
+      result:
+          result == null && nullToAbsent ? const Value.absent() : Value(result),
+      next: next == null && nullToAbsent ? const Value.absent() : Value(next),
+      date: Value(date),
     );
   }
 
@@ -145,129 +181,159 @@ class DayTask extends DataClass implements Insertable<DayTask> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return DayTask(
-      task: serializer.fromJson<String>(json['task']),
-      date: serializer.fromJson<int>(json['date']),
+      title: serializer.fromJson<String>(json['title']),
       id: serializer.fromJson<int>(json['id']),
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       labelId: serializer.fromJson<int>(json['labelId']),
+      result: serializer.fromJson<String?>(json['result']),
+      next: serializer.fromJson<String?>(json['next']),
+      date: serializer.fromJson<int>(json['date']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'task': serializer.toJson<String>(task),
-      'date': serializer.toJson<int>(date),
+      'title': serializer.toJson<String>(title),
       'id': serializer.toJson<int>(id),
       'isChecked': serializer.toJson<bool>(isChecked),
       'labelId': serializer.toJson<int>(labelId),
+      'result': serializer.toJson<String?>(result),
+      'next': serializer.toJson<String?>(next),
+      'date': serializer.toJson<int>(date),
     };
   }
 
   DayTask copyWith(
-          {String? task, int? date, int? id, bool? isChecked, int? labelId}) =>
+          {String? title,
+          int? id,
+          bool? isChecked,
+          int? labelId,
+          Value<String?> result = const Value.absent(),
+          Value<String?> next = const Value.absent(),
+          int? date}) =>
       DayTask(
-        task: task ?? this.task,
-        date: date ?? this.date,
+        title: title ?? this.title,
         id: id ?? this.id,
         isChecked: isChecked ?? this.isChecked,
         labelId: labelId ?? this.labelId,
+        result: result.present ? result.value : this.result,
+        next: next.present ? next.value : this.next,
+        date: date ?? this.date,
       );
   DayTask copyWithCompanion(DayTasksCompanion data) {
     return DayTask(
-      task: data.task.present ? data.task.value : this.task,
-      date: data.date.present ? data.date.value : this.date,
+      title: data.title.present ? data.title.value : this.title,
       id: data.id.present ? data.id.value : this.id,
       isChecked: data.isChecked.present ? data.isChecked.value : this.isChecked,
       labelId: data.labelId.present ? data.labelId.value : this.labelId,
+      result: data.result.present ? data.result.value : this.result,
+      next: data.next.present ? data.next.value : this.next,
+      date: data.date.present ? data.date.value : this.date,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('DayTask(')
-          ..write('task: $task, ')
-          ..write('date: $date, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('date: $date')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(task, date, id, isChecked, labelId);
+  int get hashCode =>
+      Object.hash(title, id, isChecked, labelId, result, next, date);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DayTask &&
-          other.task == this.task &&
-          other.date == this.date &&
+          other.title == this.title &&
           other.id == this.id &&
           other.isChecked == this.isChecked &&
-          other.labelId == this.labelId);
+          other.labelId == this.labelId &&
+          other.result == this.result &&
+          other.next == this.next &&
+          other.date == this.date);
 }
 
 class DayTasksCompanion extends UpdateCompanion<DayTask> {
-  final Value<String> task;
-  final Value<int> date;
+  final Value<String> title;
   final Value<int> id;
   final Value<bool> isChecked;
   final Value<int> labelId;
+  final Value<String?> result;
+  final Value<String?> next;
+  final Value<int> date;
   const DayTasksCompanion({
-    this.task = const Value.absent(),
-    this.date = const Value.absent(),
+    this.title = const Value.absent(),
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    this.date = const Value.absent(),
   });
   DayTasksCompanion.insert({
-    required String task,
-    required int date,
+    required String title,
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
-  })  : task = Value(task),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    required int date,
+  })  : title = Value(title),
         date = Value(date);
   static Insertable<DayTask> custom({
-    Expression<String>? task,
-    Expression<int>? date,
+    Expression<String>? title,
     Expression<int>? id,
     Expression<bool>? isChecked,
     Expression<int>? labelId,
+    Expression<String>? result,
+    Expression<String>? next,
+    Expression<int>? date,
   }) {
     return RawValuesInsertable({
-      if (task != null) 'task': task,
-      if (date != null) 'date': date,
+      if (title != null) 'title': title,
       if (id != null) 'id': id,
       if (isChecked != null) 'is_checked': isChecked,
       if (labelId != null) 'label_id': labelId,
+      if (result != null) 'result': result,
+      if (next != null) 'next': next,
+      if (date != null) 'date': date,
     });
   }
 
   DayTasksCompanion copyWith(
-      {Value<String>? task,
-      Value<int>? date,
+      {Value<String>? title,
       Value<int>? id,
       Value<bool>? isChecked,
-      Value<int>? labelId}) {
+      Value<int>? labelId,
+      Value<String?>? result,
+      Value<String?>? next,
+      Value<int>? date}) {
     return DayTasksCompanion(
-      task: task ?? this.task,
-      date: date ?? this.date,
+      title: title ?? this.title,
       id: id ?? this.id,
       isChecked: isChecked ?? this.isChecked,
       labelId: labelId ?? this.labelId,
+      result: result ?? this.result,
+      next: next ?? this.next,
+      date: date ?? this.date,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (task.present) {
-      map['task'] = Variable<String>(task.value);
-    }
-    if (date.present) {
-      map['date'] = Variable<int>(date.value);
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -278,17 +344,28 @@ class DayTasksCompanion extends UpdateCompanion<DayTask> {
     if (labelId.present) {
       map['label_id'] = Variable<int>(labelId.value);
     }
+    if (result.present) {
+      map['result'] = Variable<String>(result.value);
+    }
+    if (next.present) {
+      map['next'] = Variable<String>(next.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<int>(date.value);
+    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('DayTasksCompanion(')
-          ..write('task: $task, ')
-          ..write('date: $date, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('date: $date')
           ..write(')'))
         .toString();
   }
@@ -300,17 +377,11 @@ class $WeeklyTasksTable extends WeeklyTasks
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $WeeklyTasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _taskMeta = const VerificationMeta('task');
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
-  late final GeneratedColumn<String> task = GeneratedColumn<String>(
-      'task', aliasedName, false,
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _firstDateMeta =
-      const VerificationMeta('firstDate');
-  @override
-  late final GeneratedColumn<int> firstDate = GeneratedColumn<int>(
-      'first_date', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -338,9 +409,25 @@ class $WeeklyTasksTable extends WeeklyTasks
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(-1));
+  static const VerificationMeta _resultMeta = const VerificationMeta('result');
+  @override
+  late final GeneratedColumn<String> result = GeneratedColumn<String>(
+      'result', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nextMeta = const VerificationMeta('next');
+  @override
+  late final GeneratedColumn<String> next = GeneratedColumn<String>(
+      'next', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _firstDateMeta =
+      const VerificationMeta('firstDate');
+  @override
+  late final GeneratedColumn<int> firstDate = GeneratedColumn<int>(
+      'first_date', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [task, firstDate, id, isChecked, labelId];
+      [title, id, isChecked, labelId, result, next, firstDate];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -351,17 +438,11 @@ class $WeeklyTasksTable extends WeeklyTasks
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('task')) {
+    if (data.containsKey('title')) {
       context.handle(
-          _taskMeta, task.isAcceptableOrUnknown(data['task']!, _taskMeta));
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
     } else if (isInserting) {
-      context.missing(_taskMeta);
-    }
-    if (data.containsKey('first_date')) {
-      context.handle(_firstDateMeta,
-          firstDate.isAcceptableOrUnknown(data['first_date']!, _firstDateMeta));
-    } else if (isInserting) {
-      context.missing(_firstDateMeta);
+      context.missing(_titleMeta);
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
@@ -374,6 +455,20 @@ class $WeeklyTasksTable extends WeeklyTasks
       context.handle(_labelIdMeta,
           labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
     }
+    if (data.containsKey('result')) {
+      context.handle(_resultMeta,
+          result.isAcceptableOrUnknown(data['result']!, _resultMeta));
+    }
+    if (data.containsKey('next')) {
+      context.handle(
+          _nextMeta, next.isAcceptableOrUnknown(data['next']!, _nextMeta));
+    }
+    if (data.containsKey('first_date')) {
+      context.handle(_firstDateMeta,
+          firstDate.isAcceptableOrUnknown(data['first_date']!, _firstDateMeta));
+    } else if (isInserting) {
+      context.missing(_firstDateMeta);
+    }
     return context;
   }
 
@@ -383,16 +478,20 @@ class $WeeklyTasksTable extends WeeklyTasks
   WeeklyTask map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return WeeklyTask(
-      task: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}task'])!,
-      firstDate: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}first_date'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       isChecked: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_checked'])!,
       labelId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}label_id'])!,
+      result: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}result']),
+      next: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}next']),
+      firstDate: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}first_date'])!,
     );
   }
 
@@ -403,35 +502,48 @@ class $WeeklyTasksTable extends WeeklyTasks
 }
 
 class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
-  final String task;
-  final int firstDate;
+  final String title;
   final int id;
   final bool isChecked;
   final int labelId;
+  final String? result;
+  final String? next;
+  final int firstDate;
   const WeeklyTask(
-      {required this.task,
-      required this.firstDate,
+      {required this.title,
       required this.id,
       required this.isChecked,
-      required this.labelId});
+      required this.labelId,
+      this.result,
+      this.next,
+      required this.firstDate});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['task'] = Variable<String>(task);
-    map['first_date'] = Variable<int>(firstDate);
+    map['title'] = Variable<String>(title);
     map['id'] = Variable<int>(id);
     map['is_checked'] = Variable<bool>(isChecked);
     map['label_id'] = Variable<int>(labelId);
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(result);
+    }
+    if (!nullToAbsent || next != null) {
+      map['next'] = Variable<String>(next);
+    }
+    map['first_date'] = Variable<int>(firstDate);
     return map;
   }
 
   WeeklyTasksCompanion toCompanion(bool nullToAbsent) {
     return WeeklyTasksCompanion(
-      task: Value(task),
-      firstDate: Value(firstDate),
+      title: Value(title),
       id: Value(id),
       isChecked: Value(isChecked),
       labelId: Value(labelId),
+      result:
+          result == null && nullToAbsent ? const Value.absent() : Value(result),
+      next: next == null && nullToAbsent ? const Value.absent() : Value(next),
+      firstDate: Value(firstDate),
     );
   }
 
@@ -439,133 +551,159 @@ class WeeklyTask extends DataClass implements Insertable<WeeklyTask> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return WeeklyTask(
-      task: serializer.fromJson<String>(json['task']),
-      firstDate: serializer.fromJson<int>(json['firstDate']),
+      title: serializer.fromJson<String>(json['title']),
       id: serializer.fromJson<int>(json['id']),
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       labelId: serializer.fromJson<int>(json['labelId']),
+      result: serializer.fromJson<String?>(json['result']),
+      next: serializer.fromJson<String?>(json['next']),
+      firstDate: serializer.fromJson<int>(json['firstDate']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'task': serializer.toJson<String>(task),
-      'firstDate': serializer.toJson<int>(firstDate),
+      'title': serializer.toJson<String>(title),
       'id': serializer.toJson<int>(id),
       'isChecked': serializer.toJson<bool>(isChecked),
       'labelId': serializer.toJson<int>(labelId),
+      'result': serializer.toJson<String?>(result),
+      'next': serializer.toJson<String?>(next),
+      'firstDate': serializer.toJson<int>(firstDate),
     };
   }
 
   WeeklyTask copyWith(
-          {String? task,
-          int? firstDate,
+          {String? title,
           int? id,
           bool? isChecked,
-          int? labelId}) =>
+          int? labelId,
+          Value<String?> result = const Value.absent(),
+          Value<String?> next = const Value.absent(),
+          int? firstDate}) =>
       WeeklyTask(
-        task: task ?? this.task,
-        firstDate: firstDate ?? this.firstDate,
+        title: title ?? this.title,
         id: id ?? this.id,
         isChecked: isChecked ?? this.isChecked,
         labelId: labelId ?? this.labelId,
+        result: result.present ? result.value : this.result,
+        next: next.present ? next.value : this.next,
+        firstDate: firstDate ?? this.firstDate,
       );
   WeeklyTask copyWithCompanion(WeeklyTasksCompanion data) {
     return WeeklyTask(
-      task: data.task.present ? data.task.value : this.task,
-      firstDate: data.firstDate.present ? data.firstDate.value : this.firstDate,
+      title: data.title.present ? data.title.value : this.title,
       id: data.id.present ? data.id.value : this.id,
       isChecked: data.isChecked.present ? data.isChecked.value : this.isChecked,
       labelId: data.labelId.present ? data.labelId.value : this.labelId,
+      result: data.result.present ? data.result.value : this.result,
+      next: data.next.present ? data.next.value : this.next,
+      firstDate: data.firstDate.present ? data.firstDate.value : this.firstDate,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('WeeklyTask(')
-          ..write('task: $task, ')
-          ..write('firstDate: $firstDate, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('firstDate: $firstDate')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(task, firstDate, id, isChecked, labelId);
+  int get hashCode =>
+      Object.hash(title, id, isChecked, labelId, result, next, firstDate);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is WeeklyTask &&
-          other.task == this.task &&
-          other.firstDate == this.firstDate &&
+          other.title == this.title &&
           other.id == this.id &&
           other.isChecked == this.isChecked &&
-          other.labelId == this.labelId);
+          other.labelId == this.labelId &&
+          other.result == this.result &&
+          other.next == this.next &&
+          other.firstDate == this.firstDate);
 }
 
 class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
-  final Value<String> task;
-  final Value<int> firstDate;
+  final Value<String> title;
   final Value<int> id;
   final Value<bool> isChecked;
   final Value<int> labelId;
+  final Value<String?> result;
+  final Value<String?> next;
+  final Value<int> firstDate;
   const WeeklyTasksCompanion({
-    this.task = const Value.absent(),
-    this.firstDate = const Value.absent(),
+    this.title = const Value.absent(),
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    this.firstDate = const Value.absent(),
   });
   WeeklyTasksCompanion.insert({
-    required String task,
-    required int firstDate,
+    required String title,
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
-  })  : task = Value(task),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    required int firstDate,
+  })  : title = Value(title),
         firstDate = Value(firstDate);
   static Insertable<WeeklyTask> custom({
-    Expression<String>? task,
-    Expression<int>? firstDate,
+    Expression<String>? title,
     Expression<int>? id,
     Expression<bool>? isChecked,
     Expression<int>? labelId,
+    Expression<String>? result,
+    Expression<String>? next,
+    Expression<int>? firstDate,
   }) {
     return RawValuesInsertable({
-      if (task != null) 'task': task,
-      if (firstDate != null) 'first_date': firstDate,
+      if (title != null) 'title': title,
       if (id != null) 'id': id,
       if (isChecked != null) 'is_checked': isChecked,
       if (labelId != null) 'label_id': labelId,
+      if (result != null) 'result': result,
+      if (next != null) 'next': next,
+      if (firstDate != null) 'first_date': firstDate,
     });
   }
 
   WeeklyTasksCompanion copyWith(
-      {Value<String>? task,
-      Value<int>? firstDate,
+      {Value<String>? title,
       Value<int>? id,
       Value<bool>? isChecked,
-      Value<int>? labelId}) {
+      Value<int>? labelId,
+      Value<String?>? result,
+      Value<String?>? next,
+      Value<int>? firstDate}) {
     return WeeklyTasksCompanion(
-      task: task ?? this.task,
-      firstDate: firstDate ?? this.firstDate,
+      title: title ?? this.title,
       id: id ?? this.id,
       isChecked: isChecked ?? this.isChecked,
       labelId: labelId ?? this.labelId,
+      result: result ?? this.result,
+      next: next ?? this.next,
+      firstDate: firstDate ?? this.firstDate,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (task.present) {
-      map['task'] = Variable<String>(task.value);
-    }
-    if (firstDate.present) {
-      map['first_date'] = Variable<int>(firstDate.value);
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -576,17 +714,28 @@ class WeeklyTasksCompanion extends UpdateCompanion<WeeklyTask> {
     if (labelId.present) {
       map['label_id'] = Variable<int>(labelId.value);
     }
+    if (result.present) {
+      map['result'] = Variable<String>(result.value);
+    }
+    if (next.present) {
+      map['next'] = Variable<String>(next.value);
+    }
+    if (firstDate.present) {
+      map['first_date'] = Variable<int>(firstDate.value);
+    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('WeeklyTasksCompanion(')
-          ..write('task: $task, ')
-          ..write('firstDate: $firstDate, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('firstDate: $firstDate')
           ..write(')'))
         .toString();
   }
@@ -598,16 +747,11 @@ class $MonthlyTasksTable extends MonthlyTasks
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $MonthlyTasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _taskMeta = const VerificationMeta('task');
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
-  late final GeneratedColumn<String> task = GeneratedColumn<String>(
-      'task', aliasedName, false,
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _monthMeta = const VerificationMeta('month');
-  @override
-  late final GeneratedColumn<int> month = GeneratedColumn<int>(
-      'month', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -635,8 +779,24 @@ class $MonthlyTasksTable extends MonthlyTasks
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(-1));
+  static const VerificationMeta _resultMeta = const VerificationMeta('result');
   @override
-  List<GeneratedColumn> get $columns => [task, month, id, isChecked, labelId];
+  late final GeneratedColumn<String> result = GeneratedColumn<String>(
+      'result', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nextMeta = const VerificationMeta('next');
+  @override
+  late final GeneratedColumn<String> next = GeneratedColumn<String>(
+      'next', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _monthMeta = const VerificationMeta('month');
+  @override
+  late final GeneratedColumn<int> month = GeneratedColumn<int>(
+      'month', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [title, id, isChecked, labelId, result, next, month];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -647,17 +807,11 @@ class $MonthlyTasksTable extends MonthlyTasks
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('task')) {
+    if (data.containsKey('title')) {
       context.handle(
-          _taskMeta, task.isAcceptableOrUnknown(data['task']!, _taskMeta));
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
     } else if (isInserting) {
-      context.missing(_taskMeta);
-    }
-    if (data.containsKey('month')) {
-      context.handle(
-          _monthMeta, month.isAcceptableOrUnknown(data['month']!, _monthMeta));
-    } else if (isInserting) {
-      context.missing(_monthMeta);
+      context.missing(_titleMeta);
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
@@ -670,6 +824,20 @@ class $MonthlyTasksTable extends MonthlyTasks
       context.handle(_labelIdMeta,
           labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
     }
+    if (data.containsKey('result')) {
+      context.handle(_resultMeta,
+          result.isAcceptableOrUnknown(data['result']!, _resultMeta));
+    }
+    if (data.containsKey('next')) {
+      context.handle(
+          _nextMeta, next.isAcceptableOrUnknown(data['next']!, _nextMeta));
+    }
+    if (data.containsKey('month')) {
+      context.handle(
+          _monthMeta, month.isAcceptableOrUnknown(data['month']!, _monthMeta));
+    } else if (isInserting) {
+      context.missing(_monthMeta);
+    }
     return context;
   }
 
@@ -679,16 +847,20 @@ class $MonthlyTasksTable extends MonthlyTasks
   MonthlyTask map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return MonthlyTask(
-      task: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}task'])!,
-      month: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}month'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       isChecked: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_checked'])!,
       labelId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}label_id'])!,
+      result: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}result']),
+      next: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}next']),
+      month: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}month'])!,
     );
   }
 
@@ -699,35 +871,48 @@ class $MonthlyTasksTable extends MonthlyTasks
 }
 
 class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
-  final String task;
-  final int month;
+  final String title;
   final int id;
   final bool isChecked;
   final int labelId;
+  final String? result;
+  final String? next;
+  final int month;
   const MonthlyTask(
-      {required this.task,
-      required this.month,
+      {required this.title,
       required this.id,
       required this.isChecked,
-      required this.labelId});
+      required this.labelId,
+      this.result,
+      this.next,
+      required this.month});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['task'] = Variable<String>(task);
-    map['month'] = Variable<int>(month);
+    map['title'] = Variable<String>(title);
     map['id'] = Variable<int>(id);
     map['is_checked'] = Variable<bool>(isChecked);
     map['label_id'] = Variable<int>(labelId);
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(result);
+    }
+    if (!nullToAbsent || next != null) {
+      map['next'] = Variable<String>(next);
+    }
+    map['month'] = Variable<int>(month);
     return map;
   }
 
   MonthlyTasksCompanion toCompanion(bool nullToAbsent) {
     return MonthlyTasksCompanion(
-      task: Value(task),
-      month: Value(month),
+      title: Value(title),
       id: Value(id),
       isChecked: Value(isChecked),
       labelId: Value(labelId),
+      result:
+          result == null && nullToAbsent ? const Value.absent() : Value(result),
+      next: next == null && nullToAbsent ? const Value.absent() : Value(next),
+      month: Value(month),
     );
   }
 
@@ -735,129 +920,159 @@ class MonthlyTask extends DataClass implements Insertable<MonthlyTask> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return MonthlyTask(
-      task: serializer.fromJson<String>(json['task']),
-      month: serializer.fromJson<int>(json['month']),
+      title: serializer.fromJson<String>(json['title']),
       id: serializer.fromJson<int>(json['id']),
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       labelId: serializer.fromJson<int>(json['labelId']),
+      result: serializer.fromJson<String?>(json['result']),
+      next: serializer.fromJson<String?>(json['next']),
+      month: serializer.fromJson<int>(json['month']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'task': serializer.toJson<String>(task),
-      'month': serializer.toJson<int>(month),
+      'title': serializer.toJson<String>(title),
       'id': serializer.toJson<int>(id),
       'isChecked': serializer.toJson<bool>(isChecked),
       'labelId': serializer.toJson<int>(labelId),
+      'result': serializer.toJson<String?>(result),
+      'next': serializer.toJson<String?>(next),
+      'month': serializer.toJson<int>(month),
     };
   }
 
   MonthlyTask copyWith(
-          {String? task, int? month, int? id, bool? isChecked, int? labelId}) =>
+          {String? title,
+          int? id,
+          bool? isChecked,
+          int? labelId,
+          Value<String?> result = const Value.absent(),
+          Value<String?> next = const Value.absent(),
+          int? month}) =>
       MonthlyTask(
-        task: task ?? this.task,
-        month: month ?? this.month,
+        title: title ?? this.title,
         id: id ?? this.id,
         isChecked: isChecked ?? this.isChecked,
         labelId: labelId ?? this.labelId,
+        result: result.present ? result.value : this.result,
+        next: next.present ? next.value : this.next,
+        month: month ?? this.month,
       );
   MonthlyTask copyWithCompanion(MonthlyTasksCompanion data) {
     return MonthlyTask(
-      task: data.task.present ? data.task.value : this.task,
-      month: data.month.present ? data.month.value : this.month,
+      title: data.title.present ? data.title.value : this.title,
       id: data.id.present ? data.id.value : this.id,
       isChecked: data.isChecked.present ? data.isChecked.value : this.isChecked,
       labelId: data.labelId.present ? data.labelId.value : this.labelId,
+      result: data.result.present ? data.result.value : this.result,
+      next: data.next.present ? data.next.value : this.next,
+      month: data.month.present ? data.month.value : this.month,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('MonthlyTask(')
-          ..write('task: $task, ')
-          ..write('month: $month, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('month: $month')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(task, month, id, isChecked, labelId);
+  int get hashCode =>
+      Object.hash(title, id, isChecked, labelId, result, next, month);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is MonthlyTask &&
-          other.task == this.task &&
-          other.month == this.month &&
+          other.title == this.title &&
           other.id == this.id &&
           other.isChecked == this.isChecked &&
-          other.labelId == this.labelId);
+          other.labelId == this.labelId &&
+          other.result == this.result &&
+          other.next == this.next &&
+          other.month == this.month);
 }
 
 class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
-  final Value<String> task;
-  final Value<int> month;
+  final Value<String> title;
   final Value<int> id;
   final Value<bool> isChecked;
   final Value<int> labelId;
+  final Value<String?> result;
+  final Value<String?> next;
+  final Value<int> month;
   const MonthlyTasksCompanion({
-    this.task = const Value.absent(),
-    this.month = const Value.absent(),
+    this.title = const Value.absent(),
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    this.month = const Value.absent(),
   });
   MonthlyTasksCompanion.insert({
-    required String task,
-    required int month,
+    required String title,
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
-  })  : task = Value(task),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    required int month,
+  })  : title = Value(title),
         month = Value(month);
   static Insertable<MonthlyTask> custom({
-    Expression<String>? task,
-    Expression<int>? month,
+    Expression<String>? title,
     Expression<int>? id,
     Expression<bool>? isChecked,
     Expression<int>? labelId,
+    Expression<String>? result,
+    Expression<String>? next,
+    Expression<int>? month,
   }) {
     return RawValuesInsertable({
-      if (task != null) 'task': task,
-      if (month != null) 'month': month,
+      if (title != null) 'title': title,
       if (id != null) 'id': id,
       if (isChecked != null) 'is_checked': isChecked,
       if (labelId != null) 'label_id': labelId,
+      if (result != null) 'result': result,
+      if (next != null) 'next': next,
+      if (month != null) 'month': month,
     });
   }
 
   MonthlyTasksCompanion copyWith(
-      {Value<String>? task,
-      Value<int>? month,
+      {Value<String>? title,
       Value<int>? id,
       Value<bool>? isChecked,
-      Value<int>? labelId}) {
+      Value<int>? labelId,
+      Value<String?>? result,
+      Value<String?>? next,
+      Value<int>? month}) {
     return MonthlyTasksCompanion(
-      task: task ?? this.task,
-      month: month ?? this.month,
+      title: title ?? this.title,
       id: id ?? this.id,
       isChecked: isChecked ?? this.isChecked,
       labelId: labelId ?? this.labelId,
+      result: result ?? this.result,
+      next: next ?? this.next,
+      month: month ?? this.month,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (task.present) {
-      map['task'] = Variable<String>(task.value);
-    }
-    if (month.present) {
-      map['month'] = Variable<int>(month.value);
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -868,17 +1083,28 @@ class MonthlyTasksCompanion extends UpdateCompanion<MonthlyTask> {
     if (labelId.present) {
       map['label_id'] = Variable<int>(labelId.value);
     }
+    if (result.present) {
+      map['result'] = Variable<String>(result.value);
+    }
+    if (next.present) {
+      map['next'] = Variable<String>(next.value);
+    }
+    if (month.present) {
+      map['month'] = Variable<int>(month.value);
+    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('MonthlyTasksCompanion(')
-          ..write('task: $task, ')
-          ..write('month: $month, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('month: $month')
           ..write(')'))
         .toString();
   }
@@ -890,16 +1116,11 @@ class $YearlyTasksTable extends YearlyTasks
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $YearlyTasksTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _taskMeta = const VerificationMeta('task');
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
-  late final GeneratedColumn<String> task = GeneratedColumn<String>(
-      'task', aliasedName, false,
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+      'title', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _yearMeta = const VerificationMeta('year');
-  @override
-  late final GeneratedColumn<int> year = GeneratedColumn<int>(
-      'year', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -927,8 +1148,24 @@ class $YearlyTasksTable extends YearlyTasks
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: Constant(-1));
+  static const VerificationMeta _resultMeta = const VerificationMeta('result');
   @override
-  List<GeneratedColumn> get $columns => [task, year, id, isChecked, labelId];
+  late final GeneratedColumn<String> result = GeneratedColumn<String>(
+      'result', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _nextMeta = const VerificationMeta('next');
+  @override
+  late final GeneratedColumn<String> next = GeneratedColumn<String>(
+      'next', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _yearMeta = const VerificationMeta('year');
+  @override
+  late final GeneratedColumn<int> year = GeneratedColumn<int>(
+      'year', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [title, id, isChecked, labelId, result, next, year];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -939,17 +1176,11 @@ class $YearlyTasksTable extends YearlyTasks
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
-    if (data.containsKey('task')) {
+    if (data.containsKey('title')) {
       context.handle(
-          _taskMeta, task.isAcceptableOrUnknown(data['task']!, _taskMeta));
+          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
     } else if (isInserting) {
-      context.missing(_taskMeta);
-    }
-    if (data.containsKey('year')) {
-      context.handle(
-          _yearMeta, year.isAcceptableOrUnknown(data['year']!, _yearMeta));
-    } else if (isInserting) {
-      context.missing(_yearMeta);
+      context.missing(_titleMeta);
     }
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
@@ -962,6 +1193,20 @@ class $YearlyTasksTable extends YearlyTasks
       context.handle(_labelIdMeta,
           labelId.isAcceptableOrUnknown(data['label_id']!, _labelIdMeta));
     }
+    if (data.containsKey('result')) {
+      context.handle(_resultMeta,
+          result.isAcceptableOrUnknown(data['result']!, _resultMeta));
+    }
+    if (data.containsKey('next')) {
+      context.handle(
+          _nextMeta, next.isAcceptableOrUnknown(data['next']!, _nextMeta));
+    }
+    if (data.containsKey('year')) {
+      context.handle(
+          _yearMeta, year.isAcceptableOrUnknown(data['year']!, _yearMeta));
+    } else if (isInserting) {
+      context.missing(_yearMeta);
+    }
     return context;
   }
 
@@ -971,16 +1216,20 @@ class $YearlyTasksTable extends YearlyTasks
   YearlyTask map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return YearlyTask(
-      task: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}task'])!,
-      year: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}year'])!,
+      title: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       isChecked: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_checked'])!,
       labelId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}label_id'])!,
+      result: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}result']),
+      next: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}next']),
+      year: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}year'])!,
     );
   }
 
@@ -991,35 +1240,48 @@ class $YearlyTasksTable extends YearlyTasks
 }
 
 class YearlyTask extends DataClass implements Insertable<YearlyTask> {
-  final String task;
-  final int year;
+  final String title;
   final int id;
   final bool isChecked;
   final int labelId;
+  final String? result;
+  final String? next;
+  final int year;
   const YearlyTask(
-      {required this.task,
-      required this.year,
+      {required this.title,
       required this.id,
       required this.isChecked,
-      required this.labelId});
+      required this.labelId,
+      this.result,
+      this.next,
+      required this.year});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['task'] = Variable<String>(task);
-    map['year'] = Variable<int>(year);
+    map['title'] = Variable<String>(title);
     map['id'] = Variable<int>(id);
     map['is_checked'] = Variable<bool>(isChecked);
     map['label_id'] = Variable<int>(labelId);
+    if (!nullToAbsent || result != null) {
+      map['result'] = Variable<String>(result);
+    }
+    if (!nullToAbsent || next != null) {
+      map['next'] = Variable<String>(next);
+    }
+    map['year'] = Variable<int>(year);
     return map;
   }
 
   YearlyTasksCompanion toCompanion(bool nullToAbsent) {
     return YearlyTasksCompanion(
-      task: Value(task),
-      year: Value(year),
+      title: Value(title),
       id: Value(id),
       isChecked: Value(isChecked),
       labelId: Value(labelId),
+      result:
+          result == null && nullToAbsent ? const Value.absent() : Value(result),
+      next: next == null && nullToAbsent ? const Value.absent() : Value(next),
+      year: Value(year),
     );
   }
 
@@ -1027,129 +1289,159 @@ class YearlyTask extends DataClass implements Insertable<YearlyTask> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return YearlyTask(
-      task: serializer.fromJson<String>(json['task']),
-      year: serializer.fromJson<int>(json['year']),
+      title: serializer.fromJson<String>(json['title']),
       id: serializer.fromJson<int>(json['id']),
       isChecked: serializer.fromJson<bool>(json['isChecked']),
       labelId: serializer.fromJson<int>(json['labelId']),
+      result: serializer.fromJson<String?>(json['result']),
+      next: serializer.fromJson<String?>(json['next']),
+      year: serializer.fromJson<int>(json['year']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'task': serializer.toJson<String>(task),
-      'year': serializer.toJson<int>(year),
+      'title': serializer.toJson<String>(title),
       'id': serializer.toJson<int>(id),
       'isChecked': serializer.toJson<bool>(isChecked),
       'labelId': serializer.toJson<int>(labelId),
+      'result': serializer.toJson<String?>(result),
+      'next': serializer.toJson<String?>(next),
+      'year': serializer.toJson<int>(year),
     };
   }
 
   YearlyTask copyWith(
-          {String? task, int? year, int? id, bool? isChecked, int? labelId}) =>
+          {String? title,
+          int? id,
+          bool? isChecked,
+          int? labelId,
+          Value<String?> result = const Value.absent(),
+          Value<String?> next = const Value.absent(),
+          int? year}) =>
       YearlyTask(
-        task: task ?? this.task,
-        year: year ?? this.year,
+        title: title ?? this.title,
         id: id ?? this.id,
         isChecked: isChecked ?? this.isChecked,
         labelId: labelId ?? this.labelId,
+        result: result.present ? result.value : this.result,
+        next: next.present ? next.value : this.next,
+        year: year ?? this.year,
       );
   YearlyTask copyWithCompanion(YearlyTasksCompanion data) {
     return YearlyTask(
-      task: data.task.present ? data.task.value : this.task,
-      year: data.year.present ? data.year.value : this.year,
+      title: data.title.present ? data.title.value : this.title,
       id: data.id.present ? data.id.value : this.id,
       isChecked: data.isChecked.present ? data.isChecked.value : this.isChecked,
       labelId: data.labelId.present ? data.labelId.value : this.labelId,
+      result: data.result.present ? data.result.value : this.result,
+      next: data.next.present ? data.next.value : this.next,
+      year: data.year.present ? data.year.value : this.year,
     );
   }
 
   @override
   String toString() {
     return (StringBuffer('YearlyTask(')
-          ..write('task: $task, ')
-          ..write('year: $year, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
+          ..write('labelId: $labelId, ')
+          ..write('result: $result, ')
+          ..write('next: $next, ')
+          ..write('year: $year')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(task, year, id, isChecked, labelId);
+  int get hashCode =>
+      Object.hash(title, id, isChecked, labelId, result, next, year);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is YearlyTask &&
-          other.task == this.task &&
-          other.year == this.year &&
+          other.title == this.title &&
           other.id == this.id &&
           other.isChecked == this.isChecked &&
-          other.labelId == this.labelId);
+          other.labelId == this.labelId &&
+          other.result == this.result &&
+          other.next == this.next &&
+          other.year == this.year);
 }
 
 class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
-  final Value<String> task;
-  final Value<int> year;
+  final Value<String> title;
   final Value<int> id;
   final Value<bool> isChecked;
   final Value<int> labelId;
+  final Value<String?> result;
+  final Value<String?> next;
+  final Value<int> year;
   const YearlyTasksCompanion({
-    this.task = const Value.absent(),
-    this.year = const Value.absent(),
+    this.title = const Value.absent(),
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    this.year = const Value.absent(),
   });
   YearlyTasksCompanion.insert({
-    required String task,
-    required int year,
+    required String title,
     this.id = const Value.absent(),
     this.isChecked = const Value.absent(),
     this.labelId = const Value.absent(),
-  })  : task = Value(task),
+    this.result = const Value.absent(),
+    this.next = const Value.absent(),
+    required int year,
+  })  : title = Value(title),
         year = Value(year);
   static Insertable<YearlyTask> custom({
-    Expression<String>? task,
-    Expression<int>? year,
+    Expression<String>? title,
     Expression<int>? id,
     Expression<bool>? isChecked,
     Expression<int>? labelId,
+    Expression<String>? result,
+    Expression<String>? next,
+    Expression<int>? year,
   }) {
     return RawValuesInsertable({
-      if (task != null) 'task': task,
-      if (year != null) 'year': year,
+      if (title != null) 'title': title,
       if (id != null) 'id': id,
       if (isChecked != null) 'is_checked': isChecked,
       if (labelId != null) 'label_id': labelId,
+      if (result != null) 'result': result,
+      if (next != null) 'next': next,
+      if (year != null) 'year': year,
     });
   }
 
   YearlyTasksCompanion copyWith(
-      {Value<String>? task,
-      Value<int>? year,
+      {Value<String>? title,
       Value<int>? id,
       Value<bool>? isChecked,
-      Value<int>? labelId}) {
+      Value<int>? labelId,
+      Value<String?>? result,
+      Value<String?>? next,
+      Value<int>? year}) {
     return YearlyTasksCompanion(
-      task: task ?? this.task,
-      year: year ?? this.year,
+      title: title ?? this.title,
       id: id ?? this.id,
       isChecked: isChecked ?? this.isChecked,
       labelId: labelId ?? this.labelId,
+      result: result ?? this.result,
+      next: next ?? this.next,
+      year: year ?? this.year,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    if (task.present) {
-      map['task'] = Variable<String>(task.value);
-    }
-    if (year.present) {
-      map['year'] = Variable<int>(year.value);
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
     }
     if (id.present) {
       map['id'] = Variable<int>(id.value);
@@ -1160,262 +1452,28 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
     if (labelId.present) {
       map['label_id'] = Variable<int>(labelId.value);
     }
+    if (result.present) {
+      map['result'] = Variable<String>(result.value);
+    }
+    if (next.present) {
+      map['next'] = Variable<String>(next.value);
+    }
+    if (year.present) {
+      map['year'] = Variable<int>(year.value);
+    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('YearlyTasksCompanion(')
-          ..write('task: $task, ')
-          ..write('year: $year, ')
+          ..write('title: $title, ')
           ..write('id: $id, ')
           ..write('isChecked: $isChecked, ')
-          ..write('labelId: $labelId')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $ReviewsTable extends Reviews with TableInfo<$ReviewsTable, Review> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $ReviewsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _taskIdBitMeta =
-      const VerificationMeta('taskIdBit');
-  @override
-  late final GeneratedColumn<int> taskIdBit = GeneratedColumn<int>(
-      'task_id_bit', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _resultMeta = const VerificationMeta('result');
-  @override
-  late final GeneratedColumn<String> result = GeneratedColumn<String>(
-      'result', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _improvementMeta =
-      const VerificationMeta('improvement');
-  @override
-  late final GeneratedColumn<String> improvement = GeneratedColumn<String>(
-      'improvement', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  @override
-  List<GeneratedColumn> get $columns => [taskIdBit, result, improvement];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'reviews';
-  @override
-  VerificationContext validateIntegrity(Insertable<Review> instance,
-      {bool isInserting = false}) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('task_id_bit')) {
-      context.handle(
-          _taskIdBitMeta,
-          taskIdBit.isAcceptableOrUnknown(
-              data['task_id_bit']!, _taskIdBitMeta));
-    } else if (isInserting) {
-      context.missing(_taskIdBitMeta);
-    }
-    if (data.containsKey('result')) {
-      context.handle(_resultMeta,
-          result.isAcceptableOrUnknown(data['result']!, _resultMeta));
-    }
-    if (data.containsKey('improvement')) {
-      context.handle(
-          _improvementMeta,
-          improvement.isAcceptableOrUnknown(
-              data['improvement']!, _improvementMeta));
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => const {};
-  @override
-  Review map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Review(
-      taskIdBit: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}task_id_bit'])!,
-      result: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}result']),
-      improvement: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}improvement']),
-    );
-  }
-
-  @override
-  $ReviewsTable createAlias(String alias) {
-    return $ReviewsTable(attachedDatabase, alias);
-  }
-}
-
-class Review extends DataClass implements Insertable<Review> {
-  /// 64ビット整数の上位 32 bit にテーブル種別を、下位 32 bit にタスクIDを、
-  /// ビットパッキングして格納するカラム
-  ///
-  /// 【テーブル種別】
-  ///  - [DayTasks]: 1 （1）
-  ///  - [WeeklyTasks]: 2 （10）
-  ///  - [MonthlyTasks]: 3 （11）
-  ///  - [YearlyTasks]: 4 （100）
-  final int taskIdBit;
-  final String? result;
-  final String? improvement;
-  const Review({required this.taskIdBit, this.result, this.improvement});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['task_id_bit'] = Variable<int>(taskIdBit);
-    if (!nullToAbsent || result != null) {
-      map['result'] = Variable<String>(result);
-    }
-    if (!nullToAbsent || improvement != null) {
-      map['improvement'] = Variable<String>(improvement);
-    }
-    return map;
-  }
-
-  ReviewsCompanion toCompanion(bool nullToAbsent) {
-    return ReviewsCompanion(
-      taskIdBit: Value(taskIdBit),
-      result:
-          result == null && nullToAbsent ? const Value.absent() : Value(result),
-      improvement: improvement == null && nullToAbsent
-          ? const Value.absent()
-          : Value(improvement),
-    );
-  }
-
-  factory Review.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Review(
-      taskIdBit: serializer.fromJson<int>(json['taskIdBit']),
-      result: serializer.fromJson<String?>(json['result']),
-      improvement: serializer.fromJson<String?>(json['improvement']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'taskIdBit': serializer.toJson<int>(taskIdBit),
-      'result': serializer.toJson<String?>(result),
-      'improvement': serializer.toJson<String?>(improvement),
-    };
-  }
-
-  Review copyWith(
-          {int? taskIdBit,
-          Value<String?> result = const Value.absent(),
-          Value<String?> improvement = const Value.absent()}) =>
-      Review(
-        taskIdBit: taskIdBit ?? this.taskIdBit,
-        result: result.present ? result.value : this.result,
-        improvement: improvement.present ? improvement.value : this.improvement,
-      );
-  Review copyWithCompanion(ReviewsCompanion data) {
-    return Review(
-      taskIdBit: data.taskIdBit.present ? data.taskIdBit.value : this.taskIdBit,
-      result: data.result.present ? data.result.value : this.result,
-      improvement:
-          data.improvement.present ? data.improvement.value : this.improvement,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Review(')
-          ..write('taskIdBit: $taskIdBit, ')
+          ..write('labelId: $labelId, ')
           ..write('result: $result, ')
-          ..write('improvement: $improvement')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(taskIdBit, result, improvement);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Review &&
-          other.taskIdBit == this.taskIdBit &&
-          other.result == this.result &&
-          other.improvement == this.improvement);
-}
-
-class ReviewsCompanion extends UpdateCompanion<Review> {
-  final Value<int> taskIdBit;
-  final Value<String?> result;
-  final Value<String?> improvement;
-  final Value<int> rowid;
-  const ReviewsCompanion({
-    this.taskIdBit = const Value.absent(),
-    this.result = const Value.absent(),
-    this.improvement = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  ReviewsCompanion.insert({
-    required int taskIdBit,
-    this.result = const Value.absent(),
-    this.improvement = const Value.absent(),
-    this.rowid = const Value.absent(),
-  }) : taskIdBit = Value(taskIdBit);
-  static Insertable<Review> custom({
-    Expression<int>? taskIdBit,
-    Expression<String>? result,
-    Expression<String>? improvement,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (taskIdBit != null) 'task_id_bit': taskIdBit,
-      if (result != null) 'result': result,
-      if (improvement != null) 'improvement': improvement,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  ReviewsCompanion copyWith(
-      {Value<int>? taskIdBit,
-      Value<String?>? result,
-      Value<String?>? improvement,
-      Value<int>? rowid}) {
-    return ReviewsCompanion(
-      taskIdBit: taskIdBit ?? this.taskIdBit,
-      result: result ?? this.result,
-      improvement: improvement ?? this.improvement,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (taskIdBit.present) {
-      map['task_id_bit'] = Variable<int>(taskIdBit.value);
-    }
-    if (result.present) {
-      map['result'] = Variable<String>(result.value);
-    }
-    if (improvement.present) {
-      map['improvement'] = Variable<String>(improvement.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('ReviewsCompanion(')
-          ..write('taskIdBit: $taskIdBit, ')
-          ..write('result: $result, ')
-          ..write('improvement: $improvement, ')
-          ..write('rowid: $rowid')
+          ..write('next: $next, ')
+          ..write('year: $year')
           ..write(')'))
         .toString();
   }
@@ -2037,7 +2095,6 @@ abstract class _$MyDatabase extends GeneratedDatabase {
   late final $WeeklyTasksTable weeklyTasks = $WeeklyTasksTable(this);
   late final $MonthlyTasksTable monthlyTasks = $MonthlyTasksTable(this);
   late final $YearlyTasksTable yearlyTasks = $YearlyTasksTable(this);
-  late final $ReviewsTable reviews = $ReviewsTable(this);
   late final $LabeledTasksTable labeledTasks = $LabeledTasksTable(this);
   late final $PageSettingsTable pageSettings = $PageSettingsTable(this);
   @override
@@ -2049,25 +2106,28 @@ abstract class _$MyDatabase extends GeneratedDatabase {
         weeklyTasks,
         monthlyTasks,
         yearlyTasks,
-        reviews,
         labeledTasks,
         pageSettings
       ];
 }
 
 typedef $$DayTasksTableCreateCompanionBuilder = DayTasksCompanion Function({
-  required String task,
-  required int date,
+  required String title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  required int date,
 });
 typedef $$DayTasksTableUpdateCompanionBuilder = DayTasksCompanion Function({
-  Value<String> task,
-  Value<int> date,
+  Value<String> title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  Value<int> date,
 });
 
 class $$DayTasksTableFilterComposer
@@ -2079,11 +2139,8 @@ class $$DayTasksTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get date => $composableBuilder(
-      column: $table.date, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
@@ -2093,6 +2150,15 @@ class $$DayTasksTableFilterComposer
 
   ColumnFilters<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnFilters(column));
 }
 
 class $$DayTasksTableOrderingComposer
@@ -2104,11 +2170,8 @@ class $$DayTasksTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get date => $composableBuilder(
-      column: $table.date, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
@@ -2118,6 +2181,15 @@ class $$DayTasksTableOrderingComposer
 
   ColumnOrderings<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get date => $composableBuilder(
+      column: $table.date, builder: (column) => ColumnOrderings(column));
 }
 
 class $$DayTasksTableAnnotationComposer
@@ -2129,11 +2201,8 @@ class $$DayTasksTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get task =>
-      $composableBuilder(column: $table.task, builder: (column) => column);
-
-  GeneratedColumn<int> get date =>
-      $composableBuilder(column: $table.date, builder: (column) => column);
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
@@ -2143,6 +2212,15 @@ class $$DayTasksTableAnnotationComposer
 
   GeneratedColumn<int> get labelId =>
       $composableBuilder(column: $table.labelId, builder: (column) => column);
+
+  GeneratedColumn<String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<String> get next =>
+      $composableBuilder(column: $table.next, builder: (column) => column);
+
+  GeneratedColumn<int> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
 }
 
 class $$DayTasksTableTableManager extends RootTableManager<
@@ -2168,32 +2246,40 @@ class $$DayTasksTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$DayTasksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> task = const Value.absent(),
-            Value<int> date = const Value.absent(),
+            Value<String> title = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            Value<int> date = const Value.absent(),
           }) =>
               DayTasksCompanion(
-            task: task,
-            date: date,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            date: date,
           ),
           createCompanionCallback: ({
-            required String task,
-            required int date,
+            required String title,
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            required int date,
           }) =>
               DayTasksCompanion.insert(
-            task: task,
-            date: date,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            date: date,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2216,19 +2302,23 @@ typedef $$DayTasksTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$WeeklyTasksTableCreateCompanionBuilder = WeeklyTasksCompanion
     Function({
-  required String task,
-  required int firstDate,
+  required String title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  required int firstDate,
 });
 typedef $$WeeklyTasksTableUpdateCompanionBuilder = WeeklyTasksCompanion
     Function({
-  Value<String> task,
-  Value<int> firstDate,
+  Value<String> title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  Value<int> firstDate,
 });
 
 class $$WeeklyTasksTableFilterComposer
@@ -2240,11 +2330,8 @@ class $$WeeklyTasksTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get firstDate => $composableBuilder(
-      column: $table.firstDate, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
@@ -2254,6 +2341,15 @@ class $$WeeklyTasksTableFilterComposer
 
   ColumnFilters<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get firstDate => $composableBuilder(
+      column: $table.firstDate, builder: (column) => ColumnFilters(column));
 }
 
 class $$WeeklyTasksTableOrderingComposer
@@ -2265,11 +2361,8 @@ class $$WeeklyTasksTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get firstDate => $composableBuilder(
-      column: $table.firstDate, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
@@ -2279,6 +2372,15 @@ class $$WeeklyTasksTableOrderingComposer
 
   ColumnOrderings<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get firstDate => $composableBuilder(
+      column: $table.firstDate, builder: (column) => ColumnOrderings(column));
 }
 
 class $$WeeklyTasksTableAnnotationComposer
@@ -2290,11 +2392,8 @@ class $$WeeklyTasksTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get task =>
-      $composableBuilder(column: $table.task, builder: (column) => column);
-
-  GeneratedColumn<int> get firstDate =>
-      $composableBuilder(column: $table.firstDate, builder: (column) => column);
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
@@ -2304,6 +2403,15 @@ class $$WeeklyTasksTableAnnotationComposer
 
   GeneratedColumn<int> get labelId =>
       $composableBuilder(column: $table.labelId, builder: (column) => column);
+
+  GeneratedColumn<String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<String> get next =>
+      $composableBuilder(column: $table.next, builder: (column) => column);
+
+  GeneratedColumn<int> get firstDate =>
+      $composableBuilder(column: $table.firstDate, builder: (column) => column);
 }
 
 class $$WeeklyTasksTableTableManager extends RootTableManager<
@@ -2329,32 +2437,40 @@ class $$WeeklyTasksTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$WeeklyTasksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> task = const Value.absent(),
-            Value<int> firstDate = const Value.absent(),
+            Value<String> title = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            Value<int> firstDate = const Value.absent(),
           }) =>
               WeeklyTasksCompanion(
-            task: task,
-            firstDate: firstDate,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            firstDate: firstDate,
           ),
           createCompanionCallback: ({
-            required String task,
-            required int firstDate,
+            required String title,
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            required int firstDate,
           }) =>
               WeeklyTasksCompanion.insert(
-            task: task,
-            firstDate: firstDate,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            firstDate: firstDate,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2377,19 +2493,23 @@ typedef $$WeeklyTasksTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$MonthlyTasksTableCreateCompanionBuilder = MonthlyTasksCompanion
     Function({
-  required String task,
-  required int month,
+  required String title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  required int month,
 });
 typedef $$MonthlyTasksTableUpdateCompanionBuilder = MonthlyTasksCompanion
     Function({
-  Value<String> task,
-  Value<int> month,
+  Value<String> title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  Value<int> month,
 });
 
 class $$MonthlyTasksTableFilterComposer
@@ -2401,11 +2521,8 @@ class $$MonthlyTasksTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get month => $composableBuilder(
-      column: $table.month, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
@@ -2415,6 +2532,15 @@ class $$MonthlyTasksTableFilterComposer
 
   ColumnFilters<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get month => $composableBuilder(
+      column: $table.month, builder: (column) => ColumnFilters(column));
 }
 
 class $$MonthlyTasksTableOrderingComposer
@@ -2426,11 +2552,8 @@ class $$MonthlyTasksTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get month => $composableBuilder(
-      column: $table.month, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
@@ -2440,6 +2563,15 @@ class $$MonthlyTasksTableOrderingComposer
 
   ColumnOrderings<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get month => $composableBuilder(
+      column: $table.month, builder: (column) => ColumnOrderings(column));
 }
 
 class $$MonthlyTasksTableAnnotationComposer
@@ -2451,11 +2583,8 @@ class $$MonthlyTasksTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get task =>
-      $composableBuilder(column: $table.task, builder: (column) => column);
-
-  GeneratedColumn<int> get month =>
-      $composableBuilder(column: $table.month, builder: (column) => column);
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
@@ -2465,6 +2594,15 @@ class $$MonthlyTasksTableAnnotationComposer
 
   GeneratedColumn<int> get labelId =>
       $composableBuilder(column: $table.labelId, builder: (column) => column);
+
+  GeneratedColumn<String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<String> get next =>
+      $composableBuilder(column: $table.next, builder: (column) => column);
+
+  GeneratedColumn<int> get month =>
+      $composableBuilder(column: $table.month, builder: (column) => column);
 }
 
 class $$MonthlyTasksTableTableManager extends RootTableManager<
@@ -2493,32 +2631,40 @@ class $$MonthlyTasksTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$MonthlyTasksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> task = const Value.absent(),
-            Value<int> month = const Value.absent(),
+            Value<String> title = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            Value<int> month = const Value.absent(),
           }) =>
               MonthlyTasksCompanion(
-            task: task,
-            month: month,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            month: month,
           ),
           createCompanionCallback: ({
-            required String task,
-            required int month,
+            required String title,
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            required int month,
           }) =>
               MonthlyTasksCompanion.insert(
-            task: task,
-            month: month,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            month: month,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2544,19 +2690,23 @@ typedef $$MonthlyTasksTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$YearlyTasksTableCreateCompanionBuilder = YearlyTasksCompanion
     Function({
-  required String task,
-  required int year,
+  required String title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  required int year,
 });
 typedef $$YearlyTasksTableUpdateCompanionBuilder = YearlyTasksCompanion
     Function({
-  Value<String> task,
-  Value<int> year,
+  Value<String> title,
   Value<int> id,
   Value<bool> isChecked,
   Value<int> labelId,
+  Value<String?> result,
+  Value<String?> next,
+  Value<int> year,
 });
 
 class $$YearlyTasksTableFilterComposer
@@ -2568,11 +2718,8 @@ class $$YearlyTasksTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<int> get year => $composableBuilder(
-      column: $table.year, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
@@ -2582,6 +2729,15 @@ class $$YearlyTasksTableFilterComposer
 
   ColumnFilters<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get year => $composableBuilder(
+      column: $table.year, builder: (column) => ColumnFilters(column));
 }
 
 class $$YearlyTasksTableOrderingComposer
@@ -2593,11 +2749,8 @@ class $$YearlyTasksTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<String> get task => $composableBuilder(
-      column: $table.task, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<int> get year => $composableBuilder(
-      column: $table.year, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
@@ -2607,6 +2760,15 @@ class $$YearlyTasksTableOrderingComposer
 
   ColumnOrderings<int> get labelId => $composableBuilder(
       column: $table.labelId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get result => $composableBuilder(
+      column: $table.result, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get next => $composableBuilder(
+      column: $table.next, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get year => $composableBuilder(
+      column: $table.year, builder: (column) => ColumnOrderings(column));
 }
 
 class $$YearlyTasksTableAnnotationComposer
@@ -2618,11 +2780,8 @@ class $$YearlyTasksTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<String> get task =>
-      $composableBuilder(column: $table.task, builder: (column) => column);
-
-  GeneratedColumn<int> get year =>
-      $composableBuilder(column: $table.year, builder: (column) => column);
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
 
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
@@ -2632,6 +2791,15 @@ class $$YearlyTasksTableAnnotationComposer
 
   GeneratedColumn<int> get labelId =>
       $composableBuilder(column: $table.labelId, builder: (column) => column);
+
+  GeneratedColumn<String> get result =>
+      $composableBuilder(column: $table.result, builder: (column) => column);
+
+  GeneratedColumn<String> get next =>
+      $composableBuilder(column: $table.next, builder: (column) => column);
+
+  GeneratedColumn<int> get year =>
+      $composableBuilder(column: $table.year, builder: (column) => column);
 }
 
 class $$YearlyTasksTableTableManager extends RootTableManager<
@@ -2657,32 +2825,40 @@ class $$YearlyTasksTableTableManager extends RootTableManager<
           createComputedFieldComposer: () =>
               $$YearlyTasksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
-            Value<String> task = const Value.absent(),
-            Value<int> year = const Value.absent(),
+            Value<String> title = const Value.absent(),
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            Value<int> year = const Value.absent(),
           }) =>
               YearlyTasksCompanion(
-            task: task,
-            year: year,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            year: year,
           ),
           createCompanionCallback: ({
-            required String task,
-            required int year,
+            required String title,
             Value<int> id = const Value.absent(),
             Value<bool> isChecked = const Value.absent(),
             Value<int> labelId = const Value.absent(),
+            Value<String?> result = const Value.absent(),
+            Value<String?> next = const Value.absent(),
+            required int year,
           }) =>
               YearlyTasksCompanion.insert(
-            task: task,
-            year: year,
+            title: title,
             id: id,
             isChecked: isChecked,
             labelId: labelId,
+            result: result,
+            next: next,
+            year: year,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2702,141 +2878,6 @@ typedef $$YearlyTasksTableProcessedTableManager = ProcessedTableManager<
     $$YearlyTasksTableUpdateCompanionBuilder,
     (YearlyTask, BaseReferences<_$MyDatabase, $YearlyTasksTable, YearlyTask>),
     YearlyTask,
-    PrefetchHooks Function()>;
-typedef $$ReviewsTableCreateCompanionBuilder = ReviewsCompanion Function({
-  required int taskIdBit,
-  Value<String?> result,
-  Value<String?> improvement,
-  Value<int> rowid,
-});
-typedef $$ReviewsTableUpdateCompanionBuilder = ReviewsCompanion Function({
-  Value<int> taskIdBit,
-  Value<String?> result,
-  Value<String?> improvement,
-  Value<int> rowid,
-});
-
-class $$ReviewsTableFilterComposer
-    extends Composer<_$MyDatabase, $ReviewsTable> {
-  $$ReviewsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get taskIdBit => $composableBuilder(
-      column: $table.taskIdBit, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get result => $composableBuilder(
-      column: $table.result, builder: (column) => ColumnFilters(column));
-
-  ColumnFilters<String> get improvement => $composableBuilder(
-      column: $table.improvement, builder: (column) => ColumnFilters(column));
-}
-
-class $$ReviewsTableOrderingComposer
-    extends Composer<_$MyDatabase, $ReviewsTable> {
-  $$ReviewsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get taskIdBit => $composableBuilder(
-      column: $table.taskIdBit, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get result => $composableBuilder(
-      column: $table.result, builder: (column) => ColumnOrderings(column));
-
-  ColumnOrderings<String> get improvement => $composableBuilder(
-      column: $table.improvement, builder: (column) => ColumnOrderings(column));
-}
-
-class $$ReviewsTableAnnotationComposer
-    extends Composer<_$MyDatabase, $ReviewsTable> {
-  $$ReviewsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get taskIdBit =>
-      $composableBuilder(column: $table.taskIdBit, builder: (column) => column);
-
-  GeneratedColumn<String> get result =>
-      $composableBuilder(column: $table.result, builder: (column) => column);
-
-  GeneratedColumn<String> get improvement => $composableBuilder(
-      column: $table.improvement, builder: (column) => column);
-}
-
-class $$ReviewsTableTableManager extends RootTableManager<
-    _$MyDatabase,
-    $ReviewsTable,
-    Review,
-    $$ReviewsTableFilterComposer,
-    $$ReviewsTableOrderingComposer,
-    $$ReviewsTableAnnotationComposer,
-    $$ReviewsTableCreateCompanionBuilder,
-    $$ReviewsTableUpdateCompanionBuilder,
-    (Review, BaseReferences<_$MyDatabase, $ReviewsTable, Review>),
-    Review,
-    PrefetchHooks Function()> {
-  $$ReviewsTableTableManager(_$MyDatabase db, $ReviewsTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$ReviewsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ReviewsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$ReviewsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> taskIdBit = const Value.absent(),
-            Value<String?> result = const Value.absent(),
-            Value<String?> improvement = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ReviewsCompanion(
-            taskIdBit: taskIdBit,
-            result: result,
-            improvement: improvement,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required int taskIdBit,
-            Value<String?> result = const Value.absent(),
-            Value<String?> improvement = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ReviewsCompanion.insert(
-            taskIdBit: taskIdBit,
-            result: result,
-            improvement: improvement,
-            rowid: rowid,
-          ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
-          prefetchHooksCallback: null,
-        ));
-}
-
-typedef $$ReviewsTableProcessedTableManager = ProcessedTableManager<
-    _$MyDatabase,
-    $ReviewsTable,
-    Review,
-    $$ReviewsTableFilterComposer,
-    $$ReviewsTableOrderingComposer,
-    $$ReviewsTableAnnotationComposer,
-    $$ReviewsTableCreateCompanionBuilder,
-    $$ReviewsTableUpdateCompanionBuilder,
-    (Review, BaseReferences<_$MyDatabase, $ReviewsTable, Review>),
-    Review,
     PrefetchHooks Function()>;
 typedef $$LabeledTasksTableCreateCompanionBuilder = LabeledTasksCompanion
     Function({
@@ -3182,8 +3223,6 @@ class $MyDatabaseManager {
       $$MonthlyTasksTableTableManager(_db, _db.monthlyTasks);
   $$YearlyTasksTableTableManager get yearlyTasks =>
       $$YearlyTasksTableTableManager(_db, _db.yearlyTasks);
-  $$ReviewsTableTableManager get reviews =>
-      $$ReviewsTableTableManager(_db, _db.reviews);
   $$LabeledTasksTableTableManager get labeledTasks =>
       $$LabeledTasksTableTableManager(_db, _db.labeledTasks);
   $$PageSettingsTableTableManager get pageSettings =>

@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:three_tasks/data_foundation/review_base/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
@@ -23,6 +24,9 @@ sealed class CTask extends TaskBase{
   /// ラベル未登録の状態を null => -1 に変更
   int get labelId;
 
+  /// タスクのレビュー
+  Review get review;
+
   /// タスクの期間の単位
   TaskRec get rec;
 }
@@ -39,6 +43,7 @@ abstract class CDailyTask with DailyTaskBase, _$CDailyTask implements CTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _CDailyTask;
 }
 
@@ -53,6 +58,7 @@ abstract class CWeeklyTask with WeeklyTaskBase, _$CWeeklyTask implements CTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _CWeeklyTask;
 
   /// **編集可能な** 週単位タスクの仮データかどうか
@@ -70,6 +76,7 @@ abstract class CMonthlyTask with MonthlyTaskBase, _$CMonthlyTask implements CTas
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _CMonthlyTask;
 }
 
@@ -84,6 +91,7 @@ abstract class CYearlyTask with YearlyTaskBase, _$CYearlyTask implements CTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _CYearlyTask;
 }
 

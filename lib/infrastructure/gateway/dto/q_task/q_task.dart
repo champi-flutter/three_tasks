@@ -2,6 +2,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:data_converter/data_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:three_tasks/data_foundation/review_base/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 
 part 'q_task.freezed.dart';
@@ -12,6 +13,9 @@ sealed class QTask extends TaskBase{
   int get id;
   bool get isChecked;
   int get labelId;
+
+  /// タスクのレビュー
+  Review get review;
 }
 
 /// Query 用 日単位タスク DTO
@@ -26,6 +30,7 @@ abstract class QDailyTask with DailyTaskBase, _$QDailyTask implements QTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _QDailyTask;
 
   @override
@@ -45,6 +50,7 @@ abstract class QWeeklyTask with WeeklyTaskBase, _$QWeeklyTask implements QTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _QWeeklyTask;
 
   Date get _firstDate => firstDateInt.toDate();
@@ -69,6 +75,7 @@ abstract class QMonthlyTask with MonthlyTaskBase, _$QMonthlyTask implements QTas
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _QMonthlyTask;
 
   // todo data_converter に toMonth を実装（2026/09/11）＞＞
@@ -88,5 +95,6 @@ abstract class QYearlyTask with YearlyTaskBase, _$QYearlyTask implements QTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
   }) = _QYearlyTask;
 }

@@ -50,55 +50,6 @@ final class ToastCountProvider
 
 String _$toastCountHash() => r'3ea4afc2286f5dabb00d546c4a49b11c3ff41176';
 
-/// 「ラベル化したタスク」サービスクラス
-
-@ProviderFor(labeledTasksService)
-const labeledTasksServiceProvider = LabeledTasksServiceProvider._();
-
-/// 「ラベル化したタスク」サービスクラス
-
-final class LabeledTasksServiceProvider extends $FunctionalProvider<
-    LabeledTasksService,
-    LabeledTasksService,
-    LabeledTasksService> with $Provider<LabeledTasksService> {
-  /// 「ラベル化したタスク」サービスクラス
-  const LabeledTasksServiceProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'labeledTasksServiceProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$labeledTasksServiceHash();
-
-  @$internal
-  @override
-  $ProviderElement<LabeledTasksService> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  LabeledTasksService create(Ref ref) {
-    return labeledTasksService(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(LabeledTasksService value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<LabeledTasksService>(value),
-    );
-  }
-}
-
-String _$labeledTasksServiceHash() =>
-    r'9e64f658f95bc9c94960866ca54913832d3927cb';
-
 /// 日単位タスクのアクセス通知フロー
 
 @ProviderFor(notifyDailyTasksAccessUseCase)

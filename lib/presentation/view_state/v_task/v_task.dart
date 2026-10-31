@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:three_tasks/data_foundation/review_base/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
@@ -23,6 +24,9 @@ sealed class VTask extends TaskBase {
 
   int get labelId;
 
+  /// タスクのレビュー
+  Review get review;
+
   /// データ受信済みかどうか
   bool get isFetched;
 }
@@ -38,6 +42,7 @@ abstract class VDailyTask with DailyTaskBase, _$VDailyTask implements VTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
     required bool isFetched,
   }) = _VDailyTask;
 
@@ -48,6 +53,7 @@ abstract class VDailyTask with DailyTaskBase, _$VDailyTask implements VTask {
         id: -1,
         isChecked: false,
         labelId: -1,
+        review: Review(result: null, next: null),
         isFetched: true,
       );
 }
@@ -63,6 +69,7 @@ abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
     required bool isFetched,
     required bool canReplace,
   }) = _VWeeklyTask;
@@ -74,6 +81,7 @@ abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
       id: -1,
       isChecked: false,
       labelId: -1,
+      review: Review(result: null, next: null),
       isFetched: true,
       canReplace: false);
 
@@ -91,6 +99,7 @@ abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
         id: -2,
         isChecked: false,
         labelId: -1,
+    review: Review(result: null, next: null),
         isFetched: false,
         canReplace: true,
       );
@@ -115,6 +124,7 @@ abstract class VMonthlyTask
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
     required bool isFetched,
   }) = _VMonthlyTask;
 
@@ -125,6 +135,7 @@ abstract class VMonthlyTask
         id: -1,
         isChecked: false,
         labelId: -1,
+    review: Review(result: null, next: null),
         isFetched: true,
       );
 }
@@ -140,6 +151,7 @@ abstract class VYearlyTask with YearlyTaskBase, _$VYearlyTask implements VTask {
     required int id,
     required bool isChecked,
     required int labelId,
+    required Review review,
     required bool isFetched,
   }) = _VYearlyTask;
 
@@ -150,6 +162,7 @@ abstract class VYearlyTask with YearlyTaskBase, _$VYearlyTask implements VTask {
         id: -1,
         isChecked: false,
         labelId: -1,
+    review: Review(result: null, next: null),
         isFetched: true,
       );
 }

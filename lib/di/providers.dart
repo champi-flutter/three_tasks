@@ -28,7 +28,6 @@ import 'package:three_tasks/use_case/interactor/watch_tasks/watch_weekly_tasks_i
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
-import 'package:three_tasks/use_case/services/labeled_tasks_service.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/daily_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/weekly_tasks_stream_handler.dart';
 import 'package:three_tasks/use_case/toast_count.dart';
@@ -43,10 +42,6 @@ part 'providers.g.dart';
 // todo UseCase
 @riverpod
 ToastCount toastCount(Ref ref) => ToastCount();
-
-/// 「ラベル化したタスク」サービスクラス
-@riverpod
-LabeledTasksService labeledTasksService(Ref ref) => LabeledTasksService(ref);
 
 
 /// 日単位タスクのアクセス通知フロー

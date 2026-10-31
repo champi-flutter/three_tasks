@@ -17,14 +17,14 @@ class ToQTask {
         MonthlyTaskBase() => toQMonthlyTask(task),
         YearlyTaskBase() => toQYearlyTask(task),
         TaskBase() => throw Exception(
-          "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${task.runtimeType}）\n[ToQTask.toQTask]",
+          "ARGUMENT_ERROR: このクラスは QTask に変換できません。（${task.runtimeType}）\n[ToQTask.toQTask]",
         ),
       };
     }
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${task.runtimeType}）\n[ToQTask.toQTask]",
+        "ARGUMENT_ERROR: このクラスは QTask に変換できません。（${task.runtimeType}）\n[ToQTask.toQTask]",
       );
     }
   }
@@ -43,12 +43,13 @@ class ToQTask {
         isChecked: isChecked,
         labelId: labelId,
         dateInt: dailyTask.date.toIntIdentifier(),
+        review: dailyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${dailyTask.runtimeType}）\n[ToQTask.toQDailyTask]",
+        "ARGUMENT_ERROR: このクラスは QTask に変換できません。（${dailyTask.runtimeType}）\n[ToQTask.toQDailyTask]",
       );
     }
   }
@@ -66,12 +67,13 @@ class ToQTask {
         isChecked: isChecked,
         labelId: labelId,
         firstDateInt: weeklyTask.week.firstDateOfWeek.toIntIdentifier(),
+        review: weeklyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${weeklyTask.runtimeType}）\n[ToQTask.toQWeeklyTask]",
+        "ARGUMENT_ERROR: このクラスは QTask に変換できません。（${weeklyTask.runtimeType}）\n[ToQTask.toQWeeklyTask]",
       );
     }
   }
@@ -87,14 +89,14 @@ class ToQTask {
         title: title,
         isChecked: isChecked,
         labelId: labelId,
-        // todo data_converter に Month.toIntIdentifier を実装（2026/09/11）＞＞
         monthInt: monthlyTask.month.toIntIdentifier(),
+        review: monthlyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${monthlyTask.runtimeType}）\n[ToQTask.toQMonthlyTask]",
+        "ARGUMENT_ERROR: このクラスは QTask に変換できません。（${monthlyTask.runtimeType}）\n[ToQTask.toQMonthlyTask]",
       );
     }
   }
@@ -111,19 +113,20 @@ class ToQTask {
         isChecked: isChecked,
         labelId: labelId,
         year: yearlyTask.year,
+        review: yearlyTask.review,
       );
     }
     // null のパラメータを含む場合は例外を投げる
     else {
       throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${yearlyTask.runtimeType}）\n[ToQTask.toQYearlyTask]",
+        "ARGUMENT_ERROR: このクラスは QTask に変換できません。（${yearlyTask.runtimeType}）\n[ToQTask.toQYearlyTask]",
       );
     }
   }
 
   // /// [TaskUpdateParameter] から [ETask] に変換する
   // static QTask newQTask<Updater extends BaseTaskUpdater>(Updater updater) {
-  //   // updater が持つ TaskBase を ETask に変換する
+  //   // updater が持つ TaskBase を QTask に変換する
   //   final QTask targetQTask = ToQTask(updater.taskOrigin);
   //   return switch (targetQTask) {
   //     QDailyTask() => targetQTask.copyWith(
