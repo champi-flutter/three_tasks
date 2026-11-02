@@ -118,6 +118,34 @@ LazyViewState<TaskList<VTask>> watchTaskStateOnCurrentPage(
   }
 }
 
+
+/// 現在のページが参照しているタスク VM の `state` を監視する
+LazyViewState<TaskList<VTask>> watchPreviousTaskStateOnCurrentPage(
+    WidgetRef ref, {
+      required int pageIndex,
+    })
+// 折りたたみ用
+{
+  switch (pageIndex) {
+    case 0:
+      return ref.watch(dailyTasksViewModelProvider.select((state)=>state[today.nDaysAgo(1)]));
+    case 1:
+      throw ArgumentError(
+        "[watchPreviousTaskStateOnCurrentPage] tomorrows_page での呼び出し",
+      );
+    case 2:
+      return ref.watch(weeklyTasksViewModelProvider.select((state)=>state[today.nDaysAgo(1)]));;
+    case 3:
+      return ref.watch(monthlyTasksViewModelProvider.select((state)=>state[thisMonth.toPrevious()]));;
+    case 4:
+      return ref.watch(yearlyTasksViewModelProvider.select((state)=>state[thisYear - 1]));;
+    default:
+      throw RangeError(
+        "[currentTaskState] 無効なインデックスです。\n（pageIndex = $pageIndex）",
+      );
+  }
+}
+
 // final ControlledPageList<TaskPageBase> pageList = ControlledPageList([
 //   TodaysPage(),
 // ]);

@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:data_converter/data_converter.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
@@ -26,15 +23,9 @@ import 'package:three_tasks/infrastructure/gateway/dto/c_task/converter/to_c_tas
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/converter/e_to_q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/q_to_e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/to_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/unload_from_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/s_task/converter/to_s_task.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/s_task/s_task.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/converter/to_task_save_parameter.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/task_save_parameter/task_save_parameter.dart';
-import 'package:three_tasks/infrastructure/type_extension/e_task_data_entry.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 class DataRepositoryImpl
@@ -98,7 +89,7 @@ class DataRepositoryImpl
       // キャッシュがなかった場合、データソースから取得する
       else {
         final Result<List<QLabel>, Exception> result =
-            await _dataSource.getAllLabeledTasks();
+            await _dataSource.getAllLabels();
         switch (result) {
           // region
           case Success(value: final List<QLabel> successList):
@@ -935,11 +926,19 @@ class DataRepositoryImpl
   )
   // 折りたたみ用
   async {
-    // Date と日単位タスクリストデータ（index と DTO との Map ）との Map
-    final Map<Date, Map<int, DataEntry<int, CDailyTask>>> resultDay = {};
-    // 週単位の値
-    final Map<UniqueWeek, Map<int, DataEntry<int, CWeeklyTask>>> resultWeek =
+    // Date と日単位タスクリストデータ（配置と DataEntry との Map ）との Map
+    final Map<Date, Map<int, DataEntry<int, CDailyTask>>> dailyResultMap = {};
+
+    // UniqueWeek と週単位タスクリストデータ（配置と DataEntry との Map ）との Map
+    final Map<UniqueWeek, Map<int, DataEntry<int, CWeeklyTask>>>
+        weeklyResultMap = {};
+
+    // Month と月単位タスクリストデータ（配置と DataEntry との Map ）との Map
+    final Map<Month, Map<int, DataEntry<int, CMonthlyTask>>> monthlyResultMap =
         {};
+
+    // int（年） と年単位タスクリストデータ（配置と DataEntry との Map ）との Map
+    final Map<int, Map<int, DataEntry<int, CYearlyTask>>> yearlyResultMap = {};
 
     for (final newETaskEntry in updatingETaskEntryList) {
       // このタスクのインデックス（配置）
@@ -947,40 +946,60 @@ class DataRepositoryImpl
       // タスク本体
       final ETask newETask = newETaskEntry.value;
       switch (newETask) {
-        case EDailyTask():
+        case EDailyTask(id: final int newId, date: final Date newEDate):
           final DataEntry<int, CDailyTask> dataEntry = DataEntry(
-            id: newETask.id,
+            id: newId,
             // エンティティをキャッシュ用 DTO に変換して格納する
             value: ToCTask.toCDailyTask<EDailyTask>(newETask),
           );
           // 対象日付の key のリストに index と 日単位タスク の組み合わせを追加する
-          resultDay.addNullable(
-            key: newETask.date,
+          dailyResultMap.addNullable(
+            key: newEDate,
             subKey: index, // 配置を指定
             value: dataEntry,
           );
-        case EWeeklyTask():
+        case EWeeklyTask(id: final int newId, week: final UniqueWeek newEWeek):
           final DataEntry<int, CWeeklyTask> dataEntry = DataEntry(
-            id: newETask.id,
+            id: newId,
             // エンティティをキャッシュ用 DTO に変換して格納する
             value: ToCTask.toCWeeklyTask<EWeeklyTask>(newETask),
           );
           // 対象日付の key のリストに index と 週単位タスク の組み合わせを追加する
-          resultWeek.addNullable(
-            key: newETask.week,
+          weeklyResultMap.addNullable(
+            key: newEWeek,
             subKey: index,
             value: dataEntry,
           );
-        case EMonthlyTask():
-          _;
-        case EYearlyTask():
-          _;
+        case EMonthlyTask(id: final int newId, month: final Month newEMonth):
+          final DataEntry<int, CMonthlyTask> dataEntry = DataEntry(
+            id: newId,
+            // エンティティをキャッシュ用 DTO に変換して格納する
+            value: ToCTask.toCMonthlyTask<EMonthlyTask>(newETask),
+          );
+          // 対象日付の key のリストに index と 月単位タスク の組み合わせを追加する
+          monthlyResultMap.addNullable(
+            key: newEMonth,
+            subKey: index, // 配置を指定
+            value: dataEntry,
+          );
+        case EYearlyTask(id: final int newId, year: final int newEYear):
+          final DataEntry<int, CYearlyTask> dataEntry = DataEntry(
+            id: newId,
+            // エンティティをキャッシュ用 DTO に変換して格納する
+            value: ToCTask.toCYearlyTask<EYearlyTask>(newETask),
+          );
+          // 対象日付の key のリストに index と 年単位タスク の組み合わせを追加する
+          yearlyResultMap.addNullable(
+            key: newEYear,
+            subKey: index, // 配置を指定
+            value: dataEntry,
+          );
       }
     }
     // 日単位の分があればキャッシュを更新
-    if (resultDay.isNotEmpty) {
+    if (dailyResultMap.isNotEmpty) {
       // key は通常1つのみ
-      for (final entry in resultDay.entries) {
+      for (final entry in dailyResultMap.entries) {
         // 反映まで await
         await _dailyTasksCacheHandler.update(
           key: entry.key,
@@ -989,9 +1008,9 @@ class DataRepositoryImpl
       }
     }
     // 週単位の分があればキャッシュを更新
-    if (resultWeek.isNotEmpty) {
+    if (weeklyResultMap.isNotEmpty) {
       // key は通常1つのみ
-      for (final entry in resultWeek.entries) {
+      for (final entry in weeklyResultMap.entries) {
         // 週を key にして更新する（反映まで await）
         await _weeklyTasksCacheHandler.update(
           key: entry.key,
@@ -999,7 +1018,28 @@ class DataRepositoryImpl
         );
       }
     }
-    // todo 月、年単位の場合のキャッシュ（2026/08/06）＞＞
+    // 月単位の分があればキャッシュを更新
+    if (monthlyResultMap.isNotEmpty) {
+      // key は通常1つのみ
+      for (final entry in monthlyResultMap.entries) {
+        // 反映まで await
+        await _monthlyTasksCacheHandler.update(
+          key: entry.key,
+          valueMap: entry.value,
+        );
+      }
+    }
+    // 年単位の分があればキャッシュを更新
+    if (yearlyResultMap.isNotEmpty) {
+      // key は通常1つのみ
+      for (final entry in yearlyResultMap.entries) {
+        // 反映まで await
+        await _yearlyTasksCacheHandler.update(
+          key: entry.key,
+          valueMap: entry.value,
+        );
+      }
+    }
   }
 
   /// 週単位タスクの firstDate を書き換えるメソッド
@@ -1204,6 +1244,7 @@ class DataRepositoryImpl
   }
 
   /// 設定値の変更を保存する
+  @override
   Future<Result<void, Exception>> saveSettingChanges({
     required EPageSetting ePageSetting,
   })
@@ -1231,5 +1272,29 @@ class DataRepositoryImpl
         return Failure(Exception("$exc\n$queryExc"));
       // endregion
     }
+  }
+
+  /// タスクのアクセスを通知する
+  @override
+  void notifyDailyTaskAccess({required Date date}) {
+    _dailyTasksCacheHandler.notifyAccess(key: date);
+  }
+
+  /// 週単位タスクのアクセスを通知する
+  @override
+  void notifyWeeklyTaskAccess({required UniqueWeek week}) {
+    _weeklyTasksCacheHandler.notifyAccess(key: week);
+  }
+
+  /// 月単位タスクのアクセスを通知する
+  @override
+  void notifyMonthlyTaskAccess({required Month month}) {
+    _monthlyTasksCacheHandler.notifyAccess(key: month);
+  }
+
+  /// 年単位タスクのアクセスを通知する
+  @override
+  void notifyYearlyTaskAccess({required int year}) {
+    _yearlyTasksCacheHandler.notifyAccess(key: year);
   }
 }

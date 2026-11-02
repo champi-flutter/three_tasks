@@ -1,19 +1,13 @@
-import 'package:custom_core_types/custom_core_types.dart';
+
 import 'package:custom_widgets/custom_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/config/private_config.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
-import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
-import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view/specific_widgets/common_design/common_scaffold.dart';
 import 'package:three_tasks/view/specific_widgets/pages/screens/review_screen.dart';
-import 'package:three_tasks/view/screens/enumeration/screen_type.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/page_list.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
@@ -48,11 +42,12 @@ class ScreensWrapper extends ConsumerWidget {
       child: CommonScaffold(
         title: currentPage.title,
         appBarActions: [
-          // todo レビューボタン（2026/09/29）＞＞
-          if(isReviewValid)_NavigationForReview(
-            currentShortTitle: currentPage.shortTitle,
-            previousShortTitle: currentPage.previousShortTitle,
-          ),
+          if (isReviewValid)
+            _NavigationForReview(
+              controlledPageIndex: currentPageIndex,
+              currentShortTitle: currentPage.shortTitle,
+              previousShortTitle: currentPage.previousShortTitle,
+            ),
           // 自動保存オンオフスイッチ
           AutoSaveSwitch.primary(
             pageIndex: currentPageIndex,
@@ -68,10 +63,12 @@ class ScreensWrapper extends ConsumerWidget {
                 );
                 // タスクの下書きを保存する
                 await ref.read(tasksControllerProvider(scopeToken)).saveCurrent(
-                  taskState: taskState,
-                );
+                      taskState: taskState,
+                    );
                 // ラベルの変更の下書きを保存する
-                await ref.read(labelsControllerProvider(scopeToken)).saveDraft();
+                await ref
+                    .read(labelsControllerProvider(scopeToken))
+                    .saveDraft();
               }
               // 自動保存オン => オフ の場合
               else {
@@ -249,6 +246,7 @@ class _NavigationForReview extends StatelessWidget {
     super.key,
     required this.currentShortTitle,
     required this.previousShortTitle,
+    required this.controlledPageIndex,
   });
 
   final String currentShortTitle;
@@ -256,9 +254,12 @@ class _NavigationForReview extends StatelessWidget {
   /// 「昨日」「先週」「先月」「去年」
   final String previousShortTitle;
 
+  /// 現在表示されているページのインデックス
+  final int controlledPageIndex;
+
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton(
+    return PopupMenuButton<ReviewTarget>(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 12.0.w),
         child: Icon(
@@ -266,46 +267,30 @@ class _NavigationForReview extends StatelessWidget {
           size: 30.0.dm,
         ),
       ),
-      itemBuilder: (context) => [
-        PopupMenuItem(
-          // todo サイズ確認
-          child: Text(
-            "$currentShortTitleのタスクをレビュー",
-            style: TextStyle(fontSize: 18.sp),
+      onSelected: (ReviewTarget value) {
+        Navigator.of(context).pushWithUnfocus(
+          MaterialPageRoute(
+            builder: (context) => ReviewScreen(
+              controlledPageIndex: controlledPageIndex,
+              target: value,
+            ),
           ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ReviewScreen(
-                  timeStatus: TimeStatus.now,
-                  taskType: taskType,
-                ),
-              ),
-            );
-
-            // todo レビューが更新された場合、更新された状態の値を取得（2026/05/22）＞＞
-          },
-        ),
-        PopupMenuItem(
+        );
+      },
+      itemBuilder: (context) => ReviewTarget.values.map((target) {
+        final String shortTitle = switch (target) {
+          ReviewTarget.current => currentShortTitle,
+          ReviewTarget.previous => previousShortTitle,
+        };
+        return PopupMenuItem(
+          value: target,
           // todo サイズ確認
-          child: Text(
-            "$previousShortTitleのタスクをレビュー",
-            style: TextStyle(fontSize: 18.sp),
+          child: UtilizedText(
+            "$shortTitleのタスクをレビュー",
+            fontSize: 18.sp,
           ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => ReviewScreen(
-                  timeStatus: TimeStatus.previous,
-                  taskType: taskType,
-                ),
-              ),
-            );
-
-            // todo レビューが更新された場合、更新された状態の値を取得（2026/05/22）＞＞
-          },
-        ),
-      ],
+        );
+      }).toList(),
     );
   }
 }

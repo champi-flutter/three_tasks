@@ -9,7 +9,7 @@ import 'package:three_tasks/presentation/controller/dto/label_control_parameter/
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
+import 'package:three_tasks/view/specific_widgets/buttons/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/show_label_dialog.dart';
 
 /// 「ラベル化されたタスク一覧」ボタンクラス

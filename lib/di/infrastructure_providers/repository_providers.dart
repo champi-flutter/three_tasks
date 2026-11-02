@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/infrastructure_providers/cache_handler_providers.dart';
 import 'package:three_tasks/di/infrastructure_providers/data_source_providers.dart';
-import 'package:three_tasks/infrastructure/gateway/repositories/data_repository_impl.dart';
+import 'package:three_tasks/infrastructure/gateway/repository/data_repository_impl.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 part 'repository_providers.g.dart';

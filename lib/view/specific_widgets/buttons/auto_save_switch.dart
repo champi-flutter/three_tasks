@@ -11,7 +11,6 @@ enum _SwitchType { primary, review }
 
 /// 「自動保存オンオフ」スイッチ
 class AutoSaveSwitch extends ConsumerWidget {
-
   /// 対象ページの自動保存オンオフを切り替えるスイッチのコンストラクタ
   const AutoSaveSwitch.primary({
     super.key,
@@ -39,45 +38,59 @@ class AutoSaveSwitch extends ConsumerWidget {
     // PageSettingsViewModel を監視する
     final state = ref.watch(pageSettingsViewModelProvider);
 
-    return state.when(
+    // オンオフスイッチ本体
+    final Widget switchBody = state.when(
       onReceived: (data) {
-        final VPageSetting targetPageSetting = data[pageIndex];
+        // 一応、インデックスの範囲をチェック
+        final bool isValid = pageIndex < data.length;
+        final VPageSetting targetPageSetting =
+            isValid ? data[pageIndex] : VPageSetting.placeholder(pageIndex);
         // 現在指定されている pageIndex における「自動保存オンオフ」
         final bool willAutoSave = (_type == _SwitchType.primary)
             ? targetPageSetting.primaryAutoSaves
             : targetPageSetting.reviewAutoSaves;
-        return Row(
-          children: [
-            const UtilizedText(
-              "自動保存",
-              fontSize: 18,
-            ),
-            SizedBox(width: 4.w),
-            // オンオフスイッチ本体
-            OnOffSwitch.onWhite(
-              state: willAutoSave,
-              onChanged: (bool value) async {
-                // todo （2026/10/12）＞＞
-                // 設定値を変更する
-                await ref.read(settingsControllerProvider).controlPageSettings(
+        return OnOffSwitch.onWhite(
+          state: willAutoSave,
+          onChanged: (bool value) async {
+            // 設定値を変更する
+            await ref.read(settingsControllerProvider).controlPageSettings(
                   targetPageSetting: targetPageSetting,
                   parameter: (_type == _SwitchType.primary)
                       ? PageSettingControlParameter(
-                    primaryAutoSaves: value,
-                  )
+                          primaryAutoSaves: value,
+                        )
                       : PageSettingControlParameter(
-                    reviewAutoSaves: value,
-                  ),
+                          reviewAutoSaves: value,
+                        ),
                 );
-                await onSwitched(value);
-              },
-            ),
-          ],
+            await onSwitched(value);
+          },
         );
       },
-      // todo 読み込み時のスイッチ（2026/10/07）＞＞
-      onLoading:,
-      onError:,
+      onLoading: (_) {
+        return OnOffSwitch.onWhite(
+          state: false,
+          onChanged: (bool _) {},
+        );
+      },
+      onError: (_, __) {
+        return OnOffSwitch.onWhite(
+          state: false,
+          onChanged: (bool _) {},
+        );
+      },
+    );
+
+    return Row(
+      children: [
+        const UtilizedText(
+          "自動保存",
+          fontSize: 18,
+        ),
+        SizedBox(width: 4.w),
+        // オンオフスイッチ本体
+        switchBody,
+      ],
     );
   }
 }

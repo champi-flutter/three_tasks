@@ -18,6 +18,11 @@ sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
 
   @override
   TaskListBase<Task> get deepCopy;
+
+  /// タスクリストの先頭のタスク
+  ///
+  /// タスクの種別などのタスクリスト全体で共通する情報を取得する際に使用する。
+  Task get headTask => toEntryList()[0].value;
 }
 
 /// タスクのリスト

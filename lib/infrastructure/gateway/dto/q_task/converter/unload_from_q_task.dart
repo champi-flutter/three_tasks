@@ -17,6 +17,5 @@ class UnloadFromQTask{
   );
 
   /// [QMonthlyTask] から月情報を [Month] 型で取り出す
-  // todo data_converter に toMonth を実装（2026/09/11）＞＞
   static Month month(QMonthlyTask task)=>task.monthInt.toMonth();
 }

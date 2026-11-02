@@ -48,7 +48,7 @@ final class MonthlyTasksViewModelProvider extends $NotifierProvider<
 }
 
 String _$monthlyTasksViewModelHash() =>
-    r'20727ba3b7f44ce41db81632275869eeac870dd0';
+    r'b394c9d02326d8f5057f91dfe3416d6698a10e4c';
 
 /// 月単位タスク View Model
 

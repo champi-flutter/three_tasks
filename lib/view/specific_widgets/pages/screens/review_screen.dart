@@ -10,7 +10,7 @@ import 'package:three_tasks/presentation/view_model/setting_view_model/page_sett
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
 import 'package:three_tasks/view/specific_widgets/common_design/common_scaffold.dart';
-import 'package:three_tasks/view/specific_widgets/draft_saving_button.dart';
+import 'package:three_tasks/view/specific_widgets/buttons/draft_saving_button.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/page_list.dart';
 
 // enum ReviewStatus { date, week, month, year }
@@ -21,15 +21,20 @@ import 'package:three_tasks/view/specific_widgets/pages/task_pages/page_list.dar
 //
 // get isEditedReview => _isEditedReview;
 
+enum ReviewTarget { current, previous }
+
 /// レビュー画面
 class ReviewScreen extends ConsumerWidget {
-
   const ReviewScreen({
     required this.controlledPageIndex,
+    required this.target,
   });
 
   /// レビューする対象のタスクのページのインデックス
   final int controlledPageIndex;
+
+  /// レビューのターゲット（今回なのか、前回なのか）
+  final ReviewTarget target;
 
   // todo build
   @override
@@ -46,10 +51,16 @@ class ReviewScreen extends ConsumerWidget {
     return settingsVMState.when(
       onReceived: (setting) {
         final bool willAutoSave = setting[controlledPageIndex].reviewAutoSaves;
-        final lazyTaskState = watchTaskStateOnCurrentPage(
-          ref,
-          pageIndex: controlledPageIndex,
-        );
+        final lazyTaskState = switch (target) {
+          ReviewTarget.current => watchTaskStateOnCurrentPage(
+              ref,
+              pageIndex: controlledPageIndex,
+            ),
+          ReviewTarget.previous => watchPreviousTaskStateOnCurrentPage(
+              ref,
+              pageIndex: controlledPageIndex,
+            ),
+        };
         return lazyTaskState.when(
           onReceived: (taskState) {
             return UnfocusTapScrimScope(
@@ -82,10 +93,12 @@ class ReviewScreen extends ConsumerWidget {
                             //   pageIndex: controlledPageIndex,
                             // );
                             // レビューの下書きを保存する
-                            await ref.read(
-                                reviewControllerProvider(reviewScreenToken))
-                                .saveCurrent(taskState: taskState,
-                            );
+                            await ref
+                                .read(
+                                    reviewControllerProvider(reviewScreenToken))
+                                .saveCurrent(
+                                  taskState: taskState,
+                                );
                           }
                           // 自動保存オン => オフ の場合
                           else {
@@ -95,7 +108,6 @@ class ReviewScreen extends ConsumerWidget {
                       ),
                     ],
 
-                    // todo レビュー画面の body（2026/10/26）＞＞
                     body: SingleChildScrollView(
                       child: Center(
                         child: Column(
@@ -140,37 +152,37 @@ class ReviewScreen extends ConsumerWidget {
     );
   }
 
-  // // todo 「履歴を参照」ボタン
-  // Widget _referButton() {
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
-  //     child: ElevatedButton(
-  //       style: ElevatedButton.styleFrom(
-  //         minimumSize: Size(double.infinity, 90.h),
-  //       ),
-  //       onPressed: () async {
-  //         // _focusNode
-  //         //   ..[0].unfocus()
-  //         //   ..[1].unfocus()
-  //         //   ..[2].unfocus();
-  //         _focusNode.unfocus();
-  //         await Navigator.push(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) =>
-  //                 HistoryScreen(formatAtNavigation: TaskFormat.date),
-  //           ),
-  //         );
-  //       },
-  //       child: Text(
-  //         "履歴を参照",
-  //         style: TextStyle(
-  //           fontSize: 25.0.sp,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+// // todo 「履歴を参照」ボタン
+// Widget _referButton() {
+//   return Padding(
+//     padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
+//     child: ElevatedButton(
+//       style: ElevatedButton.styleFrom(
+//         minimumSize: Size(double.infinity, 90.h),
+//       ),
+//       onPressed: () async {
+//         // _focusNode
+//         //   ..[0].unfocus()
+//         //   ..[1].unfocus()
+//         //   ..[2].unfocus();
+//         _focusNode.unfocus();
+//         await Navigator.push(
+//           context,
+//           MaterialPageRoute(
+//             builder: (context) =>
+//                 HistoryScreen(formatAtNavigation: TaskFormat.date),
+//           ),
+//         );
+//       },
+//       child: Text(
+//         "履歴を参照",
+//         style: TextStyle(
+//           fontSize: 25.0.sp,
+//         ),
+//       ),
+//     ),
+//   );
+// }
 }
 
 /// レビュー入力欄
@@ -214,13 +226,16 @@ class _ReviewBody extends ConsumerWidget {
                   scopeToken: scopeToken,
                   vTask: taskState[position].value,
                   onTextEdited: ({String? newValue}) async {
-                    await ref.read(reviewControllerProvider(scopeToken))
+                    await ref
+                        .read(reviewControllerProvider(scopeToken))
                         .controlReview(
-                      willAutoSave: willAutoSave,
-                      taskState: taskState,
-                      position: position,
-                      parameter: ReviewControlParameter(result: newValue,),
-                    );
+                          willAutoSave: willAutoSave,
+                          taskState: taskState,
+                          position: position,
+                          parameter: ReviewControlParameter(
+                            result: newValue,
+                          ),
+                        );
                   },
                 ),
                 // 次回の方針
@@ -228,13 +243,16 @@ class _ReviewBody extends ConsumerWidget {
                   scopeToken: scopeToken,
                   vTask: taskState[position].value,
                   onTextEdited: ({String? newValue}) async {
-                    await ref.read(reviewControllerProvider(scopeToken))
+                    await ref
+                        .read(reviewControllerProvider(scopeToken))
                         .controlReview(
-                      willAutoSave: willAutoSave,
-                      taskState: taskState,
-                      position: position,
-                      parameter: ReviewControlParameter(result: newValue,),
-                    );
+                          willAutoSave: willAutoSave,
+                          taskState: taskState,
+                          position: position,
+                          parameter: ReviewControlParameter(
+                            result: newValue,
+                          ),
+                        );
                   },
                 ),
               ],
@@ -260,7 +278,7 @@ class _ReviewFormBase extends ConsumerWidget {
 
   /// 自動保存オン時の、各タスクの入力値の自動保存ロジック
   final Future<void> Function({
-  String? newValue,
+    String? newValue,
   }) onTextEdited;
 
   /// ビルド時点での対象の値
@@ -287,7 +305,7 @@ class _ReviewFormBase extends ConsumerWidget {
 
     // TextEditingController と FocusNode の管理元
     final TextFocusController textFocusController =
-    useTextFocusController(onUnfocused: _onUnfocused);
+        useTextFocusController(onUnfocused: _onUnfocused);
     return Card(
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 4.r),
@@ -332,9 +350,7 @@ class _ReviewFormBase extends ConsumerWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
-                      backgroundColor: Theme
-                          .of(context)
-                          .primaryColor,
+                      backgroundColor: Theme.of(context).primaryColor,
                       foregroundColor: Colors.white,
                     ),
                   ),
@@ -365,7 +381,7 @@ class _ResultForm extends ConsumerWidget {
 
   /// 自動保存オン時の、各タスクの入力値の自動保存ロジック
   final Future<void> Function({
-  String? newValue,
+    String? newValue,
   }) onTextEdited;
 
   @override
@@ -395,7 +411,7 @@ class _NextForm extends ConsumerWidget {
 
   /// 自動保存オン時の、各タスクの入力値の自動保存ロジック
   final Future<void> Function({
-  String? newValue,
+    String? newValue,
   }) onTextEdited;
 
   @override

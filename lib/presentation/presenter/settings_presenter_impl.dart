@@ -18,7 +18,8 @@ class SettingsPresenterImpl implements SettingsPresenter{
     // Presentation 用の値に変換する
     final VPageSetting vPageSetting = VPageSetting(
       controlledIndex: newPageSetting.pageIndex,
-      autoSave: newPageSetting.autoSave,
+      primaryAutoSaves: newPageSetting.primaryAutoSaves,
+      reviewAutoSaves: newPageSetting.reviewAutoSaves,
     );
     // VM に反映する
     _viewModel.updateWith(vPageSetting);
@@ -42,7 +43,8 @@ class SettingsPresenterImpl implements SettingsPresenter{
       final EPageSetting ePageSetting = eEntry.value;
       vData[pageIndex] = VPageSetting(
         controlledIndex: pageIndex,
-        autoSave: ePageSetting.autoSave,
+        primaryAutoSaves: ePageSetting.primaryAutoSaves,
+        reviewAutoSaves: ePageSetting.reviewAutoSaves,
       );
     }
     _viewModel.updateAll(vData);

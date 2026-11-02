@@ -11,7 +11,6 @@ part 'q_label.freezed.dart';
 abstract class QLabel with _$QLabel {
   const QLabel._();
 
-  // todo データソース用の形（2026/09/21）＞＞
   const factory QLabel({
     required String title,
     required int labelId,

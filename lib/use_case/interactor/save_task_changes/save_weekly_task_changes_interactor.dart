@@ -6,8 +6,6 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekl
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 週単位タスク変更保存フローを実装するクラス
-///
-/// todo 開始日変更フローは別で作る（2026/09/10）＞＞
 class SaveWeeklyTaskChangesInteractor
     with NotificationFromUseCase
     implements SaveWeeklyTaskChangesUseCase {

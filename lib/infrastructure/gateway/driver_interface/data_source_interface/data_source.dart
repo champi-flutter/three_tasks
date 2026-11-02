@@ -6,8 +6,8 @@ import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 
 abstract class DataSource {
   // todo フェッチ
-  /// `LabeledTask` フェッチメソッド
-  Future<Result<List<QLabel>, Exception>> getAllLabeledTasks();
+  /// `Label` フェッチメソッド
+  Future<Result<List<QLabel>, Exception>> getAllLabels();
 
   /// `DailyTask` フェッチメソッド
   ///

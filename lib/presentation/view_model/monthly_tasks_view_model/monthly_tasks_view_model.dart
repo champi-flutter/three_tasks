@@ -6,21 +6,21 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_monthly_tasks_use_case.dart';
 
 part 'monthly_tasks_view_model.g.dart';
 
 /// 月単位タスク View Model
 @riverpod
-class MonthlyTasksViewModel extends _$MonthlyTasksViewModel
-    with NotificationFromViewModel {
+class MonthlyTasksViewModel extends _$MonthlyTasksViewModel{
   // todo 初期化
   @override
   LazyMapViewState<Month, TaskList<VMonthlyTask>> build() {
     // リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
     // ハンドラ（`_handleDayTasksUpdating`）が1回起動して初めて実際のデータが表示される
     return LazyMapViewState(
-      onAnyAccess: _startWatching, //fixme
+      onAnyAccess: _onAccess,
       onNewAccess: _startWatching,
       placeholder: _placeholder,
     );
@@ -38,14 +38,21 @@ class MonthlyTasksViewModel extends _$MonthlyTasksViewModel
   WatchMonthlyTasksUseCase get _watchMonthlyTasksUseCase =>
       ref.read(watchMonthlyTasksUseCaseProvider);
 
-  /// 通知機能の呼び出し口
-  @override
-  NotificationService get notificationService =>
-      ref.read(notificationServiceProvider);
+  /// アクセス通知フローへのアクセス
+  NotifyMonthlyTasksAccessUseCase get _notifyMonthlyTasksAccessUseCase =>
+      ref.read(notifyMonthlyTasksAccessUseCaseProvider);
+
+  /// アクセスを通知する
+  void _onAccess(Month month)=>_notifyMonthlyTasksAccessUseCase.execute(month);
 
   /// 監視フローを開始する
-  void _startWatching(Month targetMonth)
-  => _watchMonthlyTasksUseCase.initAt(targetMonth);
+  void _startWatching(Month targetMonth) {
+    // 未来の日付なら何もしない
+    if(targetMonth > thisMonth){
+      return;
+    }
+    _watchMonthlyTasksUseCase.initAt(targetMonth);
+  }
 
 
   /// [state] 更新メソッド

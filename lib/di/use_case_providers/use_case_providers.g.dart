@@ -362,6 +362,194 @@ final class DiscardDraftUseCaseProvider extends $FunctionalProvider<
 String _$discardDraftUseCaseHash() =>
     r'e572efab7ffe7eff8f4b1f01be0c27d0c5520a81';
 
+@ProviderFor(notifyDailyTasksAccessUseCase)
+const notifyDailyTasksAccessUseCaseProvider =
+    NotifyDailyTasksAccessUseCaseProvider._();
+
+final class NotifyDailyTasksAccessUseCaseProvider extends $FunctionalProvider<
+        NotifyDailyTasksAccessUseCase,
+        NotifyDailyTasksAccessUseCase,
+        NotifyDailyTasksAccessUseCase>
+    with $Provider<NotifyDailyTasksAccessUseCase> {
+  const NotifyDailyTasksAccessUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'notifyDailyTasksAccessUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$notifyDailyTasksAccessUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<NotifyDailyTasksAccessUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  NotifyDailyTasksAccessUseCase create(Ref ref) {
+    return notifyDailyTasksAccessUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NotifyDailyTasksAccessUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<NotifyDailyTasksAccessUseCase>(value),
+    );
+  }
+}
+
+String _$notifyDailyTasksAccessUseCaseHash() =>
+    r'10fb46df5e113e75176c93ab7357f6c89e500c20';
+
+@ProviderFor(notifyWeeklyTasksAccessUseCase)
+const notifyWeeklyTasksAccessUseCaseProvider =
+    NotifyWeeklyTasksAccessUseCaseProvider._();
+
+final class NotifyWeeklyTasksAccessUseCaseProvider extends $FunctionalProvider<
+        NotifyWeeklyTasksAccessUseCase,
+        NotifyWeeklyTasksAccessUseCase,
+        NotifyWeeklyTasksAccessUseCase>
+    with $Provider<NotifyWeeklyTasksAccessUseCase> {
+  const NotifyWeeklyTasksAccessUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'notifyWeeklyTasksAccessUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$notifyWeeklyTasksAccessUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<NotifyWeeklyTasksAccessUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  NotifyWeeklyTasksAccessUseCase create(Ref ref) {
+    return notifyWeeklyTasksAccessUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NotifyWeeklyTasksAccessUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<NotifyWeeklyTasksAccessUseCase>(value),
+    );
+  }
+}
+
+String _$notifyWeeklyTasksAccessUseCaseHash() =>
+    r'5cf4414d113797ebb0dd51a812d5c18d9a8d7759';
+
+@ProviderFor(notifyMonthlyTasksAccessUseCase)
+const notifyMonthlyTasksAccessUseCaseProvider =
+    NotifyMonthlyTasksAccessUseCaseProvider._();
+
+final class NotifyMonthlyTasksAccessUseCaseProvider extends $FunctionalProvider<
+        NotifyMonthlyTasksAccessUseCase,
+        NotifyMonthlyTasksAccessUseCase,
+        NotifyMonthlyTasksAccessUseCase>
+    with $Provider<NotifyMonthlyTasksAccessUseCase> {
+  const NotifyMonthlyTasksAccessUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'notifyMonthlyTasksAccessUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$notifyMonthlyTasksAccessUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<NotifyMonthlyTasksAccessUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  NotifyMonthlyTasksAccessUseCase create(Ref ref) {
+    return notifyMonthlyTasksAccessUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NotifyMonthlyTasksAccessUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<NotifyMonthlyTasksAccessUseCase>(value),
+    );
+  }
+}
+
+String _$notifyMonthlyTasksAccessUseCaseHash() =>
+    r'622925a402cd3a18e6e2c708b93c4fd0131a68fd';
+
+@ProviderFor(notifyYearlyTasksAccessUseCase)
+const notifyYearlyTasksAccessUseCaseProvider =
+    NotifyYearlyTasksAccessUseCaseProvider._();
+
+final class NotifyYearlyTasksAccessUseCaseProvider extends $FunctionalProvider<
+        NotifyYearlyTasksAccessUseCase,
+        NotifyYearlyTasksAccessUseCase,
+        NotifyYearlyTasksAccessUseCase>
+    with $Provider<NotifyYearlyTasksAccessUseCase> {
+  const NotifyYearlyTasksAccessUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'notifyYearlyTasksAccessUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$notifyYearlyTasksAccessUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<NotifyYearlyTasksAccessUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  NotifyYearlyTasksAccessUseCase create(Ref ref) {
+    return notifyYearlyTasksAccessUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(NotifyYearlyTasksAccessUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride:
+          $SyncValueProvider<NotifyYearlyTasksAccessUseCase>(value),
+    );
+  }
+}
+
+String _$notifyYearlyTasksAccessUseCaseHash() =>
+    r'69c70e82a7da02dc64460b0d6f5c0ba159ae1824';
+
 @ProviderFor(fetchLabelUseCase)
 const fetchLabelUseCaseProvider = FetchLabelUseCaseProvider._();
 

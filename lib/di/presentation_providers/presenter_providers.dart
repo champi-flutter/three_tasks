@@ -23,8 +23,6 @@ import 'package:three_tasks/use_case/output_boundary/yearly_tasks_presenter.dart
 part 'presenter_providers.g.dart';
 
 
-// todo 各 Presenter の Provider をこっちに移していく（2026/09/19）＞＞
-
 
 // 日単位タスク監視反映ポート
 @riverpod

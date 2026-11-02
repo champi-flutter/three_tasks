@@ -7,7 +7,7 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/view/specific_widgets/bottom_button.dart';
+import 'package:three_tasks/view/specific_widgets/buttons/bottom_button.dart';
 import 'package:three_tasks/view/specific_widgets/tasks_view.dart';
 
 enum _ButtonType { primary, review }

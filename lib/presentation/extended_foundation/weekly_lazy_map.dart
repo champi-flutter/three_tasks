@@ -42,7 +42,7 @@ class WeeklyLazyMap {
 
   /// まだ値の入っていない key にアクセスされたときのコールバック
   @protected
-  final void Function(Date key) onAnyAccess;
+  final void Function(UniqueWeek key) onAnyAccess;
 
   /// まだ値の入っていない key にアクセスされたときのコールバック
   @protected
@@ -83,20 +83,27 @@ class WeeklyLazyMap {
       // // （更新時の順番の乱れを防ぐ）
       // taskEntries.sort((a, b) => a.key.compareTo(b.key));
 
-      final taskEntries =
-          <MapEntry<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>>[];
+      // 週とその週のタスクリストの組み合わせのリスト
+      final List<
+              MapEntry<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>>
+          taskEntries = [];
       // key（指定日付）を含む週の開始日で探索する（最大7回）
       // 開始日順に探索することで、週が古い順になるようにする（更新時の順番の乱れを防ぐ）
-      for (int diff = 1; diff <= 7; diff++) {
-        final Date targetFirstDate = key.nDaysAgo((key.week - diff) % 7);
+      for (int diff = 6; diff >= 0; diff--) {
+        // diff 日前の日付
+        final Date targetFirstDate = key.nDaysAgo(diff);
+        // diff 日前の日付から UniqueWeek を作る
         final targetWeek = UniqueWeek.fromDate(
           currentDate: key,
           firstDate: targetFirstDate,
         );
 
+        // _source に targetWeek のタスクがあった場合、taskEntry に追加する
         final LazyViewState<WeeklyTaskList<VWeeklyTask>>? targetTaskList =
             _source[targetWeek];
         if (targetTaskList != null) {
+          // targetWeek のタスクにアクセスがあった際のコールバックを呼ぶ
+          onAnyAccess(targetWeek);
           taskEntries.add(MapEntry(targetWeek, targetTaskList));
         }
       }
@@ -141,8 +148,8 @@ class WeeklyLazyMap {
         resultList.add(VWeeklyTask.placeholder2(today));
       }
 
-      // TaskList を返す時のみ onAnyAccess を回す
-      onAnyAccess(key);
+      // // TaskList を返す時のみ onAnyAccess を回す
+      // onAnyAccess(key);
 
       // TaskList に変換する
       final taskList = TaskList<VWeeklyTask>(
@@ -245,7 +252,8 @@ class WeeklyLazyMap {
   /// 指定 [UniqueWeek] のを更新して、複製した [WeeklyLazyMap] の新しい枠を返すメソッド
   ///
   /// 受信データを当てはめたコピーを返す
-  WeeklyLazyMap copyReception(UniqueWeek key, WeeklyTaskList<VWeeklyTask> value) =>
+  WeeklyLazyMap copyReception(
+          UniqueWeek key, WeeklyTaskList<VWeeklyTask> value) =>
       copyWith(key, LazyViewState.data(value));
 
   /// [copyWith] の override
@@ -256,7 +264,9 @@ class WeeklyLazyMap {
     UniqueWeek key,
     LazyViewState<WeeklyTaskList<VWeeklyTask>> value,
   ) {
-    final newMap = Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>.of(_source)..[key] = value;
+    final newMap =
+        Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>.of(_source)
+          ..[key] = value;
     return WeeklyLazyMap._copy(
       source: newMap,
       refLengthAtEachDate: _refLengthAtEachDate,

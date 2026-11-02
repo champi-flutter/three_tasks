@@ -2,7 +2,7 @@
 import 'package:drift/drift.dart';
 
 /// 2026/06/01 追加: ラベリングされたタスク
-class LabeledTasks extends Table {
+class Labels extends Table {
   // 主キー
   IntColumn get labeledId => integer().autoIncrement()();
 

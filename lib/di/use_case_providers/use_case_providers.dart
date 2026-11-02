@@ -2,13 +2,11 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/infrastructure_providers/stream_handler_providers.dart';
-import 'package:three_tasks/di/infrastructure_providers/data_source_providers.dart';
 import 'package:three_tasks/di/infrastructure_providers/repository_providers.dart';
 import 'package:three_tasks/di/presentation_providers/presenter_providers.dart';
-import 'package:three_tasks/di/providers.dart';
-import 'package:three_tasks/use_case/input_boundary/draft_label/draft_label_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_label/fetch_label_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_settings/fetch_settings_use_case.dart';
+import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_label/register_new_label_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_label/save_label_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_settings/save_setting_changes_use_case.dart';
@@ -20,9 +18,9 @@ import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_task
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_monthly_tasks_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_yearly_tasks_use_case.dart';
-import 'package:three_tasks/use_case/interactor/draft_label/draft_label_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/fetch_label/fetch_label_interactor.dart';
 import 'package:three_tasks/use_case/interactor/fetch_settings/fetch_settings_interactor.dart';
+import 'package:three_tasks/use_case/interactor/notify_access/notify_tasks_access_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_label/register_new_label_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_label/save_label_changes_interactor.dart';
 import 'package:three_tasks/use_case/interactor/save_settings/save_setting_changes_interactor.dart';
@@ -37,7 +35,6 @@ import 'package:three_tasks/use_case/interactor/watch_tasks/watch_yearly_tasks_i
 
 part 'use_case_providers.g.dart';
 
-// todo UseCase 層のクラスの Provider をこっちに移していく（2026/09/19）＞＞
 
 
 // 日単位タスクの監視フロー
@@ -132,6 +129,35 @@ DiscardDraftUseCase discardDraftUseCase(Ref ref) => DiscardDraftInteractor(
   notificationService: ref.watch(notificationServiceProvider),
   loadingService: ref.watch(loadingServiceProvider),
 );
+
+// 日単位タスクのアクセス通知フロー
+@riverpod
+NotifyDailyTasksAccessUseCase notifyDailyTasksAccessUseCase(Ref ref) =>
+    NotifyDailyTasksAccessInteractor(
+      dataRepository: ref.watch(dataRepositoryProvider),
+    );
+
+// 週単位タスクのアクセス通知フロー
+@riverpod
+NotifyWeeklyTasksAccessUseCase notifyWeeklyTasksAccessUseCase(Ref ref) =>
+    NotifyWeeklyTasksAccessInteractor(
+      dataRepository: ref.watch(dataRepositoryProvider),
+    );
+
+// 月単位タスクのアクセス通知フロー
+@riverpod
+NotifyMonthlyTasksAccessUseCase notifyMonthlyTasksAccessUseCase(Ref ref) =>
+    NotifyMonthlyTasksAccessInteractor(
+      dataRepository: ref.watch(dataRepositoryProvider),
+    );
+
+// 年単位タスクのアクセス通知フロー
+@riverpod
+NotifyYearlyTasksAccessUseCase notifyYearlyTasksAccessUseCase(Ref ref) =>
+    NotifyYearlyTasksAccessInteractor(
+      dataRepository: ref.watch(dataRepositoryProvider),
+    );
+
 
 // ラベルフェッチフロー
 @riverpod

@@ -29,6 +29,8 @@ sealed class VTask extends TaskBase {
 
   /// データ受信済みかどうか
   bool get isFetched;
+
+
 }
 
 /// 日単位のタスククラス

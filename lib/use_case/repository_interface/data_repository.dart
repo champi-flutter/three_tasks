@@ -86,4 +86,16 @@ abstract class DataRepository {
   Future<Result<void, Exception>> saveSettingChanges({
     required EPageSetting ePageSetting,
   });
+
+  /// 日単位タスクのアクセスを通知する
+  void notifyDailyTaskAccess({required Date date});
+
+  /// 週単位タスクのアクセスを通知する
+  void notifyWeeklyTaskAccess({required UniqueWeek week});
+
+  /// 月単位タスクのアクセスを通知する
+  void notifyMonthlyTaskAccess({required Month month});
+
+  /// 年単位タスクのアクセスを通知する
+  void notifyYearlyTaskAccess({required int year});
 }

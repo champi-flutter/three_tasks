@@ -1479,12 +1479,11 @@ class YearlyTasksCompanion extends UpdateCompanion<YearlyTask> {
   }
 }
 
-class $LabeledTasksTable extends LabeledTasks
-    with TableInfo<$LabeledTasksTable, LabeledTask> {
+class $LabelsTable extends Labels with TableInfo<$LabelsTable, Label> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $LabeledTasksTable(this.attachedDatabase, [this._alias]);
+  $LabelsTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _labeledIdMeta =
       const VerificationMeta('labeledId');
   @override
@@ -1545,9 +1544,9 @@ class $LabeledTasksTable extends LabeledTasks
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'labeled_tasks';
+  static const String $name = 'labels';
   @override
-  VerificationContext validateIntegrity(Insertable<LabeledTask> instance,
+  VerificationContext validateIntegrity(Insertable<Label> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -1591,9 +1590,9 @@ class $LabeledTasksTable extends LabeledTasks
   @override
   Set<GeneratedColumn> get $primaryKey => {labeledId};
   @override
-  LabeledTask map(Map<String, dynamic> data, {String? tablePrefix}) {
+  Label map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LabeledTask(
+    return Label(
       labeledId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}labeled_id'])!,
       label: attachedDatabase.typeMapping
@@ -1610,19 +1609,19 @@ class $LabeledTasksTable extends LabeledTasks
   }
 
   @override
-  $LabeledTasksTable createAlias(String alias) {
-    return $LabeledTasksTable(attachedDatabase, alias);
+  $LabelsTable createAlias(String alias) {
+    return $LabelsTable(attachedDatabase, alias);
   }
 }
 
-class LabeledTask extends DataClass implements Insertable<LabeledTask> {
+class Label extends DataClass implements Insertable<Label> {
   final int labeledId;
   final String label;
   final Uint8List dailyIdList;
   final Uint8List weeklyIdList;
   final Uint8List monthlyIdList;
   final Uint8List yearlyIdList;
-  const LabeledTask(
+  const Label(
       {required this.labeledId,
       required this.label,
       required this.dailyIdList,
@@ -1641,8 +1640,8 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
     return map;
   }
 
-  LabeledTasksCompanion toCompanion(bool nullToAbsent) {
-    return LabeledTasksCompanion(
+  LabelsCompanion toCompanion(bool nullToAbsent) {
+    return LabelsCompanion(
       labeledId: Value(labeledId),
       label: Value(label),
       dailyIdList: Value(dailyIdList),
@@ -1652,10 +1651,10 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
     );
   }
 
-  factory LabeledTask.fromJson(Map<String, dynamic> json,
+  factory Label.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LabeledTask(
+    return Label(
       labeledId: serializer.fromJson<int>(json['labeledId']),
       label: serializer.fromJson<String>(json['label']),
       dailyIdList: serializer.fromJson<Uint8List>(json['dailyIdList']),
@@ -1677,14 +1676,14 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
     };
   }
 
-  LabeledTask copyWith(
+  Label copyWith(
           {int? labeledId,
           String? label,
           Uint8List? dailyIdList,
           Uint8List? weeklyIdList,
           Uint8List? monthlyIdList,
           Uint8List? yearlyIdList}) =>
-      LabeledTask(
+      Label(
         labeledId: labeledId ?? this.labeledId,
         label: label ?? this.label,
         dailyIdList: dailyIdList ?? this.dailyIdList,
@@ -1692,8 +1691,8 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
         monthlyIdList: monthlyIdList ?? this.monthlyIdList,
         yearlyIdList: yearlyIdList ?? this.yearlyIdList,
       );
-  LabeledTask copyWithCompanion(LabeledTasksCompanion data) {
-    return LabeledTask(
+  Label copyWithCompanion(LabelsCompanion data) {
+    return Label(
       labeledId: data.labeledId.present ? data.labeledId.value : this.labeledId,
       label: data.label.present ? data.label.value : this.label,
       dailyIdList:
@@ -1712,7 +1711,7 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
 
   @override
   String toString() {
-    return (StringBuffer('LabeledTask(')
+    return (StringBuffer('Label(')
           ..write('labeledId: $labeledId, ')
           ..write('label: $label, ')
           ..write('dailyIdList: $dailyIdList, ')
@@ -1734,7 +1733,7 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LabeledTask &&
+      (other is Label &&
           other.labeledId == this.labeledId &&
           other.label == this.label &&
           $driftBlobEquality.equals(other.dailyIdList, this.dailyIdList) &&
@@ -1743,14 +1742,14 @@ class LabeledTask extends DataClass implements Insertable<LabeledTask> {
           $driftBlobEquality.equals(other.yearlyIdList, this.yearlyIdList));
 }
 
-class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
+class LabelsCompanion extends UpdateCompanion<Label> {
   final Value<int> labeledId;
   final Value<String> label;
   final Value<Uint8List> dailyIdList;
   final Value<Uint8List> weeklyIdList;
   final Value<Uint8List> monthlyIdList;
   final Value<Uint8List> yearlyIdList;
-  const LabeledTasksCompanion({
+  const LabelsCompanion({
     this.labeledId = const Value.absent(),
     this.label = const Value.absent(),
     this.dailyIdList = const Value.absent(),
@@ -1758,7 +1757,7 @@ class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
     this.monthlyIdList = const Value.absent(),
     this.yearlyIdList = const Value.absent(),
   });
-  LabeledTasksCompanion.insert({
+  LabelsCompanion.insert({
     this.labeledId = const Value.absent(),
     required String label,
     this.dailyIdList = const Value.absent(),
@@ -1766,7 +1765,7 @@ class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
     this.monthlyIdList = const Value.absent(),
     this.yearlyIdList = const Value.absent(),
   }) : label = Value(label);
-  static Insertable<LabeledTask> custom({
+  static Insertable<Label> custom({
     Expression<int>? labeledId,
     Expression<String>? label,
     Expression<Uint8List>? dailyIdList,
@@ -1784,14 +1783,14 @@ class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
     });
   }
 
-  LabeledTasksCompanion copyWith(
+  LabelsCompanion copyWith(
       {Value<int>? labeledId,
       Value<String>? label,
       Value<Uint8List>? dailyIdList,
       Value<Uint8List>? weeklyIdList,
       Value<Uint8List>? monthlyIdList,
       Value<Uint8List>? yearlyIdList}) {
-    return LabeledTasksCompanion(
+    return LabelsCompanion(
       labeledId: labeledId ?? this.labeledId,
       label: label ?? this.label,
       dailyIdList: dailyIdList ?? this.dailyIdList,
@@ -1827,7 +1826,7 @@ class LabeledTasksCompanion extends UpdateCompanion<LabeledTask> {
 
   @override
   String toString() {
-    return (StringBuffer('LabeledTasksCompanion(')
+    return (StringBuffer('LabelsCompanion(')
           ..write('labeledId: $labeledId, ')
           ..write('label: $label, ')
           ..write('dailyIdList: $dailyIdList, ')
@@ -2095,20 +2094,14 @@ abstract class _$MyDatabase extends GeneratedDatabase {
   late final $WeeklyTasksTable weeklyTasks = $WeeklyTasksTable(this);
   late final $MonthlyTasksTable monthlyTasks = $MonthlyTasksTable(this);
   late final $YearlyTasksTable yearlyTasks = $YearlyTasksTable(this);
-  late final $LabeledTasksTable labeledTasks = $LabeledTasksTable(this);
+  late final $LabelsTable labels = $LabelsTable(this);
   late final $PageSettingsTable pageSettings = $PageSettingsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [
-        dayTasks,
-        weeklyTasks,
-        monthlyTasks,
-        yearlyTasks,
-        labeledTasks,
-        pageSettings
-      ];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [dayTasks, weeklyTasks, monthlyTasks, yearlyTasks, labels, pageSettings];
 }
 
 typedef $$DayTasksTableCreateCompanionBuilder = DayTasksCompanion Function({
@@ -2879,8 +2872,7 @@ typedef $$YearlyTasksTableProcessedTableManager = ProcessedTableManager<
     (YearlyTask, BaseReferences<_$MyDatabase, $YearlyTasksTable, YearlyTask>),
     YearlyTask,
     PrefetchHooks Function()>;
-typedef $$LabeledTasksTableCreateCompanionBuilder = LabeledTasksCompanion
-    Function({
+typedef $$LabelsTableCreateCompanionBuilder = LabelsCompanion Function({
   Value<int> labeledId,
   required String label,
   Value<Uint8List> dailyIdList,
@@ -2888,8 +2880,7 @@ typedef $$LabeledTasksTableCreateCompanionBuilder = LabeledTasksCompanion
   Value<Uint8List> monthlyIdList,
   Value<Uint8List> yearlyIdList,
 });
-typedef $$LabeledTasksTableUpdateCompanionBuilder = LabeledTasksCompanion
-    Function({
+typedef $$LabelsTableUpdateCompanionBuilder = LabelsCompanion Function({
   Value<int> labeledId,
   Value<String> label,
   Value<Uint8List> dailyIdList,
@@ -2898,9 +2889,8 @@ typedef $$LabeledTasksTableUpdateCompanionBuilder = LabeledTasksCompanion
   Value<Uint8List> yearlyIdList,
 });
 
-class $$LabeledTasksTableFilterComposer
-    extends Composer<_$MyDatabase, $LabeledTasksTable> {
-  $$LabeledTasksTableFilterComposer({
+class $$LabelsTableFilterComposer extends Composer<_$MyDatabase, $LabelsTable> {
+  $$LabelsTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2926,9 +2916,9 @@ class $$LabeledTasksTableFilterComposer
       column: $table.yearlyIdList, builder: (column) => ColumnFilters(column));
 }
 
-class $$LabeledTasksTableOrderingComposer
-    extends Composer<_$MyDatabase, $LabeledTasksTable> {
-  $$LabeledTasksTableOrderingComposer({
+class $$LabelsTableOrderingComposer
+    extends Composer<_$MyDatabase, $LabelsTable> {
+  $$LabelsTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2957,9 +2947,9 @@ class $$LabeledTasksTableOrderingComposer
       builder: (column) => ColumnOrderings(column));
 }
 
-class $$LabeledTasksTableAnnotationComposer
-    extends Composer<_$MyDatabase, $LabeledTasksTable> {
-  $$LabeledTasksTableAnnotationComposer({
+class $$LabelsTableAnnotationComposer
+    extends Composer<_$MyDatabase, $LabelsTable> {
+  $$LabelsTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2985,31 +2975,28 @@ class $$LabeledTasksTableAnnotationComposer
       column: $table.yearlyIdList, builder: (column) => column);
 }
 
-class $$LabeledTasksTableTableManager extends RootTableManager<
+class $$LabelsTableTableManager extends RootTableManager<
     _$MyDatabase,
-    $LabeledTasksTable,
-    LabeledTask,
-    $$LabeledTasksTableFilterComposer,
-    $$LabeledTasksTableOrderingComposer,
-    $$LabeledTasksTableAnnotationComposer,
-    $$LabeledTasksTableCreateCompanionBuilder,
-    $$LabeledTasksTableUpdateCompanionBuilder,
-    (
-      LabeledTask,
-      BaseReferences<_$MyDatabase, $LabeledTasksTable, LabeledTask>
-    ),
-    LabeledTask,
+    $LabelsTable,
+    Label,
+    $$LabelsTableFilterComposer,
+    $$LabelsTableOrderingComposer,
+    $$LabelsTableAnnotationComposer,
+    $$LabelsTableCreateCompanionBuilder,
+    $$LabelsTableUpdateCompanionBuilder,
+    (Label, BaseReferences<_$MyDatabase, $LabelsTable, Label>),
+    Label,
     PrefetchHooks Function()> {
-  $$LabeledTasksTableTableManager(_$MyDatabase db, $LabeledTasksTable table)
+  $$LabelsTableTableManager(_$MyDatabase db, $LabelsTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$LabeledTasksTableFilterComposer($db: db, $table: table),
+              $$LabelsTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$LabeledTasksTableOrderingComposer($db: db, $table: table),
+              $$LabelsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$LabeledTasksTableAnnotationComposer($db: db, $table: table),
+              $$LabelsTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> labeledId = const Value.absent(),
             Value<String> label = const Value.absent(),
@@ -3018,7 +3005,7 @@ class $$LabeledTasksTableTableManager extends RootTableManager<
             Value<Uint8List> monthlyIdList = const Value.absent(),
             Value<Uint8List> yearlyIdList = const Value.absent(),
           }) =>
-              LabeledTasksCompanion(
+              LabelsCompanion(
             labeledId: labeledId,
             label: label,
             dailyIdList: dailyIdList,
@@ -3034,7 +3021,7 @@ class $$LabeledTasksTableTableManager extends RootTableManager<
             Value<Uint8List> monthlyIdList = const Value.absent(),
             Value<Uint8List> yearlyIdList = const Value.absent(),
           }) =>
-              LabeledTasksCompanion.insert(
+              LabelsCompanion.insert(
             labeledId: labeledId,
             label: label,
             dailyIdList: dailyIdList,
@@ -3049,20 +3036,17 @@ class $$LabeledTasksTableTableManager extends RootTableManager<
         ));
 }
 
-typedef $$LabeledTasksTableProcessedTableManager = ProcessedTableManager<
+typedef $$LabelsTableProcessedTableManager = ProcessedTableManager<
     _$MyDatabase,
-    $LabeledTasksTable,
-    LabeledTask,
-    $$LabeledTasksTableFilterComposer,
-    $$LabeledTasksTableOrderingComposer,
-    $$LabeledTasksTableAnnotationComposer,
-    $$LabeledTasksTableCreateCompanionBuilder,
-    $$LabeledTasksTableUpdateCompanionBuilder,
-    (
-      LabeledTask,
-      BaseReferences<_$MyDatabase, $LabeledTasksTable, LabeledTask>
-    ),
-    LabeledTask,
+    $LabelsTable,
+    Label,
+    $$LabelsTableFilterComposer,
+    $$LabelsTableOrderingComposer,
+    $$LabelsTableAnnotationComposer,
+    $$LabelsTableCreateCompanionBuilder,
+    $$LabelsTableUpdateCompanionBuilder,
+    (Label, BaseReferences<_$MyDatabase, $LabelsTable, Label>),
+    Label,
     PrefetchHooks Function()>;
 typedef $$PageSettingsTableCreateCompanionBuilder = PageSettingsCompanion
     Function({
@@ -3223,8 +3207,8 @@ class $MyDatabaseManager {
       $$MonthlyTasksTableTableManager(_db, _db.monthlyTasks);
   $$YearlyTasksTableTableManager get yearlyTasks =>
       $$YearlyTasksTableTableManager(_db, _db.yearlyTasks);
-  $$LabeledTasksTableTableManager get labeledTasks =>
-      $$LabeledTasksTableTableManager(_db, _db.labeledTasks);
+  $$LabelsTableTableManager get labels =>
+      $$LabelsTableTableManager(_db, _db.labels);
   $$PageSettingsTableTableManager get pageSettings =>
       $$PageSettingsTableTableManager(_db, _db.pageSettings);
 }

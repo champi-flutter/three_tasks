@@ -6,21 +6,21 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_yearly_tasks_use_case.dart';
 
 part 'yearly_tasks_view_model.g.dart';
 
 /// 月単位タスク View Model
 @riverpod
-class YearlyTasksViewModel extends _$YearlyTasksViewModel
-    with NotificationFromViewModel {
+class YearlyTasksViewModel extends _$YearlyTasksViewModel{
   // todo 初期化
   @override
   LazyMapViewState<int, TaskList<VYearlyTask>> build() {
     // リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
     // ハンドラ（`_handleDayTasksUpdating`）が1回起動して初めて実際のデータが表示される
     return LazyMapViewState(
-      onAnyAccess: _startWatching, //fixme
+      onAnyAccess: _onAccess,
       onNewAccess: _startWatching,
       placeholder: _placeholder,
     );
@@ -38,14 +38,21 @@ class YearlyTasksViewModel extends _$YearlyTasksViewModel
   WatchYearlyTasksUseCase get _watchYearlyTasksUseCase =>
       ref.read(watchYearlyTasksUseCaseProvider);
 
-  /// 通知機能の呼び出し口
-  @override
-  NotificationService get notificationService =>
-      ref.read(notificationServiceProvider);
+  /// アクセス通知フローへのアクセス
+  NotifyYearlyTasksAccessUseCase get _notifyYearlyTasksAccessUseCase =>
+      ref.read(notifyYearlyTasksAccessUseCaseProvider);
+
+  /// アクセスを通知する
+  void _onAccess(int year)=>_notifyYearlyTasksAccessUseCase.execute(year);
 
   /// 監視フローを開始する
-  void _startWatching(int targetYear)
-  => _watchYearlyTasksUseCase.initAt(targetYear);
+  void _startWatching(int targetYear) {
+    // 未来の日付なら何もしない
+    if(targetYear > thisYear){
+      return;
+    }
+    _watchYearlyTasksUseCase.initAt(targetYear);
+  }
 
 
   /// [state] 更新メソッド

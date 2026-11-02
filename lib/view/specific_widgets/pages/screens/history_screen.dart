@@ -30,7 +30,6 @@ int _interstitialStackForHistoryScreen = 0;
 int get interstitialStackForHistoryScreen => _interstitialStackForHistoryScreen;
 
 class HistoryScreen extends HookConsumerWidget {
-
   HistoryScreen({required this.initialFormat});
 
   final DateFormat _dateFormat = DateFormat("yyyy年MM月dd日");
@@ -45,9 +44,6 @@ class HistoryScreen extends HookConsumerWidget {
     // カレンダーが現在参照している日付（DateTime）
     final targetDay = useState<DateTime>(DateTime.now());
 
-    // 未来の日付かどうか
-    final bool isFuture = targetDay.value.isDateAfter(DateTime.now());
-
     // カレンダー下の Widget タップ時に変更されるフォーマット
     final taskFormat = useState<TaskRec>(initialFormat);
 
@@ -55,13 +51,13 @@ class HistoryScreen extends HookConsumerWidget {
     final LazyViewState<TaskList<VTask>> lazyTaskState =
         switch (taskFormat.value) {
       TaskRec.day => ref.watch(dailyTasksViewModelProvider
-          .select((state) => state[isFuture?targetDay.value.toDate():today])),
+          .select((state) => state[targetDay.value.toDate()])),
       TaskRec.week => ref.watch(weeklyTasksViewModelProvider
-          .select((state) => state[isFuture?targetDay.value.toDate():today])),
+          .select((state) => state[targetDay.value.toDate()])),
       TaskRec.month => ref.watch(monthlyTasksViewModelProvider
-          .select((state) => state[isFuture?Month.fromDateTime(targetDay.value):thisMonth])),
+          .select((state) => state[Month.fromDateTime(targetDay.value)])),
       TaskRec.year => ref.watch(yearlyTasksViewModelProvider
-          .select((state) => state[isFuture?targetDay.value.year:thisYear])),
+          .select((state) => state[targetDay.value.year])),
     };
 
     // todo フォーマット変更メソッド
@@ -117,23 +113,15 @@ class HistoryScreen extends HookConsumerWidget {
         title: "履歴",
         // todo body
         body: lazyTaskState.when(
-          // todo 未来をどう管理するか（2026/10/31）＞＞
           onReceived: (taskState) {
-            final headTask = taskState[0].value;
-            final String formattedDate = (headTask.id < 0)
-                ? "non-value"
-                : switch (headTask) {
-                    // region switch
-                    VDailyTask() =>
-                      "${_dateFormat.format(targetDay.value)} のタスク",
-                    VWeeklyTask() =>
-                      "${_dateFormat.format(targetDay.value)} の週タスク",
-                    VMonthlyTask() =>
-                      "${_monthFormat.format(targetDay.value)} のタスク",
-                    VYearlyTask() =>
-                      "${_yearFormat.format(targetDay.value)} のタスク",
-                    // endregion
-                  };
+            final String formattedDate = switch (taskState.headTask) {
+              // region switch
+              VDailyTask() => "${_dateFormat.format(targetDay.value)} のタスク",
+              VWeeklyTask() => "${_dateFormat.format(targetDay.value)} の週タスク",
+              VMonthlyTask() => "${_monthFormat.format(targetDay.value)} のタスク",
+              VYearlyTask() => "${_yearFormat.format(targetDay.value)} のタスク",
+              // endregion
+            };
             return Column(
               children: [
                 Expanded(
@@ -166,7 +154,14 @@ class HistoryScreen extends HookConsumerWidget {
                           ),
                         ),
                         // targetDay のタスクの情報
-                        _TaskInfoSection(taskState: taskState),
+                        _TaskInfoSection(
+                          // 日付やフォーマットが変わるたびにKeyが変わり、再生成される
+                          key: ValueKey(
+                            "${targetDay.value.toIso8601String()}_${taskFormat.value}",
+                          ),
+                          taskState: taskState,
+                          isFuture: targetDay.value.isDateAfter(DateTime.now()),
+                        ),
                       ],
                     ),
                   ),
@@ -232,9 +227,16 @@ class _TaskHistoryCalendar extends HookConsumerWidget {
 
 /// 「履歴」画面のタスク情報欄
 class _TaskInfoSection extends HookConsumerWidget {
-  const _TaskInfoSection({super.key, required this.taskState});
+  const _TaskInfoSection({
+    super.key,
+    required this.taskState,
+    required this.isFuture,
+  });
 
   final TaskList<VTask> taskState;
+
+  /// 未来の日付のタスクかどうか
+  final bool isFuture;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -342,37 +344,39 @@ class _TaskInfoSection extends HookConsumerWidget {
               fontSize: 14,
             ),
             value: vTask.isChecked,
+            // 未来のタスクならチェックボックスを無効にする
+            onChanged: isFuture
+                ? null
+                : (newValue) async {
+                    // 確認ダイアログ
+                    if (!canChangeCheck.value) {
+                      await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialogTemplate(
+                          title: "確認",
+                          content: "過去のタスクを達成を変更してもいいですか？",
+                          actionStyle: ActionStyle.yesNo,
+                          yesAction: () {
+                            canChangeCheck.value = true;
+                          },
+                        ),
+                      );
+                    }
 
-            onChanged: (newValue) async {
-              // todo 確認ダイアログ
-              if (!_canChangeCheck && !_isFuture) {
-                await showDialog(
-                  context: context,
-                  builder: (context) => AlertDialogTemplate(
-                    title: "確認",
-                    content: "過去のタスクを達成を変更してもいいですか？",
-                    actionStyle: ActionStyle.yesNo,
-                    yesAction: (){
-                      canChangeCheck.value = true;
-                    },
-                  ),
-                );
-              }
-
-              if (canChangeCheck.value) {
-                // この画面のトークンでコントローラを呼び出し、変更を伝える
-                await ref
-                    .read(tasksControllerProvider(historyScreenToken))
-                    .controlTask(
-                      willAutoSave: true,
-                      taskState: taskState,
-                      position: position,
-                      parameter: TaskControlParameter(
-                        newChecked: newValue,
-                      ),
-                    );
-              }
-            },
+                    if (canChangeCheck.value) {
+                      // この画面のトークンでコントローラを呼び出し、変更を伝える
+                      await ref
+                          .read(tasksControllerProvider(historyScreenToken))
+                          .controlTask(
+                            willAutoSave: true,
+                            taskState: taskState,
+                            position: position,
+                            parameter: TaskControlParameter(
+                              newChecked: newValue,
+                            ),
+                          );
+                    }
+                  },
             controlAffinity: ListTileControlAffinity.leading,
             // 3点リーダ
             secondary: ellipsis,

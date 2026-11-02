@@ -48,7 +48,6 @@ class QToETask {
 
   static EMonthlyTask toEMonthlyTask(QMonthlyTask monthlyTask) {
     // エンティティのプロパティの型に適合させる
-    // todo data_converter に toMonth を実装（2026/09/11）＞＞
     final Month adaptedMonth = monthlyTask.monthInt.toMonth();
     return EMonthlyTask(
       id: monthlyTask.id,

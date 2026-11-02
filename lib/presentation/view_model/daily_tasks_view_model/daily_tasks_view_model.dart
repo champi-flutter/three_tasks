@@ -1,17 +1,17 @@
-
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
+import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'daily_tasks_view_model.g.dart';
 
 @riverpod
-class DailyTasksViewModel extends _$DailyTasksViewModel{
+class DailyTasksViewModel extends _$DailyTasksViewModel {
   // todo 初期化
   @override
   LazyMapViewState<Date, TaskList<VDailyTask>> build() {
@@ -20,7 +20,7 @@ class DailyTasksViewModel extends _$DailyTasksViewModel{
     // リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
     // ハンドラ（`_handleDayTasksUpdating`）が1回起動して初めて実際のデータが表示される
     return LazyMapViewState(
-      onAnyAccess: _startWatching, //fixme
+      onAnyAccess: _onAccess,
       onNewAccess: _startWatching,
       placeholder: _placeholder,
     );
@@ -28,26 +28,31 @@ class DailyTasksViewModel extends _$DailyTasksViewModel{
 
   /// リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
   TaskList<VDailyTask> _placeholder(Date targetDate) => TaskList<VDailyTask>(
-    VDailyTask.placeholder(date: targetDate),
-    VDailyTask.placeholder(date: targetDate),
-    VDailyTask.placeholder(date: targetDate),
-  );
+        VDailyTask.placeholder(date: targetDate),
+        VDailyTask.placeholder(date: targetDate),
+        VDailyTask.placeholder(date: targetDate),
+      );
 
   // todo 依存先
   /// タスク監視フローへのアクセス
   WatchDailyTasksUseCase get _watchDailyTasksUseCase =>
       ref.read(watchDailyTasksUseCaseProvider);
 
-  // /// アクセス通知フローへのアクセス
-  // NotifyDailyTasksAccessUseCase get _notifyDailyTasksAccessUseCase => ref.read();
+  /// アクセス通知フローへのアクセス
+  NotifyDailyTasksAccessUseCase get _notifyDailyTasksAccessUseCase =>
+      ref.read(notifyDailyTasksAccessUseCaseProvider);
 
-  // /// 通知機能の呼び出し口
-  // @override
-  // NotificationService get notificationService =>
-  //     ref.read(notificationServiceProvider);
+  /// アクセスを通知する
+  void _onAccess(Date date)=>_notifyDailyTasksAccessUseCase.execute(date);
 
   /// 監視フローを開始する
-  void _startWatching(Date targetDate) => _watchDailyTasksUseCase.initAt(targetDate);
+  void _startWatching(Date targetDate) {
+    // 未来の日付なら何もしない
+    if (targetDate > today) {
+      return;
+    }
+    _watchDailyTasksUseCase.initAt(targetDate);
+  }
 
   // void _notifyAccess(Date date)=>;
 
@@ -59,7 +64,7 @@ class DailyTasksViewModel extends _$DailyTasksViewModel{
     // リビルドを行うトリガー
     bool isChanged = false;
     // 各エントリ（日付とタスクリスト）
-    for(final newEntry in newData.entries){
+    for (final newEntry in newData.entries) {
       final Date targetDate = newEntry.key;
       final TaskList<VDailyTask> newTaskList = newEntry.value;
       // 中身が違うのを確認したら、リビルドトリガーをオンにする
@@ -68,13 +73,13 @@ class DailyTasksViewModel extends _$DailyTasksViewModel{
       }
       newStateMap[targetDate] = LazyViewState.data(newTaskList);
     }
-    if(isChanged) {
+    if (isChanged) {
       // state を更新してリビルドを促す
       state = state.copyAs(newStateMap);
     }
   }
 
-  TaskList<VDailyTask> getCurrentStateAt(Date date)=>state[date].data;
+  TaskList<VDailyTask> getCurrentStateAt(Date date) => state[date].data;
 }
 
 /// printメソッド [当日のタスクVM]

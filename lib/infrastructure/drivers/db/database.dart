@@ -1,12 +1,14 @@
-
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:data_converter/data_converter.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/infrastructure/drivers/db/table/converter/q_to_table_task.dart';
-import 'package:three_tasks/infrastructure/drivers/db/table/converter/table_to_q_task.dart';
+import 'package:three_tasks/infrastructure/drivers/db/table/converter/label/q_to_table_label.dart';
+import 'package:three_tasks/infrastructure/drivers/db/table/converter/label/table_to_q_label.dart';
+import 'package:three_tasks/infrastructure/drivers/db/table/converter/setting/table_to_q_setting.dart';
+import 'package:three_tasks/infrastructure/drivers/db/table/converter/tasks/q_to_table_task.dart';
+import 'package:three_tasks/infrastructure/drivers/db/table/converter/tasks/table_to_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/data_source_interface/data_source.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
@@ -16,10 +18,8 @@ import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 import 'package:three_tasks/infrastructure/drivers/db/table/setting_tables.dart';
 import 'package:three_tasks/infrastructure/drivers/db/table/task_tables.dart';
 import 'package:three_tasks/infrastructure/drivers/db/table/label_tables.dart';
-import 'package:three_tasks/infrastructure/drivers/db/table/review_tables.dart';
 
 part 'database.g.dart';
-
 
 @DriftDatabase(tables: [
   DayTasks,
@@ -27,7 +27,7 @@ part 'database.g.dart';
   MonthlyTasks,
   YearlyTasks,
   // Reviews,
-  LabeledTasks,
+  Labels,
   PageSettings,
 ])
 class MyDatabase extends _$MyDatabase implements DataSource {
@@ -39,65 +39,16 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     return driftDatabase(name: "tasks");
   }
 
-  /// [LabeledTask]（テーブルクラス）から [QLabel]（クエリ用DTO）へ変換
-  QLabel _toQLabel(LabeledTask rawData) {
-    return QLabel(
-      title: rawData.label,
-      labelId: rawData.labeledId,
-      dailyId32Blob: Int32Blob.fromUint8List(rawData.dailyIdList),
-      weeklyId32Blob: Int32Blob.fromUint8List(rawData.weeklyIdList),
-      monthlyId32Blob: Int32Blob.fromUint8List(rawData.monthlyIdList),
-      yearlyId32Blob: Int32Blob.fromUint8List(rawData.yearlyIdList),
-    );
-  }
-
-  /// [LabeledTask]（テーブルクラス）の List から [QLabel]（クエリ用DTO）の
-  /// List へ変換
-  List<QLabel> _toQLabelList(List<LabeledTask> rawDataList) {
-    return rawDataList.map(_toQLabel).toList();
-  }
-
-  /// [QLabel] から [LabeledTask] への変換
-  LabeledTask _toLabeledTaskRecord(QLabel qLabel) {
-    return LabeledTask(
-      labeledId: qLabel.labelId,
-      label: qLabel.title,
-      dailyIdList: qLabel.dailyId32Blob.data,
-      weeklyIdList: qLabel.weeklyId32Blob.data,
-      monthlyIdList: qLabel.monthlyId32Blob.data,
-      yearlyIdList: qLabel.yearlyId32Blob.data,
-    );
-  }
-
-  /// [PageSetting] から [QPageSetting] への変更
-  QPageSetting _toQPageSetting(PageSetting pageSetting) {
-    return QPageSetting(
-      pageId: pageSetting.pageId,
-      primaryAutoSaves: pageSetting.primaryAutoSaves,
-      reviewAutoSaves: pageSetting.reviewAutoSaves,
-    );
-  }
-
-  /// `List<PageSetting>` から [QSettingsMap] への変更
-  QSettingsMap _toQSettingMap(List<PageSetting> pageSettingList) {
-    final Map<int, QPageSetting> map = {};
-    // pageId を key として map に QPageSetting を組み込んでいく
-    for (final pageSetting in pageSettingList) {
-      map[pageSetting.pageId] = _toQPageSetting(pageSetting);
-    }
-    return QSettingsMap.fromMapCopy(map);
-  }
-
   // todo フェッチ
-  // todo LabeledTasks
-  /// `LabeledTask` フェッチメソッド
+  // todo Labels
+  /// `Label` フェッチメソッド
   @override
-  Future<Result<List<QLabel>, Exception>> getAllLabeledTasks() async {
+  Future<Result<List<QLabel>, Exception>> getAllLabels() async {
     try {
-      final List<LabeledTask> rawDataList = await managers.labeledTasks.get();
-      return Success(_toQLabelList(rawDataList));
+      final List<Label> rawDataList = await managers.labels.get();
+      return Success(TableToQLabel.toQLabelList(rawDataList));
     } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "getAllLabeledTasks");
+      return Failure(Exception("$e\n$st"), methodName: "getAllLabels");
     }
   }
 
@@ -217,7 +168,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   Future<Result<QSettingsMap, Exception>> getSettings() async {
     try {
       final settings = await managers.pageSettings.get();
-      return Success(_toQSettingMap(settings));
+      return Success(TableToQSetting.toQSettingMap(settings));
     } catch (e, st) {
       return Failure(Exception("$e\n$st"), methodName: "getSettings");
     }
@@ -308,7 +259,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         for (int index in indexList) {
           final int createdId =
               await managers.weeklyTasks.create((record) => record(
-                title: "",
+                    title: "",
                     // カラムの型の変換に対応
                     firstDate: today.toIntIdentifier(),
                   ));
@@ -337,19 +288,20 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         // 空のタスクを3つ作る
         for (int i = 0; i < 3; i++) {
           final MonthlyTask rawData =
-          await managers.monthlyTasks.createReturning((record) => record(
-            title: "",
-            month: targetMonthInt,
-          ));
+              await managers.monthlyTasks.createReturning((record) => record(
+                    title: "",
+                    month: targetMonthInt,
+                  ));
           qTaskList.add(TableToQTask.toQMonthlyTask(rawData));
         }
       });
       final TaskList<QMonthlyTask> returning =
-      TaskList<QMonthlyTask>.fromIterable(qTaskList);
+          TaskList<QMonthlyTask>.fromIterable(qTaskList);
       // Fetch 用の DTO に変換して返す
       return Success(returning);
     } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "createMonthlyTaskRecord");
+      return Failure(Exception("$e\n$st"),
+          methodName: "createMonthlyTaskRecord");
     }
   }
 
@@ -367,19 +319,20 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         // 空のタスクを3つ作る
         for (int i = 0; i < 3; i++) {
           final YearlyTask rawData =
-          await managers.yearlyTasks.createReturning((record) => record(
-            title: "",
-            year: targetYear,
-          ));
+              await managers.yearlyTasks.createReturning((record) => record(
+                    title: "",
+                    year: targetYear,
+                  ));
           qTaskList.add(TableToQTask.toQYearlyTask(rawData));
         }
       });
       final TaskList<QYearlyTask> returning =
-      TaskList<QYearlyTask>.fromIterable(qTaskList);
+          TaskList<QYearlyTask>.fromIterable(qTaskList);
       // Fetch 用の DTO に変換して返す
       return Success(returning);
     } catch (e, st) {
-      return Failure(Exception("$e\n$st"), methodName: "createYearlyTaskRecord");
+      return Failure(Exception("$e\n$st"),
+          methodName: "createYearlyTaskRecord");
     }
   }
 
@@ -450,12 +403,15 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           // 変更後のレコードを保存する
           await managers.weeklyTasks.replace(newRecord);
         case QMonthlyTask():
-        // 変更後情報をテーブルのレコードの型に変換する
+          // 変更後情報をテーブルのレコードの型に変換する
           final newRecord = QToTableTask.toMonthlyTaskRecord(newQTask);
           // 変更後のレコードを保存する
           await managers.monthlyTasks.replace(newRecord);
         case QYearlyTask():
-        // todo _saveTask の case QMonthlyTask(): （2026/09/11）＞＞
+          // 変更後情報をテーブルのレコードの型に変換する
+          final newRecord = QToTableTask.toYearlyTaskRecord(newQTask);
+          // 変更後のレコードを保存する
+          await managers.yearlyTasks.replace(newRecord);
       }
     } catch (_) {
       rethrow;
@@ -513,8 +469,8 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   // 折りたたみ用
   async {
     try {
-      // LabeledTasks に新しいレコードを作成
-      final int createdId = await managers.labeledTasks.create(
+      // Labels に新しいレコードを作成
+      final int createdId = await managers.labels.create(
         (record) => switch (firstTask) {
           QDailyTask(id: final int firstTaskId) => record(
               label: title,
@@ -548,9 +504,9 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     try {
       await transaction(() async {
         for (final qLabel in qLabels) {
-          final newRecord = _toLabeledTaskRecord(qLabel);
+          final newRecord = QToTableLabel.toLabelRecord(qLabel);
           // 指定レコード（ID を自動検索）に新しい情報を当てはめる
-          await managers.labeledTasks.replace(newRecord);
+          await managers.labels.replace(newRecord);
         }
       });
       return Success(null);
@@ -578,7 +534,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           rawCreatedList.add(setting);
         }
       });
-      return Success(_toQSettingMap(rawCreatedList));
+      return Success(TableToQSetting.toQSettingMap(rawCreatedList));
     } catch (e, st) {
       return Failure(Exception("$e\n$st"), methodName: "initSettings");
     }
@@ -608,7 +564,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
 
   @override
   // todo スキーマバージョン
-  int get schemaVersion => 22;
+  int get schemaVersion => 23;
 
   // todo 統合処理 ＜＜　重いかも
   @override
@@ -628,7 +584,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           //   });
           // }
           if (from < 18) {
-            await m.createTable(labeledTasks);
+            await m.createTable(labels);
           }
           if (from < 19) {
             await m.alterTable(
@@ -650,7 +606,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
                 columnTransformer: {
                   // month カラムのデータを変換する処理を記述
                   monthlyTasks.month: CustomExpression<int>(
-                    // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
+                      // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
                       'CAST(REPLACE(month, "-", "") AS INTEGER)'),
                 },
               ),
@@ -662,7 +618,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
                 columnTransformer: {
                   // year カラムのデータを変換する処理を記述
                   yearlyTasks.year: CustomExpression<int>(
-                    // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
+                      // SQLiteの関数を使って、既存のStringからハイフンを除去してintにキャスト
                       'CAST(REPLACE(year, "-", "") AS INTEGER)'),
                 },
               ),
@@ -731,14 +687,15 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           //   await m.alterTable(TableMigration(yearlyTasks));
           // }
           // endregion
-          if(from < 23){
+          if (from < 23) {
             await m.renameColumn(dayTasks, "task", dayTasks.title);
             await m.renameColumn(weeklyTasks, "task", weeklyTasks.title);
             await m.renameColumn(monthlyTasks, "task", monthlyTasks.title);
             await m.renameColumn(yearlyTasks, "task", yearlyTasks.title);
             await m.renameColumn(dayTasks, "improvement", dayTasks.next);
             await m.renameColumn(weeklyTasks, "improvement", weeklyTasks.next);
-            await m.renameColumn(monthlyTasks, "improvement", monthlyTasks.next);
+            await m.renameColumn(
+                monthlyTasks, "improvement", monthlyTasks.next);
             await m.renameColumn(yearlyTasks, "improvement", yearlyTasks.next);
           }
           // if (from < 2) {

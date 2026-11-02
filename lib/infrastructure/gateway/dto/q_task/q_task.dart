@@ -78,7 +78,6 @@ abstract class QMonthlyTask with MonthlyTaskBase, _$QMonthlyTask implements QTas
     required Review review,
   }) = _QMonthlyTask;
 
-  // todo data_converter に toMonth を実装（2026/09/11）＞＞
   @override
   @protected
   Month get month => monthInt.toMonth();

@@ -26,7 +26,6 @@ class SaveLabelChangesInteractor
   final LoadingService _loading;
 
   /// タスク ID をラベルに追加するフローを実装
-  /// todo ラベル情報変更保存フローに変更（2026/09/09）＞＞
   ///  - [DataRepository] に、 [targetVTask] の ID の対象ラベルへの追加を依頼する
   ///  - ラベルキャッシュの更新処理を呼び出す
   @override

@@ -148,7 +148,6 @@ class _LabelDialogWrapper extends HookConsumerWidget {
           ],
         );
       },
-      // todo VM からエラーを返された場合（2026/09/28）＞＞
       onError: (_, __){
         return SimpleDialog(
           contentPadding: EdgeInsets.fromLTRB(0.0, 12.h, 0.0, 24.h),

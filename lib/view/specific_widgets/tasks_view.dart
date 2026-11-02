@@ -420,25 +420,6 @@ class _LabelIconTrailing extends StatelessWidget {
   }
 }
 
-extension ControlActionOnTasksView on WidgetRef {
-  // region todo ラベルタイトル変更時のコールバック（2026/09/25）＞＞
-  // Future<void> _onChangeLabelTitle({
-  //   required bool isAutoSave,
-  //   required VLabel vLabel,
-  //   required String newTitle,
-  // })
-  //     // 折りたたみ用
-  //     =>
-  //     _onControlLabel(
-  //       isAutoSave: isAutoSave,
-  //       vLabel: vLabel,
-  //       parameter: LabelControlParameter(
-  //         newTitle: newTitle,
-  //       ),
-  //     );
-  //     endregion
-}
-
 /// printメソッド [tasks_view.dart]
 void _print(String s1, [String? s2, String? s3, String? s4, String? s5]) {
   if (kDebugMode) {
