@@ -60,7 +60,7 @@ final class LabelsViewModelProvider extends $NotifierProvider<LabelsViewModel,
   }
 }
 
-String _$labelsViewModelHash() => r'92b71cdb91cd99bff798a15757e0307aa25915cf';
+String _$labelsViewModelHash() => r'486ff447f7ea11e8381460db2493951386357306';
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 ///

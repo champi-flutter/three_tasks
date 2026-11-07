@@ -2,7 +2,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
-import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
+import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
@@ -13,13 +13,13 @@ class DailyTasksPresenterImpl
     implements DailyTasksPresenter {
   // todo コンストラクタ
   DailyTasksPresenterImpl({
-    required DailyTasksViewModel dailyTasksViewModel,
+    required DailyTasksStateNotifier dailyTasksStateNotifier,
     required NotificationService notificationService,
-  })  : _viewModel = dailyTasksViewModel,
+  })  : _state = dailyTasksStateNotifier,
         notificationService = notificationService;
 
-  /// 日単位タスク ViewModel の呼び出し口
-  final DailyTasksViewModel _viewModel;
+  /// 日単位タスク ViewState の更新呼び出し口
+  final DailyTasksStateNotifier _state;
 
   /// 通知機能の呼び出し口
   @override
@@ -38,7 +38,7 @@ class DailyTasksPresenterImpl
         (key, taskList) => MapEntry(key, _convertToVList(taskList)),
       );
       // ViewModel の update を呼び出す
-      _viewModel.update(resultMap);
+      _state.update(resultMap);
     } catch (e, st) {
       notifyError(content: "[DailyTasksPresenter] $e\n$st");
     }

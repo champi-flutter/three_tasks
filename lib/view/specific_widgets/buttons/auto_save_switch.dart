@@ -12,14 +12,14 @@ enum _SwitchType { primary, review }
 /// 「自動保存オンオフ」スイッチ
 class AutoSaveSwitch extends ConsumerWidget {
   /// 対象ページの自動保存オンオフを切り替えるスイッチのコンストラクタ
-  const AutoSaveSwitch.primary({
+  AutoSaveSwitch.primary({
     super.key,
     required this.pageIndex,
     required this.onSwitched,
   }) : _type = _SwitchType.primary;
 
   /// 対象ページに対応するレビュー画面の自動保存オンオフを切り替えるスイッチのコンストラクタ
-  const AutoSaveSwitch.review({
+  AutoSaveSwitch.review({
     super.key,
     required this.pageIndex,
     required this.onSwitched,
@@ -50,8 +50,11 @@ class AutoSaveSwitch extends ConsumerWidget {
             ? targetPageSetting.primaryAutoSaves
             : targetPageSetting.reviewAutoSaves;
         return OnOffSwitch.onWhite(
+          width: 60,
+          height: 28,
           state: willAutoSave,
           onChanged: (bool value) async {
+            print("自動保存: ${!value} => $value");
             // 設定値を変更する
             await ref.read(settingsControllerProvider).controlPageSettings(
                   targetPageSetting: targetPageSetting,
@@ -69,25 +72,33 @@ class AutoSaveSwitch extends ConsumerWidget {
       },
       onLoading: (_) {
         return OnOffSwitch.onWhite(
+          width: 60,
+          height: 28,
           state: false,
-          onChanged: (bool _) {},
+          onChanged: (bool _) {
+            print("[AutoSaveSwitch] ローディング中");
+          },
         );
       },
-      onError: (_, __) {
+      onError: (_, errorMsg) {
         return OnOffSwitch.onWhite(
+          width: 60,
+          height: 28,
           state: false,
-          onChanged: (bool _) {},
+          onChanged: (bool _) {
+            print("[AutoSaveSwitch] $errorMsg");
+          },
         );
       },
     );
 
-    return Row(
+    return Column(
       children: [
         const UtilizedText(
           "自動保存",
-          fontSize: 18,
+          fontSize: 12,
         ),
-        SizedBox(width: 4.w),
+        SizedBox(height: 4.h),
         // オンオフスイッチ本体
         switchBody,
       ],

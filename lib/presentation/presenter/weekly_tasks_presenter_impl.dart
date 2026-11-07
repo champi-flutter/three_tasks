@@ -2,6 +2,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
+import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
@@ -13,13 +14,13 @@ class WeeklyTasksPresenterImpl
     implements WeeklyTasksPresenter {
   // todo コンストラクタ
   WeeklyTasksPresenterImpl({
-    required WeeklyTasksViewModel weeklyTasksViewModel,
+    required WeeklyTasksStateNotifier weeklyTasksStateNotifier,
     required NotificationService notificationService,
-  })  : _weeklyTasksVM = weeklyTasksViewModel,
+  })  : _state = weeklyTasksStateNotifier,
         notificationService = notificationService;
 
-  /// 「週のタスク」VM のインスタンス
-  final WeeklyTasksViewModel _weeklyTasksVM;
+  /// 週単位タスク ViewState の更新呼び出し口
+  final WeeklyTasksStateNotifier _state;
 
   /// 通知機能の呼び出し口
   @override
@@ -44,7 +45,7 @@ class WeeklyTasksPresenterImpl
         ),
       );
       // VM を更新する
-      _weeklyTasksVM.update(result);
+      _state.update(result);
     } catch (e, st) {
       notifyError(content: "[WeeklyTasksPresenter] $e\n$st");
     }

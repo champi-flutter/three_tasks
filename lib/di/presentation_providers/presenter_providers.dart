@@ -1,18 +1,15 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
+import 'package:three_tasks/di/presentation_providers/notifier_providers.dart';
 import 'package:three_tasks/presentation/presenter/daily_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/labels_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/monthly_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/settings_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/weekly_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/yearly_tasks_presenter_impl.dart';
-import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
-import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
-import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/yearly_tasks_view_model/yearly_tasks_view_model.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/labels_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/monthly_tasks_presenter.dart';
@@ -27,7 +24,7 @@ part 'presenter_providers.g.dart';
 // 日単位タスク監視反映ポート
 @riverpod
 DailyTasksPresenter dailyTasksPresenter(Ref ref) => DailyTasksPresenterImpl(
-  dailyTasksViewModel: ref.watch(dailyTasksViewModelProvider.notifier),
+  dailyTasksStateNotifier: ref.watch(dailyTasksStateProvider),
   notificationService: ref.watch(notificationServiceProvider),
 );
 
@@ -35,33 +32,33 @@ DailyTasksPresenter dailyTasksPresenter(Ref ref) => DailyTasksPresenterImpl(
 @riverpod
 WeeklyTasksPresenter weeklyTasksPresenter(Ref ref) => WeeklyTasksPresenterImpl(
   notificationService: ref.watch(notificationServiceProvider),
-  weeklyTasksViewModel: ref.watch(weeklyTasksViewModelProvider.notifier),
+  weeklyTasksStateNotifier: ref.watch(weeklyTasksStateProvider),
 );
 
 // 月単位タスク監視反映ポート
 @riverpod
 MonthlyTasksPresenter monthlyTasksPresenter(Ref ref) => MonthlyTasksPresenterImpl(
-    monthlyTasksViewModel: ref.watch(monthlyTasksViewModelProvider.notifier),
+    monthlyTasksStateNotifier: ref.watch(monthlyTasksStateProvider),
     notificationService: ref.watch(notificationServiceProvider),
 );
 
 // 年単位タスク監視反映ポート
 @riverpod
 YearlyTasksPresenter yearlyTasksPresenter(Ref ref) => YearlyTasksPresenterImpl(
-  yearlyTasksViewModel: ref.watch(yearlyTasksViewModelProvider.notifier),
+  yearlyTasksStateNotifier: ref.watch(yearlyTasksStateProvider),
   notificationService: ref.watch(notificationServiceProvider),
 );
 
 
-/// ラベルデータ反映クラス
+// ラベルデータ反映クラス
 @riverpod
 LabelsPresenter labelsPresenter(Ref ref) => LabelsPresenterImpl(
-      labelsViewModel: ref.watch(labelsViewModelProvider.notifier),
+      labelsStateNotifier: ref.watch(labelsStateProvider),
     );
 
-/// 各種設定反映クラス
+// 各種設定反映クラス
 @riverpod
 SettingsPresenter settingsPresenter(Ref ref)=> SettingsPresenterImpl(
-  pageSettingsViewModelNotifier: ref.watch(pageSettingsViewModelProvider.notifier),
+  pageSettingsStateNotifier: ref.watch(pageSettingsStateProvider),
 );
 

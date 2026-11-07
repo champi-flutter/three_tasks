@@ -8,15 +8,15 @@ part of 'yearly_tasks_view_model.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// 月単位タスク View Model
+/// 年単位タスク View Model
 
 @ProviderFor(YearlyTasksViewModel)
 const yearlyTasksViewModelProvider = YearlyTasksViewModelProvider._();
 
-/// 月単位タスク View Model
+/// 年単位タスク View Model
 final class YearlyTasksViewModelProvider extends $NotifierProvider<
     YearlyTasksViewModel, LazyMapViewState<int, TaskList<VYearlyTask>>> {
-  /// 月単位タスク View Model
+  /// 年単位タスク View Model
   const YearlyTasksViewModelProvider._()
       : super(
           from: null,
@@ -48,9 +48,9 @@ final class YearlyTasksViewModelProvider extends $NotifierProvider<
 }
 
 String _$yearlyTasksViewModelHash() =>
-    r'78f2c4ec0409bdaa2fdcb920b4086523ce87bf54';
+    r'139a43e8ad9e9c18e753ef9be9b055613f929171';
 
-/// 月単位タスク View Model
+/// 年単位タスク View Model
 
 abstract class _$YearlyTasksViewModel
     extends $Notifier<LazyMapViewState<int, TaskList<VYearlyTask>>> {

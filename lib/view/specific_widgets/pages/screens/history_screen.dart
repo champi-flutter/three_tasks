@@ -1,13 +1,8 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:custom_widgets/custom_widgets.dart';
-import 'package:drift/isolate.dart';
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
@@ -15,8 +10,6 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
-import 'package:three_tasks/main.dart';
-import 'package:io/io.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
@@ -186,10 +179,10 @@ class HistoryScreen extends HookConsumerWidget {
 /// 「履歴」画面のカレンダー部分
 class _TaskHistoryCalendar extends HookConsumerWidget {
   const _TaskHistoryCalendar({
-    super.key,
+    Key? key,
     required this.targetDay,
     required this.onChangedTo,
-  });
+  }): super(key: key);
 
   /// 現在参照している日付
   final DateTime targetDay;
@@ -384,6 +377,5 @@ class _TaskInfoSection extends HookConsumerWidget {
         );
       }).toList(),
     );
-    ;
   }
 }

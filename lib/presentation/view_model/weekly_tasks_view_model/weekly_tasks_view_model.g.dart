@@ -42,7 +42,7 @@ final class WeeklyTasksViewModelProvider
 }
 
 String _$weeklyTasksViewModelHash() =>
-    r'25b6826d6a9a05e75a37ec9b9a925b5a7b527fc8';
+    r'5bcccbecd3eb6e69b59f15e493537f937d6b6042';
 
 abstract class _$WeeklyTasksViewModel extends $Notifier<WeeklyLazyMap> {
   WeeklyLazyMap build();

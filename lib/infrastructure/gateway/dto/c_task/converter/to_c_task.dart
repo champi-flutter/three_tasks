@@ -1,125 +1,62 @@
 
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
+import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/c_task/c_task.dart';
 
-class ToCTask {
+class EToCTask {
   static CTask toCTask<Task extends TaskBase>(
-      Task task,
+      ETask task,
       ) {
-    final title = task.title;
-    final isChecked = task.isChecked;
-    final labelId = task.labelId;
-    if (title != null && isChecked != null && labelId != null) {
-      return switch (task) {
-        DailyTaskBase() => toCDailyTask(task),
-        WeeklyTaskBase() => toCWeeklyTask(task),
-        MonthlyTaskBase() => toCMonthlyTask(task),
-        YearlyTaskBase() => toCYearlyTask(task),
-        TaskBase() => throw Exception(
-          "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${task.runtimeType}）\n[ToCTask.toCTask]",
-        ),
-      };
-    }
-    // null のパラメータを含む場合は例外を投げる
-    else {
-      throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${task.runtimeType}）\n[ToCTask.toCTask]",
-      );
-    }
+    return switch (task) {
+      EDailyTask() => toCDailyTask(task),
+      EWeeklyTask() => toCWeeklyTask(task),
+      EMonthlyTask() => toCMonthlyTask(task),
+      EYearlyTask() => toCYearlyTask(task),
+    };
   }
 
   /// [CDailyTask] へ変換
-  static CDailyTask toCDailyTask<DailyTask extends DailyTaskBase>(
-      DailyTask dailyTask,
-      ) {
-    final title = dailyTask.title;
-    final isChecked = dailyTask.isChecked;
-    final labelId = dailyTask.labelId;
-    if (title != null && isChecked != null && labelId != null) {
-      return CDailyTask(
-        id: dailyTask.id,
-        title: title,
-        isChecked: isChecked,
-        labelId: labelId,
-        date: dailyTask.date,
-        review: dailyTask.review,
-      );
-    }
-    // null のパラメータを含む場合は例外を投げる
-    else {
-      throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${dailyTask.runtimeType}）\n[ToCTask.toCDailyTask]",
-      );
-    }
+  static CDailyTask toCDailyTask(EDailyTask dailyTask) {
+    return CDailyTask(
+      id: dailyTask.id,
+      title: dailyTask.title,
+      isChecked: dailyTask.isChecked,
+      labelId: dailyTask.labelId,
+      date: dailyTask.date,
+      review: dailyTask.review,
+    );
   }
 
-  static CWeeklyTask toCWeeklyTask<WeeklyTask extends WeeklyTaskBase>(
-      WeeklyTask weeklyTask,
-      ) {
-    final title = weeklyTask.title;
-    final isChecked = weeklyTask.isChecked;
-    final labelId = weeklyTask.labelId;
-    if (title != null && isChecked != null && labelId != null) {
-      return CWeeklyTask(
-        id: weeklyTask.id,
-        title: title,
-        isChecked: isChecked,
-        labelId: labelId,
-        week: weeklyTask.week,
-        review: weeklyTask.review,
-      );
-    }
-    // null のパラメータを含む場合は例外を投げる
-    else {
-      throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${weeklyTask.runtimeType}）\n[ToCTask.toCWeeklyTask]",
-      );
-    }
+  static CWeeklyTask toCWeeklyTask(EWeeklyTask weeklyTask) {
+    return CWeeklyTask(
+      id: weeklyTask.id,
+      title: weeklyTask.title,
+      isChecked: weeklyTask.isChecked,
+      labelId: weeklyTask.labelId,
+      week: weeklyTask.week,
+      review: weeklyTask.review,
+    );
   }
 
-  static CMonthlyTask toCMonthlyTask<MonthlyTask extends MonthlyTaskBase>(
-      MonthlyTask monthlyTask) {
-    final title = monthlyTask.title;
-    final isChecked = monthlyTask.isChecked;
-    final labelId = monthlyTask.labelId;
-    if (title != null && isChecked != null && labelId != null) {
-      return CMonthlyTask(
-        id: monthlyTask.id,
-        title: title,
-        isChecked: isChecked,
-        labelId: labelId,
-        month: monthlyTask.month,
-        review: monthlyTask.review,
-      );
-    }
-    // null のパラメータを含む場合は例外を投げる
-    else {
-      throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${monthlyTask.runtimeType}）\n[ToCTask.toCMonthlyTask]",
-      );
-    }
+  static CMonthlyTask toCMonthlyTask(EMonthlyTask monthlyTask) {
+    return CMonthlyTask(
+      id: monthlyTask.id,
+      title: monthlyTask.title,
+      isChecked: monthlyTask.isChecked,
+      labelId: monthlyTask.labelId,
+      month: monthlyTask.month,
+      review: monthlyTask.review,
+    );
   }
 
-  static CYearlyTask toCYearlyTask<YearlyTask extends YearlyTaskBase>(
-      YearlyTask yearlyTask) {
-    final title = yearlyTask.title;
-    final isChecked = yearlyTask.isChecked;
-    final labelId = yearlyTask.labelId;
-    if (title != null && isChecked != null && labelId != null) {
-      return CYearlyTask(
-        id: yearlyTask.id,
-        title: title,
-        isChecked: isChecked,
-        labelId: labelId,
-        year: yearlyTask.year,
-        review: yearlyTask.review,
-      );
-    }
-    // null のパラメータを含む場合は例外を投げる
-    else {
-      throw Exception(
-        "ARGUMENT_ERROR: このクラスは ETask に変換できません。（${yearlyTask.runtimeType}）\n[ToCTask.toCYearlyTask]",
-      );
-    }
+  static CYearlyTask toCYearlyTask(EYearlyTask yearlyTask) {
+    return CYearlyTask(
+      id: yearlyTask.id,
+      title: yearlyTask.title,
+      isChecked: yearlyTask.isChecked,
+      labelId: yearlyTask.labelId,
+      year: yearlyTask.year,
+      review: yearlyTask.review,
+    );
   }
 }

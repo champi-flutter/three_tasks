@@ -262,10 +262,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: b62062023eb1e6b14ee7057a13cf2819e88ab0a2
+      resolved-ref: d00b7781e1f4fd689bc903a19d321234636b4e54
       url: "https://github.com/champi-flutter/custom_core_types.git"
     source: git
-    version: "1.2.5+16"
+    version: "1.2.3+17"
   custom_lint:
     dependency: "direct dev"
     description:
@@ -303,10 +303,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: a46d0a5bcd36f316160835bb9177bce79cbb09e0
+      resolved-ref: "689665f175a2843a7b913277b81578efbac8bb07"
       url: "https://github.com/champi-flutter/custom_widgets.git"
     source: git
-    version: "1.0.4+5"
+    version: "1.0.5+6"
   dart_style:
     dependency: transitive
     description:
@@ -320,10 +320,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: e3346ba913da5930906858030eccd0930a4a0d9f
+      resolved-ref: a7ef58feb86670e51d3a04438aaf92af8242b3e1
       url: "https://github.com/champi-flutter/data_converter.git"
     source: git
-    version: "1.0.2+3"
+    version: "1.0.3+4"
   drift:
     dependency: "direct main"
     description:
@@ -448,14 +448,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fluttertoast:
-    dependency: "direct main"
-    description:
-      name: fluttertoast
-      sha256: "144ddd74d49c865eba47abe31cbc746c7b311c82d6c32e571fd73c4264b740e2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "9.0.0"
   freezed:
     dependency: "direct dev"
     description:
@@ -488,14 +480,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
-  google_mobile_ads:
-    dependency: "direct main"
-    description:
-      name: google_mobile_ads
-      sha256: a4f59019f2c32769fb6c60ed8aa321e9c21a36297e2c4f23452b3e779a3e7a26
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.0"
   graphs:
     dependency: transitive
     description:
@@ -868,10 +852,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: b40ab009a05ae344fd0194e66896d34b4061ea46
+      resolved-ref: "81afea5dcd9bd3bf994c9296c8823f531fe9f567"
       url: "https://github.com/champi-flutter/riverpod_wrapper.git"
     source: git
-    version: "1.3.2+12"
+    version: "1.3.4+14"
   rxdart:
     dependency: "direct main"
     description:
@@ -1213,38 +1197,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.1"
-  webview_flutter:
-    dependency: transitive
-    description:
-      name: webview_flutter
-      sha256: "889a0a678e7c793c308c68739996227c9661590605e70b1f6cf6b9a6634f7aec"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.10.0"
-  webview_flutter_android:
-    dependency: transitive
-    description:
-      name: webview_flutter_android
-      sha256: "34ee3954f28ab3c8b5f96608d75125736643b3c239c969cd50d9476d5f90559a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.3.5"
-  webview_flutter_platform_interface:
-    dependency: transitive
-    description:
-      name: webview_flutter_platform_interface
-      sha256: d937581d6e558908d7ae3dc1989c4f87b786891ab47bb9df7de548a151779d8d
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.10.0"
-  webview_flutter_wkwebview:
-    dependency: transitive
-    description:
-      name: webview_flutter_wkwebview
-      sha256: bf0745adeaca48a3105473440cffade47720fe2d56514de4e86f0d363439c4a7
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.18.6"
   xdg_directories:
     dependency: transitive
     description:

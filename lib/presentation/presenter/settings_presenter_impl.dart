@@ -1,17 +1,18 @@
 
 import 'package:three_tasks/domain/application_config.dart';
 import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
+import 'package:three_tasks/presentation/notifier/setting_state_notifier/page_setting_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
 import 'package:three_tasks/use_case/output_boundary/settings_presenter.dart';
 
 /// 各種設定値を Presentation 層に反映させるクラスの中身を実装
 class SettingsPresenterImpl implements SettingsPresenter{
 
-  SettingsPresenterImpl({required PageSettingsViewModel pageSettingsViewModelNotifier,
-  }): _viewModel = pageSettingsViewModelNotifier;
+  SettingsPresenterImpl({required PageSettingsStateNotifier pageSettingsStateNotifier,
+  }): _state = pageSettingsStateNotifier;
 
-  final PageSettingsViewModel _viewModel;
+  /// 設定 ViewState 更新呼び出し口
+  final PageSettingsStateNotifier _state;
 
   @override
   Future<void> presentWith(EPageSetting newPageSetting)async{
@@ -22,7 +23,7 @@ class SettingsPresenterImpl implements SettingsPresenter{
       reviewAutoSaves: newPageSetting.reviewAutoSaves,
     );
     // VM に反映する
-    _viewModel.updateWith(vPageSetting);
+    _state.updateWith(vPageSetting);
   }
 
   @override
@@ -47,6 +48,6 @@ class SettingsPresenterImpl implements SettingsPresenter{
         reviewAutoSaves: ePageSetting.reviewAutoSaves,
       );
     }
-    _viewModel.updateAll(vData);
+    _state.updateAll(vData);
   }
 }

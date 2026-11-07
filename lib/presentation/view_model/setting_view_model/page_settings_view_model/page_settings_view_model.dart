@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/domain/application_config.dart';
+import 'package:three_tasks/presentation/notifier/setting_state_notifier/page_setting_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_settings/fetch_settings_use_case.dart';
 
@@ -10,7 +11,8 @@ part 'page_settings_view_model.g.dart';
 
 /// 各ページの設定
 @riverpod
-class PageSettingsViewModel extends _$PageSettingsViewModel {
+class PageSettingsViewModel extends _$PageSettingsViewModel
+    implements PageSettingsStateNotifier {
   @override
   LazyViewState<VSettingsMap> build() {
     _initViewModel();
@@ -21,18 +23,19 @@ class PageSettingsViewModel extends _$PageSettingsViewModel {
     return LazyViewState.placeholder(placeholder);
   }
 
-  FetchSettingsUseCase get _fetchSettingsUseCase => ref.read(fetchSettingsUseCaseProvider);
+  FetchSettingsUseCase get _fetchSettingsUseCase =>
+      ref.read(fetchSettingsUseCaseProvider);
 
   Future<void> _initViewModel() async {
     await _fetchSettingsUseCase.execute(validLength: pageConfig.numberOfPages);
   }
 
   /// この VM の [state] の一部を更新する
+  @override
   void updateWith(VPageSetting newSetting) {
-
     final VSettingsMap updatingMap = state.data;
 
-    if(updatingMap[newSetting.controlledIndex] != newSetting) {
+    if (updatingMap[newSetting.controlledIndex] != newSetting) {
       updatingMap[newSetting.controlledIndex] = newSetting;
 
       state = LazyViewState.data(updatingMap);
@@ -40,6 +43,7 @@ class PageSettingsViewModel extends _$PageSettingsViewModel {
   }
 
   /// この VM の [state] を Map で更新する
+  @override
   void updateAll(VSettingsMap newMapState) {
     if (state.data.hasChanges(newMapState)) {
       state = LazyViewState.data(newMapState);

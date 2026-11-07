@@ -5,6 +5,7 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/extended_foundation/weekly_lazy_map.dart';
+import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
@@ -12,7 +13,7 @@ import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tas
 part 'weekly_tasks_view_model.g.dart';
 
 @riverpod
-class WeeklyTasksViewModel extends _$WeeklyTasksViewModel {
+class WeeklyTasksViewModel extends _$WeeklyTasksViewModel implements WeeklyTasksStateNotifier{
   // todo 初期化
   @override
   WeeklyLazyMap build() {
@@ -55,6 +56,7 @@ class WeeklyTasksViewModel extends _$WeeklyTasksViewModel {
   }
 
   /// [state] （`List<VWeeklyTask>`）更新メソッド
+  @override
   void update(Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> newData) {
     final Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>
         newStateMap = {};

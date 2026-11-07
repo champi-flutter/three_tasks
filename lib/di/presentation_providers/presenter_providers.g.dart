@@ -51,7 +51,7 @@ final class DailyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$dailyTasksPresenterHash() =>
-    r'f28a92fe7091c76a3b8c9455fdfb0f28dcc0bea3';
+    r'7028e676e366fbfa9e64ab057652e9e0559475e5';
 
 @ProviderFor(weeklyTasksPresenter)
 const weeklyTasksPresenterProvider = WeeklyTasksPresenterProvider._();
@@ -95,7 +95,7 @@ final class WeeklyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$weeklyTasksPresenterHash() =>
-    r'289376b1ee10c2ce4a2b18f4940488f0cc4bd7c7';
+    r'35fa7670a9997d50920d3ad16ffb531b36fa65fb';
 
 @ProviderFor(monthlyTasksPresenter)
 const monthlyTasksPresenterProvider = MonthlyTasksPresenterProvider._();
@@ -139,7 +139,7 @@ final class MonthlyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$monthlyTasksPresenterHash() =>
-    r'07b2cad2c69ccc058f43185bc5a13527ddc46465';
+    r'688011c171cf4831d17d16347c8dd417b8111c1b';
 
 @ProviderFor(yearlyTasksPresenter)
 const yearlyTasksPresenterProvider = YearlyTasksPresenterProvider._();
@@ -183,7 +183,7 @@ final class YearlyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$yearlyTasksPresenterHash() =>
-    r'fa18c743ebbd1267a18ff4e5bc989205b09368c8';
+    r'c5479b1920e73f3cd974bf9bb8aa560749a7480f';
 
 /// ラベルデータ反映クラス
 
@@ -228,7 +228,7 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
   }
 }
 
-String _$labelsPresenterHash() => r'a95decdda6e2d12d9aab70eaa87dcb6b041f5c11';
+String _$labelsPresenterHash() => r'96c0825a5e1c22d7b1fcc2cde6d6ece326a87e73';
 
 /// 各種設定反映クラス
 
@@ -276,4 +276,4 @@ final class SettingsPresenterProvider extends $FunctionalProvider<
   }
 }
 
-String _$settingsPresenterHash() => r'27036811072e1c3fda697c88c11d3af1158213e0';
+String _$settingsPresenterHash() => r'feae8e8d2c5102e612b7f9bf57becca84cb6f9d5';

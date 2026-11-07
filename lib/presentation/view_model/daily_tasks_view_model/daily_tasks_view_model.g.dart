@@ -45,7 +45,7 @@ final class DailyTasksViewModelProvider extends $NotifierProvider<
 }
 
 String _$dailyTasksViewModelHash() =>
-    r'b1a1cba57b07133fcb14cd05424136d5b00496f2';
+    r'20dc16c9c41c1ed49cea03932e5f15a59b4e7bc4';
 
 abstract class _$DailyTasksViewModel
     extends $Notifier<LazyMapViewState<Date, TaskList<VDailyTask>>> {

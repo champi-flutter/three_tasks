@@ -23,7 +23,7 @@ import 'package:three_tasks/infrastructure/gateway/dto/c_task/converter/to_c_tas
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/converter/e_to_q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_setting/q_page_setting.dart';
-import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/to_q_task.dart';
+import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/e_to_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/converter/unload_from_q_task.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
@@ -770,7 +770,7 @@ class DataRepositoryImpl
   async {
     // Entity のリストを保存用 DTO のリストに変換する
     final TaskList<QTask> newTaskList = updatingETaskList
-        .mapValues<QTask>(ToQTask.toQTask)
+        .mapValues<QTask>(EToQTask.toQTask)
         .toListAs<TaskList<QTask>>(TaskList.fromIterable);
     // データソースに保存する
     final Result<void, Exception> result = await _dataSource.saveTaskChanges(
@@ -811,7 +811,7 @@ class DataRepositoryImpl
         // 適応後の Entity のリストを保存用 DTO のリストに変換する
         final List<QWeeklyTask> qTaskList = adaptedETaskList
             .map<QWeeklyTask>(
-                (taskEntry) => ToQTask.toQWeeklyTask(taskEntry.value))
+                (taskEntry) => EToQTask.toQWeeklyTask(taskEntry.value))
             .toList();
         // データソースに保存する
         final Result<void, Exception> result =
@@ -950,7 +950,7 @@ class DataRepositoryImpl
           final DataEntry<int, CDailyTask> dataEntry = DataEntry(
             id: newId,
             // エンティティをキャッシュ用 DTO に変換して格納する
-            value: ToCTask.toCDailyTask<EDailyTask>(newETask),
+            value: EToCTask.toCDailyTask(newETask),
           );
           // 対象日付の key のリストに index と 日単位タスク の組み合わせを追加する
           dailyResultMap.addNullable(
@@ -962,7 +962,7 @@ class DataRepositoryImpl
           final DataEntry<int, CWeeklyTask> dataEntry = DataEntry(
             id: newId,
             // エンティティをキャッシュ用 DTO に変換して格納する
-            value: ToCTask.toCWeeklyTask<EWeeklyTask>(newETask),
+            value: EToCTask.toCWeeklyTask(newETask),
           );
           // 対象日付の key のリストに index と 週単位タスク の組み合わせを追加する
           weeklyResultMap.addNullable(
@@ -974,7 +974,7 @@ class DataRepositoryImpl
           final DataEntry<int, CMonthlyTask> dataEntry = DataEntry(
             id: newId,
             // エンティティをキャッシュ用 DTO に変換して格納する
-            value: ToCTask.toCMonthlyTask<EMonthlyTask>(newETask),
+            value: EToCTask.toCMonthlyTask(newETask),
           );
           // 対象日付の key のリストに index と 月単位タスク の組み合わせを追加する
           monthlyResultMap.addNullable(
@@ -986,7 +986,7 @@ class DataRepositoryImpl
           final DataEntry<int, CYearlyTask> dataEntry = DataEntry(
             id: newId,
             // エンティティをキャッシュ用 DTO に変換して格納する
-            value: ToCTask.toCYearlyTask<EYearlyTask>(newETask),
+            value: EToCTask.toCYearlyTask(newETask),
           );
           // 対象日付の key のリストに index と 年単位タスク の組み合わせを追加する
           yearlyResultMap.addNullable(
@@ -1113,7 +1113,7 @@ class DataRepositoryImpl
   // 折りたたみ用
   async {
     // 最初に登録するタスクの情報を、エンティティから クエリ用 DTO に移す
-    final QTask firstQTask = ToQTask.toQTask(firstETask);
+    final QTask firstQTask = EToQTask.toQTask(firstETask);
     // データソースに新しいラベルの枠を作って、その ID を取得する
     final Result<int, Exception> result = await _dataSource.createNewLabel(
       title: title,

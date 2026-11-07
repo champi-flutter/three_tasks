@@ -52,6 +52,7 @@ LabelsController labelsController(Ref ref, Token token) => LabelsController(
 // 設定値のコントローラ
 @riverpod
 SettingsController settingsController(Ref ref) => SettingsController(
+  fetchSettingsUseCase: ref.watch(fetchSettingsUseCaseProvider),
       saveSettingChangesUseCase: ref.watch(saveSettingChangesUseCaseProvider),
     );
 

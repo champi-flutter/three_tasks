@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
+import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
@@ -11,9 +12,9 @@ import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_yearly_tas
 
 part 'yearly_tasks_view_model.g.dart';
 
-/// 月単位タスク View Model
+/// 年単位タスク View Model
 @riverpod
-class YearlyTasksViewModel extends _$YearlyTasksViewModel{
+class YearlyTasksViewModel extends _$YearlyTasksViewModel implements YearlyTasksStateNotifier{
   // todo 初期化
   @override
   LazyMapViewState<int, TaskList<VYearlyTask>> build() {
@@ -58,6 +59,7 @@ class YearlyTasksViewModel extends _$YearlyTasksViewModel{
   /// [state] 更新メソッド
   ///
   /// キャッシュは追加されるたびに、LFU 方式で evict される。
+  @override
   void update(Map<int, TaskList<VYearlyTask>> newData) {
     final Map<int, LazyViewState<TaskList<VYearlyTask>>> newStateMap = {};
     // リビルドを行うトリガー

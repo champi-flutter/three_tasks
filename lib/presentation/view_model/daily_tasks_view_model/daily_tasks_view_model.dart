@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
+import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
@@ -11,12 +12,10 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'daily_tasks_view_model.g.dart';
 
 @riverpod
-class DailyTasksViewModel extends _$DailyTasksViewModel {
+class DailyTasksViewModel extends _$DailyTasksViewModel implements DailyTasksStateNotifier{
   // todo 初期化
   @override
   LazyMapViewState<Date, TaskList<VDailyTask>> build() {
-    // 監視フローを開始する
-    _startWatching(today);
     // リスト要素数 0 （データ未受信）時の仮データ（ID: -1 ）
     // ハンドラ（`_handleDayTasksUpdating`）が1回起動して初めて実際のデータが表示される
     return LazyMapViewState(
@@ -59,6 +58,7 @@ class DailyTasksViewModel extends _$DailyTasksViewModel {
   /// [state] 更新メソッド
   ///
   /// キャッシュは追加されるたびに、LFU 方式で evict される。
+  @override
   void update(Map<Date, TaskList<VDailyTask>> newData) {
     final Map<Date, LazyViewState<TaskList<VDailyTask>>> newStateMap = {};
     // リビルドを行うトリガー

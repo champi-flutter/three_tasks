@@ -70,6 +70,8 @@ class WeeklyLazyMap {
       // まだ登録されていない日付の場合、onNewAccess を呼ぶ
       if (oldListLength == null) {
         onNewAccess(key);
+        // 2026/11/07 修正: 新規 key アクセス時に、_refLengthAtEachDate に 1 を入れる
+        _refLengthAtEachDate[key] = 1;
         return placeholder(key);
       }
 

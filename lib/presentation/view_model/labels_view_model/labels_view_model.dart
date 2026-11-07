@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
+import 'package:three_tasks/presentation/notifier/labels_state_notifier/labels_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_label/fetch_label_use_case.dart';
 
@@ -18,7 +19,7 @@ part 'labels_view_model.g.dart';
 ///
 /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 @riverpod
-class LabelsViewModel extends _$LabelsViewModel {
+class LabelsViewModel extends _$LabelsViewModel implements LabelsStateNotifier{
   // todo 初期化
   @override
   LazyViewState<LabelList<VLabel>> build() {
@@ -39,6 +40,7 @@ class LabelsViewModel extends _$LabelsViewModel {
   }
 
   /// [state] の更新
+  @override
   void update(LabelList<VLabel> newState) {
     state = LazyViewState.data(newState);
   }

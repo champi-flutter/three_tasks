@@ -146,6 +146,7 @@ class MyDatabase extends _$MyDatabase implements DataSource {
   /// 要求された年に該当するデータを返す。
   ///
   /// **【注意】** このデータは空の場合もある。
+  @override
   Future<Result<List<QYearlyTask>, Exception>> getYearlyTasks({
     required int targetYear,
   })
@@ -173,41 +174,6 @@ class MyDatabase extends _$MyDatabase implements DataSource {
       return Failure(Exception("$e\n$st"), methodName: "getSettings");
     }
   }
-
-  // todo DayTasks
-
-  // Read（抽出）
-  // managerが管理する全てのデータベース（）の中から対象のデータベース（）を取得する
-  Future<List<DayTask>> get allDayTasks => managers.dayTasks.get();
-
-  // // 今日のタスクだけを抽出
-  // Future<List<DayTask>> get allTasksForToday =>
-  //     managers.dayTasks.filter((f) => f.date(today)).get();
-  //
-  // // 明日のタスクだけを抽出
-  // Future<List<DayTask>> get allTasksForTomorrow =>
-  //     managers.dayTasks.filter((f) => f.date(tomorrow)).get();
-  //
-  // // 昨日のタスクだけを抽出
-  // Future<List<DayTask>> get allTasksForYesterday => managers.dayTasks
-  //     .filter((f) => f.date(outputFormat.format(now.add(Duration(days: -1)))))
-  //     .get();
-  //
-  // // カレンダーで選択された日付のタスクを抽出
-  // Future<List<DayTask>> get allTasksForTheDay => managers.dayTasks
-  //     .filter((f) => f.date(outputFormat.format(theDay)))
-  //     .get();
-
-  /// 達成されなかったタスクを抽出
-  Future<List<DayTask>> get allTasksNotAchieved => managers.dayTasks
-      .filter((f) => f.isChecked.equals(false))
-      .orderBy((o) => o.date.asc())
-      .get();
-
-  // Update（更新）
-  // 指定したデータ行（）を古いデータと置き換える
-  Future<void> updateDayTask(DayTask dayTaskUpdated) =>
-      managers.dayTasks.replace(dayTaskUpdated);
 
   // todo 書き換え
   /// 日単位タスクの新しい日付の枠を作成するメソッド
@@ -335,33 +301,6 @@ class MyDatabase extends _$MyDatabase implements DataSource {
           methodName: "createYearlyTaskRecord");
     }
   }
-
-  // /// タスクタイトル保存メソッド
-  // @override
-  // Future<Result<void, Exception>> saveTaskTitles({
-  //   required List<DTask> newTaskList,
-  // })
-  // // 折りたたみ用
-  // async {
-  //   try {
-  //     // 返す Map の枠
-  //     final Map<Date, List<DDailyTask>> dataMap = {};
-  //     await transaction(() async {
-  //       /// task ごとに情報を保存
-  //       for (DTask task in newTaskList) {
-  //         _print(
-  //           "タスクを DB に保存",
-  //           "  ID: ${task.id}",
-  //           "  タスクタイトル: ${task.task}",
-  //         );
-  //         await _saveDTaskTitle(newDTask: task);
-  //       }
-  //     });
-  //     return Success(null);
-  //   } catch (e) {
-  //     return Failure(Exception(e), methodName: "saveTaskTitles");
-  //   }
-  // }
 
   /// タスク情報変更保存メソッドを実装
   @override
