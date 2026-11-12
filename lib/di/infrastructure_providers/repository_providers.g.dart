@@ -49,3 +49,47 @@ final class DataRepositoryProvider
 }
 
 String _$dataRepositoryHash() => r'7335dbd8f846e7caa5da0df7215a267eeab5fb74';
+
+@ProviderFor(labelDraftRepository)
+const labelDraftRepositoryProvider = LabelDraftRepositoryProvider._();
+
+final class LabelDraftRepositoryProvider extends $FunctionalProvider<
+    LabelDraftRepository,
+    LabelDraftRepository,
+    LabelDraftRepository> with $Provider<LabelDraftRepository> {
+  const LabelDraftRepositoryProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'labelDraftRepositoryProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$labelDraftRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<LabelDraftRepository> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  LabelDraftRepository create(Ref ref) {
+    return labelDraftRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(LabelDraftRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<LabelDraftRepository>(value),
+    );
+  }
+}
+
+String _$labelDraftRepositoryHash() =>
+    r'bbe190e82242899da84dc93f9d2e27cc440aad09';

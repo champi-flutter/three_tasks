@@ -234,7 +234,7 @@ final class LabelsControllerProvider extends $FunctionalProvider<
   }
 }
 
-String _$labelsControllerHash() => r'dd253c84a0bd564aa26d3874fb56ca925d909b1f';
+String _$labelsControllerHash() => r'82fa7b71f1a2470bbf5ea0dccc8e06f1dfb55cb6';
 
 final class LabelsControllerFamily extends $Family
     with $FunctionalFamilyOverride<LabelsController, Token> {
@@ -298,48 +298,4 @@ final class SettingsControllerProvider extends $FunctionalProvider<
 }
 
 String _$settingsControllerHash() =>
-    r'445cec6e71defc5f41ea048a933232212a6dfcc8';
-
-@ProviderFor(labelsDraftHandler)
-const labelsDraftHandlerProvider = LabelsDraftHandlerProvider._();
-
-final class LabelsDraftHandlerProvider extends $FunctionalProvider<
-    LabelsDraftHandler,
-    LabelsDraftHandler,
-    LabelsDraftHandler> with $Provider<LabelsDraftHandler> {
-  const LabelsDraftHandlerProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'labelsDraftHandlerProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
-
-  @override
-  String debugGetCreateSourceHash() => _$labelsDraftHandlerHash();
-
-  @$internal
-  @override
-  $ProviderElement<LabelsDraftHandler> $createElement(
-          $ProviderPointer pointer) =>
-      $ProviderElement(pointer);
-
-  @override
-  LabelsDraftHandler create(Ref ref) {
-    return labelsDraftHandler(ref);
-  }
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(LabelsDraftHandler value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<LabelsDraftHandler>(value),
-    );
-  }
-}
-
-String _$labelsDraftHandlerHash() =>
-    r'8439f6aa543663a2004a55ce3b30120a8b8e293f';
+    r'af653ebe3b93f06d0c99e40c7e638e8a9b39eb7d';

@@ -8,8 +8,6 @@ import 'package:three_tasks/presentation/presenter/monthly_tasks_presenter_impl.
 import 'package:three_tasks/presentation/presenter/settings_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/weekly_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/presenter/yearly_tasks_presenter_impl.dart';
-import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/labels_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/monthly_tasks_presenter.dart';

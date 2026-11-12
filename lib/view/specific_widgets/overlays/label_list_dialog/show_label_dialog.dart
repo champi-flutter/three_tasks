@@ -5,9 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_state_handler/labels_state_handler/labels_state_handler.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/confirming_existing_label_dialog.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/label_list_dialog.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/type_definition.dart';
@@ -90,7 +90,7 @@ class _LabelDialogWrapper extends HookConsumerWidget {
 
 
     // VM が管理するリスト（state）を監視
-    final labelsViewModelState = ref.watch(labelsViewModelProvider);
+    final labelsViewModelState = ref.watch(labelsStateHandlerProvider);
 
     return labelsViewModelState.when<Widget>(
       // データが届いた場合

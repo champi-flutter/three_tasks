@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/di/infrastructure_providers/stream_handler_providers.dart';
-import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/daily_tasks_cache_handler_impl.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/labels_cache_handler_impl.dart';
 import 'package:three_tasks/infrastructure/drivers/cache_handler/monthly_tasks_cache_handler_impl.dart';

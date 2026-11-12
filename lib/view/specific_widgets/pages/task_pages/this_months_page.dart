@@ -7,8 +7,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
-import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
+import 'package:three_tasks/presentation/view_state_handler/monthly_tasks_state_handler/monthly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/setting_state_handler/page_settings_state_handler/page_settings_state_handler.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/view/specific_widgets/pages/screens/history_screen.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/bottom_button.dart';
@@ -46,14 +46,14 @@ class ThisMonthsPage extends TaskPageBase {
   Widget build(BuildContext context, WidgetRef ref) {
     // VMを監視
     final monthlyTasksViewModelState = ref.watch(
-        monthlyTasksViewModelProvider.select((state) => state[thisMonth]));
+        monthlyTasksStateHandlerProvider.select((state) => state[thisMonth]));
 
     // ローディング表示は riverpod_wrapper の LoadingService に任せるので、
     // `.when` は使わず、 `.data` を直接参照する
     final TaskList<VMonthlyTask> taskState = monthlyTasksViewModelState.data;
 
     // 自動保存オンオフを監視する
-    final bool willAutoSave = ref.watch(pageSettingsViewModelProvider
+    final bool willAutoSave = ref.watch(pageSettingsStateHandlerProvider
         .select((state) => state.data[pageIndex].primaryAutoSaves));
 
     // 現在表示している画面に、未保存の編集があるかどうか

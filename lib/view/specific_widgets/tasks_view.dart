@@ -7,13 +7,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
-import 'package:three_tasks/di/providers.dart';
 import 'package:three_tasks/presentation/controller/dto/label_control_parameter/label_control_parameter.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/view/custom_widgets_impl/utilized_text_impl.dart';
 import 'package:three_tasks/view/specific_widgets/overlays/label_list_dialog/show_label_dialog.dart';
 
 /// [TasksView] の表示形式

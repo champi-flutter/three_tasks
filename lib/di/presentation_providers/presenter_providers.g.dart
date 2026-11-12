@@ -185,16 +185,11 @@ final class YearlyTasksPresenterProvider extends $FunctionalProvider<
 String _$yearlyTasksPresenterHash() =>
     r'c5479b1920e73f3cd974bf9bb8aa560749a7480f';
 
-/// ラベルデータ反映クラス
-
 @ProviderFor(labelsPresenter)
 const labelsPresenterProvider = LabelsPresenterProvider._();
 
-/// ラベルデータ反映クラス
-
 final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
     LabelsPresenter, LabelsPresenter> with $Provider<LabelsPresenter> {
-  /// ラベルデータ反映クラス
   const LabelsPresenterProvider._()
       : super(
           from: null,
@@ -230,18 +225,13 @@ final class LabelsPresenterProvider extends $FunctionalProvider<LabelsPresenter,
 
 String _$labelsPresenterHash() => r'96c0825a5e1c22d7b1fcc2cde6d6ece326a87e73';
 
-/// 各種設定反映クラス
-
 @ProviderFor(settingsPresenter)
 const settingsPresenterProvider = SettingsPresenterProvider._();
-
-/// 各種設定反映クラス
 
 final class SettingsPresenterProvider extends $FunctionalProvider<
     SettingsPresenter,
     SettingsPresenter,
     SettingsPresenter> with $Provider<SettingsPresenter> {
-  /// 各種設定反映クラス
   const SettingsPresenterProvider._()
       : super(
           from: null,

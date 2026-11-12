@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/presentation/controller/dto/setting_control_parameter/setting_control_parameter.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
+import 'package:three_tasks/presentation/view_state_handler/setting_state_handler/page_settings_state_handler/page_settings_state_handler.dart';
 
 enum _SwitchType { primary, review }
 
@@ -36,7 +36,7 @@ class AutoSaveSwitch extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // PageSettingsViewModel を監視する
-    final state = ref.watch(pageSettingsViewModelProvider);
+    final state = ref.watch(pageSettingsStateHandlerProvider);
 
     // オンオフスイッチ本体
     final Widget switchBody = state.when(

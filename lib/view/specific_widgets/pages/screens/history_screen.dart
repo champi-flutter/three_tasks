@@ -11,11 +11,11 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
-import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/yearly_tasks_view_model/yearly_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_state_handler/daily_tasks_state_handler/daily_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/monthly_tasks_state_handler/monthly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/weekly_tasks_state_handler/weekly_tasks_state_handler.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_state_handler/yearly_tasks_view_model/yearly_tasks_state_handler.dart';
 import 'package:three_tasks/view/specific_widgets/common_design/common_scaffold.dart';
 
 int _interstitialStackForHistoryScreen = 0;
@@ -43,13 +43,13 @@ class HistoryScreen extends HookConsumerWidget {
     // taskFormat に応じた VM を監視する
     final LazyViewState<TaskList<VTask>> lazyTaskState =
         switch (taskFormat.value) {
-      TaskRec.day => ref.watch(dailyTasksViewModelProvider
+      TaskRec.day => ref.watch(dailyTasksStateHandlerProvider
           .select((state) => state[targetDay.value.toDate()])),
-      TaskRec.week => ref.watch(weeklyTasksViewModelProvider
+      TaskRec.week => ref.watch(weeklyTasksStateHandlerProvider
           .select((state) => state[targetDay.value.toDate()])),
-      TaskRec.month => ref.watch(monthlyTasksViewModelProvider
+      TaskRec.month => ref.watch(monthlyTasksStateHandlerProvider
           .select((state) => state[Month.fromDateTime(targetDay.value)])),
-      TaskRec.year => ref.watch(yearlyTasksViewModelProvider
+      TaskRec.year => ref.watch(yearlyTasksStateHandlerProvider
           .select((state) => state[targetDay.value.year])),
     };
 

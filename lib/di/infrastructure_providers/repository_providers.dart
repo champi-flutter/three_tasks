@@ -4,7 +4,9 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/infrastructure_providers/cache_handler_providers.dart';
 import 'package:three_tasks/di/infrastructure_providers/data_source_providers.dart';
 import 'package:three_tasks/infrastructure/gateway/repository/data_repository_impl.dart';
+import 'package:three_tasks/infrastructure/gateway/repository/label_draft_repository_impl.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
+import 'package:three_tasks/use_case/repository_interface/label_draft_repository.dart';
 
 part 'repository_providers.g.dart';
 
@@ -19,3 +21,6 @@ DataRepository dataRepository(Ref ref) => DataRepositoryImpl(
   yearlyTasksCacheHandler: ref.watch(yearlyTasksCacheHandlerProvider),
   labelsCacheHandler: ref.watch(labelsCacheHandlerProvider),
 );
+
+@riverpod
+LabelDraftRepository labelDraftRepository(Ref ref)=> LabelDraftRepositoryImpl();

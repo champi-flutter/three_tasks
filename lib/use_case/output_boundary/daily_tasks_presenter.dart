@@ -6,5 +6,5 @@ import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 /// 日単位タスクの監視を反映させるポート
 abstract class DailyTasksPresenter {
   /// 更新を反映させる
-  Future<void> handleDailyTasksUpdating(Map<Date, TaskList<EDailyTask>> newDataMap);
+  Future<void> present(Map<Date, TaskList<EDailyTask>> newDataMap);
 }

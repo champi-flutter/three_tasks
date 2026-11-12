@@ -3,6 +3,8 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_data/i_task/converter/i_to_e_task.dart';
+import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 週単位タスク変更保存フローを実装するクラス
@@ -38,14 +40,15 @@ class SaveWeeklyTaskChangesInteractor
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
   Future<void> execute({
-    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
+    required WeeklyTaskList<IWeeklyTask>  taskListInputData,
   }) =>
       _loadingService.loadAsync(
         () async {
           try {
-            if (updatingETaskList.isEmpty) {
-              throw Exception("無効な値です");
-            }
+            // InputData をエンティティに変換する
+            final WeeklyTaskList<EWeeklyTask> updatingETaskList = taskListInputData
+                .mapValues<EWeeklyTask>(IToETask.toEWeeklyTask)
+                .toListAs(WeeklyTaskList<EWeeklyTask>.fromIterable);
             // リポジトリにデータの保存を依頼する
             final Result<void, Exception> result =
                 await _repository.saveWeeklyTaskChanges(

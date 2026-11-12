@@ -3,6 +3,8 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_data/i_task/converter/i_to_e_task.dart';
+import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// タスク情報の変更を保存する処理フローを実装するクラス
@@ -38,17 +40,20 @@ class SaveTaskChangesInteractor
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
   Future<void> execute({
-    required TaskList<ETask> updatingETaskList,
+    required TaskList<ITask> taskListInputData,
   }) =>
       _loadingService.loadAsync(
         () async {
           try {
-            if (updatingETaskList.isEmpty) {
-              throw Exception("無効な値です");
-            }
+            // InputData をエンティティに変換する
+            final TaskList<ETask> updatingETaskList = taskListInputData
+                .mapValues<ETask>(IToETask.toETask)
+                .toListAs(TaskList<ETask>.fromIterable);
             // リポジトリにデータの保存を依頼する
             final Result<void, Exception> result =
-                await _repository.saveTaskChanges(updatingETaskList: updatingETaskList);
+                await _repository.saveTaskChanges(
+              updatingETaskList: updatingETaskList,
+            );
             // 失敗を通知する
             switch (result) {
               // region
@@ -60,7 +65,7 @@ class SaveTaskChangesInteractor
                 ):
                 final Exception fetchExc = fetchError(methodName: methodName);
                 notifyError(content: "$exc\n$fetchExc");
-                // endregion
+              // endregion
             }
           } catch (e) {
             notifyError(content: "$e", specifiesLayer: true);

@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
+import 'package:three_tasks/presentation/view_state_handler/setting_state_handler/page_settings_state_handler/page_settings_state_handler.dart';
 import 'package:three_tasks/view/specific_widgets/common_design/common_scaffold.dart';
 import 'package:three_tasks/view/specific_widgets/pages/screens/review_screen.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
@@ -201,8 +201,8 @@ class _ScreenBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // PageSettingsViewModel を監視する
-    final settingsVMState = ref.watch(pageSettingsViewModelProvider);
+    // PageSettingsStateHandler を監視する
+    final settingsVMState = ref.watch(pageSettingsStateHandlerProvider);
     return settingsVMState.when(
       onReceived: (data) {
         final bool willAutoSave = data[currentPageIndex].primaryAutoSaves;

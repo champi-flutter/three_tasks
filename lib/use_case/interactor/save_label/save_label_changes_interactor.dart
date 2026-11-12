@@ -2,6 +2,8 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/use_case/input_boundary/save_label/save_label_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_data/i_label/converter/i_to_e_label.dart';
+import 'package:three_tasks/use_case/input_data/i_label/i_label.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// タスク ID をラベルに追加するフローを実装するクラス
@@ -30,16 +32,19 @@ class SaveLabelChangesInteractor
   ///  - ラベルキャッシュの更新処理を呼び出す
   @override
   Future<void> execute({
-    required List<ELabel> updatedELabels,
+    required List<ILabel> labelInputDataList,
   }) =>
       _loading.loadAsync(() async {
         try {
+          // エンティティに変換する
+          final List<ELabel> updatedELabels =
+              labelInputDataList.map<ELabel>(IToELabel.toELabel).toList();
           // リポジトリにタスクIDの指定ラベルへの追加を依頼する
           final Result<void, Exception> result =
               await _repository.saveLabelChanges(
-                changedLabels: updatedELabels,
-                shouldReflect: true,
-              );
+            changedLabels: updatedELabels,
+            shouldReflect: true,
+          );
           // 失敗を通知する
           switch (result) {
             // region switch

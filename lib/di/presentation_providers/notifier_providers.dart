@@ -1,33 +1,35 @@
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:three_tasks/presentation/notifier/labels_draft_notifier/labels_draft_notifier.dart';
 import 'package:three_tasks/presentation/notifier/labels_state_notifier/labels_state_notifier.dart';
 import 'package:three_tasks/presentation/notifier/setting_state_notifier/page_setting_state_notifier.dart';
 import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
-import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
-import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
-import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/yearly_tasks_view_model/yearly_tasks_view_model.dart';
+import 'package:three_tasks/presentation/view_state_handler/daily_tasks_state_handler/daily_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/labels_draft/labels_draft_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/labels_state_handler/labels_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/monthly_tasks_state_handler/monthly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/setting_state_handler/page_settings_state_handler/page_settings_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/weekly_tasks_state_handler/weekly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/yearly_tasks_view_model/yearly_tasks_state_handler.dart';
 
 part 'notifier_providers.g.dart';
 
 @riverpod
-DailyTasksStateNotifier dailyTasksStateNotifier(Ref ref) => DailyTasksViewModel();
+DailyTasksStateNotifier dailyTasksStateNotifier(Ref ref) => DailyTasksStateHandler();
 
 @riverpod
-WeeklyTasksStateNotifier weeklyTasksStateNotifier(Ref ref) => WeeklyTasksViewModel();
+WeeklyTasksStateNotifier weeklyTasksStateNotifier(Ref ref) => WeeklyTasksStateHandler();
 
 @riverpod
-MonthlyTasksStateNotifier monthlyTasksStateNotifier(Ref ref) => MonthlyTasksViewModel();
+MonthlyTasksStateNotifier monthlyTasksStateNotifier(Ref ref) => MonthlyTasksStateHandler();
 
 @riverpod
-YearlyTasksStateNotifier yearlyTasksStateNotifier(Ref ref) => YearlyTasksViewModel();
-
-
-@riverpod
-LabelsStateNotifier labelsStateNotifier(Ref ref) => LabelsViewModel();
+YearlyTasksStateNotifier yearlyTasksStateNotifier(Ref ref) => YearlyTasksStateHandler();
 
 
 @riverpod
-PageSettingsStateNotifier pageSettingsStateNotifier(Ref ref) => PageSettingsViewModel();
+LabelsStateNotifier labelsStateNotifier(Ref ref) => LabelsStateHandler();
+
+
+@riverpod
+PageSettingsStateNotifier pageSettingsStateNotifier(Ref ref) => PageSettingsStateHandler();

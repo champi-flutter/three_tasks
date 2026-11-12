@@ -52,7 +52,7 @@ abstract class DataRepository {
   ///
   /// `ListEntry<EWeeklyTask>` の可変長リストを渡す
   Future<Result<void, Exception>> saveWeeklyTaskChanges({
-    required List<ListEntry<EWeeklyTask>> updatingETaskList,
+    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
   });
 
   /// 週単位タスクの firstDate を書き換えるメソッド

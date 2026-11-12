@@ -637,6 +637,139 @@ final class SaveLabelChangesUseCaseProvider extends $FunctionalProvider<
 String _$saveLabelChangesUseCaseHash() =>
     r'cbd3e1448d1c0a681ca972354b060bc20a7343aa';
 
+@ProviderFor(pendLabelsSaveUseCase)
+const pendLabelsSaveUseCaseProvider = PendLabelsSaveUseCaseProvider._();
+
+final class PendLabelsSaveUseCaseProvider extends $FunctionalProvider<
+    PendLabelsSaveUseCase,
+    PendLabelsSaveUseCase,
+    PendLabelsSaveUseCase> with $Provider<PendLabelsSaveUseCase> {
+  const PendLabelsSaveUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'pendLabelsSaveUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$pendLabelsSaveUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<PendLabelsSaveUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PendLabelsSaveUseCase create(Ref ref) {
+    return pendLabelsSaveUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PendLabelsSaveUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PendLabelsSaveUseCase>(value),
+    );
+  }
+}
+
+String _$pendLabelsSaveUseCaseHash() =>
+    r'1ee39c9d1ddf355f43e258b447a5fb549b2daee9';
+
+@ProviderFor(savePendingLabelUseCase)
+const savePendingLabelUseCaseProvider = SavePendingLabelUseCaseProvider._();
+
+final class SavePendingLabelUseCaseProvider extends $FunctionalProvider<
+    SavePendingLabelUseCase,
+    SavePendingLabelUseCase,
+    SavePendingLabelUseCase> with $Provider<SavePendingLabelUseCase> {
+  const SavePendingLabelUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'savePendingLabelUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$savePendingLabelUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SavePendingLabelUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  SavePendingLabelUseCase create(Ref ref) {
+    return savePendingLabelUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SavePendingLabelUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SavePendingLabelUseCase>(value),
+    );
+  }
+}
+
+String _$savePendingLabelUseCaseHash() =>
+    r'466b435373df3bd51dee449d4ce02e9e7de21906';
+
+@ProviderFor(discardPendingLabelUseCase)
+const discardPendingLabelUseCaseProvider =
+    DiscardPendingLabelUseCaseProvider._();
+
+final class DiscardPendingLabelUseCaseProvider extends $FunctionalProvider<
+    DiscardPendingLabelUseCase,
+    DiscardPendingLabelUseCase,
+    DiscardPendingLabelUseCase> with $Provider<DiscardPendingLabelUseCase> {
+  const DiscardPendingLabelUseCaseProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'discardPendingLabelUseCaseProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$discardPendingLabelUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DiscardPendingLabelUseCase> $createElement(
+          $ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  DiscardPendingLabelUseCase create(Ref ref) {
+    return discardPendingLabelUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DiscardPendingLabelUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DiscardPendingLabelUseCase>(value),
+    );
+  }
+}
+
+String _$discardPendingLabelUseCaseHash() =>
+    r'0750728c109bed6d932f54b2579b39d97a19e278';
+
 @ProviderFor(registerNewLabelUseCase)
 const registerNewLabelUseCaseProvider = RegisterNewLabelUseCaseProvider._();
 

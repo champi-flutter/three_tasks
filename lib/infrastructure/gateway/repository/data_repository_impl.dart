@@ -797,7 +797,7 @@ class DataRepositoryImpl
   /// `ListEntry<EWeeklyTask>` の可変長リストを渡す
   @override
   Future<Result<void, Exception>> saveWeeklyTaskChanges({
-    required List<ListEntry<EWeeklyTask>> updatingETaskList,
+    required WeeklyTaskList<EWeeklyTask> updatingETaskList,
   })
   // 折りたたみ用
   async {
@@ -807,7 +807,7 @@ class DataRepositoryImpl
     );
     switch (applied) {
       // region
-      case Success(value: final List<ListEntry<EWeeklyTask>> adaptedETaskList):
+      case Success(value: final WeeklyTaskList<EWeeklyTask> adaptedETaskList):
         // 適応後の Entity のリストを保存用 DTO のリストに変換する
         final List<QWeeklyTask> qTaskList = adaptedETaskList
             .map<QWeeklyTask>(
@@ -841,13 +841,13 @@ class DataRepositoryImpl
   }
 
   /// placeholder2 に入れられた値を反映し、更新されたタスクリストを返す
-  Future<Result<List<ListEntry<EWeeklyTask>>, Exception>> _applyPlaceholder2({
-    required List<ListEntry<EWeeklyTask>> eTaskList,
+  Future<Result<WeeklyTaskList<EWeeklyTask>, Exception>> _applyPlaceholder2({
+    required WeeklyTaskList<EWeeklyTask> eTaskList,
   })
   // 折りたたみ用
   async {
     // 引数に渡されたリストが変更しないように、コピーを用意する
-    final List<ListEntry<EWeeklyTask>> returningList = [...eTaskList];
+    final WeeklyTaskList<EWeeklyTask> returningList = eTaskList.deepCopy;
     // 値が入れられた placeholder2 を抽出する
     final List<ListEntry<EWeeklyTask>> valuedPlaceholders =
         returningList.where((eTask) => eTask.value.isPlaceHolder2).toList();
@@ -872,8 +872,10 @@ class DataRepositoryImpl
           final int createdId = entry.value;
           final originalETask = returningList[index].value;
           // ListEntry<EWeeklyTask> の value を変更する
-          returningList[index].value =
-              originalETask.replacePlaceholder2(createdId);
+          returningList.setAt(
+            index,
+            originalETask.replacePlaceholder2(createdId),
+          );
         }
         return Success(returningList);
       case Failure(

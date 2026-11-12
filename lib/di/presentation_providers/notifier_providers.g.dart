@@ -51,7 +51,7 @@ final class DailyTasksStateNotifierProvider extends $FunctionalProvider<
 }
 
 String _$dailyTasksStateNotifierHash() =>
-    r'74bdb6c71be818e48d11def67c97ff55e465e3ee';
+    r'3ac3ecca84d26442ddc7d14d7a1398aa21606650';
 
 @ProviderFor(weeklyTasksStateNotifier)
 const weeklyTasksStateProvider = WeeklyTasksStateNotifierProvider._();
@@ -95,7 +95,7 @@ final class WeeklyTasksStateNotifierProvider extends $FunctionalProvider<
 }
 
 String _$weeklyTasksStateNotifierHash() =>
-    r'13b7cf65eb943000481c392f84e8f035ac6404d9';
+    r'3417211dbfae57b8a1b927248a96ab8b2a656e06';
 
 @ProviderFor(monthlyTasksStateNotifier)
 const monthlyTasksStateProvider = MonthlyTasksStateNotifierProvider._();
@@ -139,7 +139,7 @@ final class MonthlyTasksStateNotifierProvider extends $FunctionalProvider<
 }
 
 String _$monthlyTasksStateNotifierHash() =>
-    r'8f655056317ffb23716cccf0586d03eb5842f748';
+    r'05637f6cd7ce46a8e8f1bd8f5f96b88045c8040e';
 
 @ProviderFor(yearlyTasksStateNotifier)
 const yearlyTasksStateProvider = YearlyTasksStateNotifierProvider._();
@@ -183,7 +183,7 @@ final class YearlyTasksStateNotifierProvider extends $FunctionalProvider<
 }
 
 String _$yearlyTasksStateNotifierHash() =>
-    r'062e348d7dd98f00e7be6d5143ac9a15980c8236';
+    r'af1c8d47e33c689539b119c4a9c40ba8308f20f9';
 
 @ProviderFor(labelsStateNotifier)
 const labelsStateProvider = LabelsStateNotifierProvider._();
@@ -227,7 +227,7 @@ final class LabelsStateNotifierProvider extends $FunctionalProvider<
 }
 
 String _$labelsStateNotifierHash() =>
-    r'3e4604ffd4e39303970edb5660b1fc79b20b3182';
+    r'1c677504369fac7375a1fcb1e424f9a352ad6ddd';
 
 @ProviderFor(pageSettingsStateNotifier)
 const pageSettingsStateProvider = PageSettingsStateNotifierProvider._();
@@ -271,4 +271,4 @@ final class PageSettingsStateNotifierProvider extends $FunctionalProvider<
 }
 
 String _$pageSettingsStateNotifierHash() =>
-    r'868ef1f472b7d2b49e513839e2b80611e628cf4e';
+    r'b461607baaa39e8727478cb1b5fe0d076cdf76ea';

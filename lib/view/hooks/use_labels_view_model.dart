@@ -4,7 +4,7 @@
 // import 'package:hooks_riverpod/hooks_riverpod.dart';
 // import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 // import 'package:three_tasks/data_foundation/label_base/label_list.dart';
-// import 'package:three_tasks/presentation/view_model/labels_view_model/labels_view_model.dart';
+// import 'package:three_tasks/presentation/view_state_handler/labels_state_handler/labels_state_handler.dart';
 // import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 //
 // /// [LabelsViewModel] を監視する Hook

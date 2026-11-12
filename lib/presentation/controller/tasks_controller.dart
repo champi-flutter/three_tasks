@@ -1,8 +1,8 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/presentation/controller/dto/converter/to_i_task.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/v_to_e_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
@@ -10,6 +10,7 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/disc
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draft_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
 
 class TasksController {
   TasksController({
@@ -48,7 +49,7 @@ class TasksController {
   })
       // 折りたたみ用
       =>
-          willAutoSave
+      willAutoSave
           ? _saveAt(
               position,
               state: taskState,
@@ -70,48 +71,49 @@ class TasksController {
   async {
     // 編集未保存フラグをおろす
     _editController.notifySaved();
-    // あとで TaskList<ETask> に当てはめるリスト
-    final List<ETask> tempTaskList = [];
-    // あとで WeeklyTaskList<EWeeklyTask> に当てはめるリスト
-    final Map<UniqueWeek, List<EWeeklyTask>> tempWeeklyTaskListMap = {};
+
+    // あとで TaskList<ITask> に当てはめるリスト
+    final List<ITask> tempTaskList = [];
+    // あとで WeeklyTaskList<IWeeklyTask> に当てはめるリスト
+    final Map<UniqueWeek, List<IWeeklyTask>> tempWeeklyTaskListMap = {};
+
     // 渡された情報を tempTaskList （または tempWeeklyTaskList ）に当てはめるプロセス
     for (final ListEntry<VTask> vTaskEntry in state) {
-      ETask eTask = VToETask.toETask(vTaskEntry.value);
-      // 対象インデックスのエンティティを更新する
-      if (vTaskEntry.index == position) {
-        eTask.update(
-          newTitle: parameter.newTitle,
-          newChecked: parameter.newChecked,
-          newLabelId: parameter.newLabelId,
-        );
-      }
+      final ITask iTask = ToITask.toTaskSaveInputData(
+        vTask: vTaskEntry.value,
+        // 対象インデックスのタスクなら引数のパラメータを、
+        // そうでない場合は空のパラメータをあたはめる
+        parameter:
+            (vTaskEntry.index == position) ? parameter : TaskControlParameter(),
+      );
+
       // 週タスクの場合
-      if (eTask is EWeeklyTask) {
-        tempWeeklyTaskListMap.addNullable(key: eTask.week, value: eTask);
+      if (iTask is IWeeklyTask) {
+        tempWeeklyTaskListMap.addNullable(key: iTask.week, value: iTask);
       }
       // 週タスク以外の場合
       else {
-        tempTaskList.add(eTask);
+        tempTaskList.add(iTask);
       }
     }
 
     // tempTaskList （または tempWeeklyTaskList ）を UseCase に渡す形に変換する
     // 週タスク以外の場合
     if (tempTaskList.length == 3) {
-      final TaskList<ETask> updatingETaskList =
-          TaskList.fromIterable(tempTaskList);
+      final TaskList<ITask> updatingITaskList =
+          TaskList<ITask>.fromIterable(tempTaskList);
       // SaveTaskChangesUseCase を起動する
       await _saveTaskChangesUseCase.execute(
-          updatingETaskList: updatingETaskList);
+        taskListInputData: updatingITaskList,
+      );
     }
     // 週タスクの場合
     else if (tempWeeklyTaskListMap.isNotEmpty) {
-
       // UniqueWeek が Comparable を実装しているため、`..sort()` で古い順にする
       final sortedKeys = tempWeeklyTaskListMap.keys.toList()..sort();
 
       // 1つのリストにまとめる
-      final List<EWeeklyTask> combinedList = [];
+      final List<IWeeklyTask> combinedList = [];
 
       // 古い順のキーに対応するリストを順番に追加していく
       for (final key in sortedKeys) {
@@ -122,13 +124,13 @@ class TasksController {
         }
       }
 
-      // tempWeeklyList を WeeklyTaskList<EWeeklyTask> に適用する
-      final WeeklyTaskList<EWeeklyTask> updatingETaskList =
-          WeeklyTaskList.fromIterable(combinedList);
+      // tempWeeklyList を WeeklyTaskList<IWeeklyTask> に適用する
+      final WeeklyTaskList<IWeeklyTask> updatingITaskList =
+          WeeklyTaskList<IWeeklyTask>.fromIterable(combinedList);
 
       // SaveTaskChangesUseCase を起動する
       await _saveWeeklyTaskChangesUseCase.execute(
-        updatingETaskList: updatingETaskList,
+        taskListInputData: updatingITaskList,
       );
     }
   }
@@ -143,23 +145,20 @@ class TasksController {
   async {
     // 編集未保存フラグを立てる
     _editController.notifyEdited();
-    // state をエンティティのリストに変換する（下書きは週タスクも TaskList で渡す）
-    final TaskList<ETask> newDraft = state.map<ETask>((vTaskEntry) {
-      // 一旦、state の各タスクをそのままエンティティに当てはめる
-      ETask eTask = VToETask.toETask(vTaskEntry.value);
-      // 指定 position なら、エンティティの値を更新する
-      if (vTaskEntry.index == position) {
-        eTask.update(
-          newTitle: parameter.newTitle,
-          newChecked: parameter.newChecked,
-          newLabelId: parameter.newLabelId,
-        );
-      }
-      return eTask;
-    }).toListAs(TaskList<ETask>.fromIterable);
+    // state をInputData に変換する（下書きは週タスクも TaskList で渡す）
+    final TaskList<ITask> newDraft = state
+        .map<ITask>((vTaskEntry) => ToITask.toTaskSaveInputData(
+              vTask: vTaskEntry.value,
+              // 対象インデックスのタスクなら引数のパラメータを、
+              // そうでない場合は空のパラメータをあたはめる
+              parameter: (vTaskEntry.index == position)
+                  ? parameter
+                  : TaskControlParameter(),
+            ))
+        .toListAs(TaskList<ITask>.fromIterable);
 
     // DraftTaskChangesUseCase を起動する
-    await _draftTaskChangesUseCase.execute(draft: newDraft);
+    await _draftTaskChangesUseCase.execute(draftInputData: newDraft);
   }
 
   /// 現時点でのタスクの View State でタスク変更保存フローを呼び出す
@@ -172,25 +171,41 @@ class TasksController {
     _editController.notifySaved();
     // 週タスクの場合
     if (VTaskType is VWeeklyTask) {
-      final WeeklyTaskList<EWeeklyTask> eTaskList = taskState
-          .mapValues<EWeeklyTask>(
-              (vTask) => VToETask.toEWeeklyTask(vTask as VWeeklyTask))
-          .toListAs(WeeklyTaskList<EWeeklyTask>.fromIterable);
-
-      eTaskList.removeWhere((eTaskEntry) => eTaskEntry.value.cannotReplace);
-      await _saveWeeklyTaskChangesUseCase.execute(updatingETaskList: eTaskList);
+      // InputData に変換する（まだ可変長リスト）
+      final List<IWeeklyTask> iTaskList = taskState
+          .mapValues<IWeeklyTask>(
+            (VTaskType vTask) =>
+                ToITask.toIWeeklyTask(vTask: vTask as VWeeklyTask),
+          )
+          .toList();
+      // 編集不可の仮データを省く
+      iTaskList.removeWhere((iTask) => iTask.cannotReplace);
+      // 固定長リストに変換する
+      final WeeklyTaskList<IWeeklyTask> updatingITaskList =
+          WeeklyTaskList<IWeeklyTask>.fromIterable(iTaskList);
+      await _saveWeeklyTaskChangesUseCase.execute(
+        taskListInputData: updatingITaskList,
+      );
     }
     // 週タスク以外の場合
     else {
-      final TaskList<ETask> eTaskList = taskState
-          .mapValues(VToETask.toETask)
-          .toListAs(TaskList<ETask>.fromIterable);
-      await _saveTaskChangesUseCase.execute(updatingETaskList: eTaskList);
+      // 空のパラメータを当てはめて、そのまま InputData に変換する
+      final TaskList<ITask> updatingITaskList = taskState
+          .mapValues<ITask>(
+            (vTask) => ToITask.toTaskSaveInputData(
+              vTask: vTask,
+              parameter: TaskControlParameter(),
+            ),
+          )
+          .toListAs(TaskList<ITask>.fromIterable);
+      await _saveTaskChangesUseCase.execute(
+        taskListInputData: updatingITaskList,
+      );
     }
   }
 
   /// 下書きを破棄する
-  Future<void> discardDraft({required TaskRec taskRec}) async{
+  Future<void> discardDraft({required TaskRec taskRec}) async {
     // 編集未保存フラグをおろす
     _editController.notifyDiscarded();
     await _discardDraftUseCase.execute(taskRec: taskRec);

@@ -5,11 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/application_config.dart';
-import 'package:three_tasks/presentation/view_model/daily_tasks_view_model/daily_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/monthly_tasks_view_model/monthly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
-import 'package:three_tasks/presentation/view_model/yearly_tasks_view_model/yearly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_state_handler/daily_tasks_state_handler/daily_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/monthly_tasks_state_handler/monthly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/weekly_tasks_state_handler/weekly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/yearly_tasks_view_model/yearly_tasks_state_handler.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_months_page.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_weeks_page.dart';
@@ -66,23 +66,23 @@ TaskList<VTask> getTaskStateOnCurrentPage(
 {
   switch (pageIndex) {
     case 0:
-      return ref.read(dailyTasksViewModelProvider.notifier).getCurrentStateAt(
+      return ref.read(dailyTasksStateHandlerProvider.notifier).getCurrentStateAt(
             today,
           );
     case 1:
-      return ref.read(dailyTasksViewModelProvider.notifier).getCurrentStateAt(
+      return ref.read(dailyTasksStateHandlerProvider.notifier).getCurrentStateAt(
             tomorrow,
           );
     case 2:
-      return ref.read(weeklyTasksViewModelProvider.notifier).getCurrentStateAt(
+      return ref.read(weeklyTasksStateHandlerProvider.notifier).getCurrentStateAt(
             today,
           );
     case 3:
-      return ref.read(monthlyTasksViewModelProvider.notifier).getCurrentStateAt(
+      return ref.read(monthlyTasksStateHandlerProvider.notifier).getCurrentStateAt(
             thisMonth,
           );
     case 4:
-      return ref.read(yearlyTasksViewModelProvider.notifier).getCurrentStateAt(
+      return ref.read(yearlyTasksStateHandlerProvider.notifier).getCurrentStateAt(
             thisYear,
           );
     default:
@@ -102,15 +102,15 @@ LazyViewState<TaskList<VTask>> watchTaskStateOnCurrentPage(
 {
   switch (pageIndex) {
     case 0:
-      return ref.watch(dailyTasksViewModelProvider.select((state)=>state[today]));
+      return ref.watch(dailyTasksStateHandlerProvider.select((state)=>state[today]));
     case 1:
-      return ref.watch(dailyTasksViewModelProvider.select((state)=>state[tomorrow]));
+      return ref.watch(dailyTasksStateHandlerProvider.select((state)=>state[tomorrow]));
     case 2:
-      return ref.watch(weeklyTasksViewModelProvider.select((state)=>state[today]));;
+      return ref.watch(weeklyTasksStateHandlerProvider.select((state)=>state[today]));
     case 3:
-      return ref.watch(monthlyTasksViewModelProvider.select((state)=>state[thisMonth]));;
+      return ref.watch(monthlyTasksStateHandlerProvider.select((state)=>state[thisMonth]));
     case 4:
-      return ref.watch(yearlyTasksViewModelProvider.select((state)=>state[thisYear]));;
+      return ref.watch(yearlyTasksStateHandlerProvider.select((state)=>state[thisYear]));
     default:
       throw RangeError(
         "[currentTaskState] 無効なインデックスです。\n（pageIndex = $pageIndex）",
@@ -128,17 +128,17 @@ LazyViewState<TaskList<VTask>> watchPreviousTaskStateOnCurrentPage(
 {
   switch (pageIndex) {
     case 0:
-      return ref.watch(dailyTasksViewModelProvider.select((state)=>state[today.nDaysAgo(1)]));
+      return ref.watch(dailyTasksStateHandlerProvider.select((state)=>state[today.nDaysAgo(1)]));
     case 1:
       throw ArgumentError(
         "[watchPreviousTaskStateOnCurrentPage] tomorrows_page での呼び出し",
       );
     case 2:
-      return ref.watch(weeklyTasksViewModelProvider.select((state)=>state[today.nDaysAgo(1)]));;
+      return ref.watch(weeklyTasksStateHandlerProvider.select((state)=>state[today.nDaysAgo(1)]));
     case 3:
-      return ref.watch(monthlyTasksViewModelProvider.select((state)=>state[thisMonth.toPrevious()]));;
+      return ref.watch(monthlyTasksStateHandlerProvider.select((state)=>state[thisMonth.toPrevious()]));
     case 4:
-      return ref.watch(yearlyTasksViewModelProvider.select((state)=>state[thisYear - 1]));;
+      return ref.watch(yearlyTasksStateHandlerProvider.select((state)=>state[thisYear - 1]));
     default:
       throw RangeError(
         "[currentTaskState] 無効なインデックスです。\n（pageIndex = $pageIndex）",

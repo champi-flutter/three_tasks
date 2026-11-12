@@ -2,6 +2,8 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/use_case/input_boundary/save_settings/save_setting_changes_use_case.dart';
+import 'package:three_tasks/use_case/input_data/i_setting/converter/i_to_e_setting.dart';
+import 'package:three_tasks/use_case/input_data/i_setting/i_page_setting.dart';
 import 'package:three_tasks/use_case/output_boundary/settings_presenter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
@@ -34,9 +36,13 @@ class SaveSettingChangesInteractor
 
   @override
   Future<void> execute({
-    required EPageSetting ePageSetting,
+    required IPageSetting iPageSetting,
   }) =>
       _loading.loadAsync(() async {
+        // エンティティに変換する
+        final EPageSetting ePageSetting = IToESetting.toEPageSetting(
+          iPageSetting,
+        );
         // リポジトリに設定値の変更の保存を依頼する
         final Result<void, Exception> result =
             await _repository.saveSettingChanges(

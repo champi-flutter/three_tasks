@@ -3,7 +3,6 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
-import 'package:three_tasks/presentation/view_model/weekly_tasks_view_model/weekly_tasks_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';

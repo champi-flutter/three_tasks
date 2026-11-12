@@ -1,7 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
@@ -27,7 +26,7 @@ class DailyTasksPresenterImpl
 
   /// 更新反映フローを実装
   @override
-  Future<void> handleDailyTasksUpdating(
+  Future<void> present(
     Map<Date, TaskList<EDailyTask>> newDataMap,
   )
   // 折りたたみ用

@@ -6,8 +6,8 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
 import 'package:three_tasks/presentation/controller/dto/review_control_parameter/review_control_parameter.dart';
-import 'package:three_tasks/presentation/view_model/setting_view_model/page_settings_view_model/page_settings_view_model.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
+import 'package:three_tasks/presentation/view_state_handler/setting_state_handler/page_settings_state_handler/page_settings_state_handler.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/auto_save_switch.dart';
 import 'package:three_tasks/view/specific_widgets/common_design/common_scaffold.dart';
 import 'package:three_tasks/view/specific_widgets/buttons/draft_saving_button.dart';
@@ -46,7 +46,7 @@ class ReviewScreen extends ConsumerWidget {
     final isEdited = ref.watch(editViewModelProvider(reviewScreenToken));
 
     // PageSettingsViewModel を監視する
-    final settingsVMState = ref.watch(pageSettingsViewModelProvider);
+    final settingsVMState = ref.watch(pageSettingsStateHandlerProvider);
 
     return settingsVMState.when(
       onReceived: (setting) {
