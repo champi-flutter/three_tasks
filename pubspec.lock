@@ -262,7 +262,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: d00b7781e1f4fd689bc903a19d321234636b4e54
+      resolved-ref: "3a0a38fcb2ce3b22f2ca977f4e4deb27ca9e48c7"
       url: "https://github.com/champi-flutter/custom_core_types.git"
     source: git
     version: "1.2.3+17"

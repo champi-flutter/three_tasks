@@ -2,7 +2,7 @@ import 'package:three_tasks/presentation/controller/dto/setting_control_paramete
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
 import 'package:three_tasks/use_case/input_data/i_setting/i_page_setting.dart';
 
-class ToISetting {
+class SettingInputConverter {
   static IPageSetting toIPageSetting({
     required VPageSetting vPageSetting,
     required PageSettingControlParameter parameter,
@@ -14,4 +14,6 @@ class ToISetting {
         reviewAutoSaves:
             parameter.reviewAutoSaves ?? vPageSetting.reviewAutoSaves,
       );
+
+  SettingInputConverter._();
 }

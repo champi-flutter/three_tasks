@@ -1,12 +1,10 @@
-import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/data_foundation/review_base/review.dart';
-import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/presentation/controller/dto/review_control_parameter/review_control_parameter.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
 
-class ToITask {
+class TaskInputConverter {
   static ITask toTaskSaveInputData({
     required VTask vTask,
     required TaskControlParameter parameter,
@@ -156,4 +154,6 @@ class ToITask {
       year: vTask.year,
     );
   }
+
+  TaskInputConverter._();
 }

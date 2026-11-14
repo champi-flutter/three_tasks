@@ -1,4 +1,4 @@
-import 'package:three_tasks/presentation/controller/dto/converter/to_i_setting.dart';
+import 'package:three_tasks/presentation/controller/dto/converter/setting_input_converter.dart';
 import 'package:three_tasks/presentation/controller/dto/setting_control_parameter/setting_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_setting/v_page_setting.dart';
 import 'package:three_tasks/use_case/input_boundary/fetch_settings/fetch_settings_use_case.dart';
@@ -30,7 +30,7 @@ class SettingsController {
   // 折りたたみ用
   async {
     // InputData に変換する
-    final IPageSetting iPageSetting = ToISetting.toIPageSetting(
+    final IPageSetting iPageSetting = SettingInputConverter.toIPageSetting(
       vPageSetting: targetPageSetting,
       parameter: parameter,
     );

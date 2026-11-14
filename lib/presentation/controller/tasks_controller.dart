@@ -2,7 +2,7 @@ import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
-import 'package:three_tasks/presentation/controller/dto/converter/to_i_task.dart';
+import 'package:three_tasks/presentation/controller/dto/converter/task_input_converter.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/v_to_e_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
@@ -11,6 +11,7 @@ import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draf
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/task_input_data.dart';
 
 class TasksController {
   TasksController({
@@ -79,7 +80,7 @@ class TasksController {
 
     // 渡された情報を tempTaskList （または tempWeeklyTaskList ）に当てはめるプロセス
     for (final ListEntry<VTask> vTaskEntry in state) {
-      final ITask iTask = ToITask.toTaskSaveInputData(
+      final ITask iTask = TaskInputConverter.toTaskSaveInputData(
         vTask: vTaskEntry.value,
         // 対象インデックスのタスクなら引数のパラメータを、
         // そうでない場合は空のパラメータをあたはめる
@@ -104,7 +105,7 @@ class TasksController {
           TaskList<ITask>.fromIterable(tempTaskList);
       // SaveTaskChangesUseCase を起動する
       await _saveTaskChangesUseCase.execute(
-        taskListInputData: updatingITaskList,
+        taskListInputData: TaskInputData(updatingITaskList),
       );
     }
     // 週タスクの場合
@@ -147,7 +148,7 @@ class TasksController {
     _editController.notifyEdited();
     // state をInputData に変換する（下書きは週タスクも TaskList で渡す）
     final TaskList<ITask> newDraft = state
-        .map<ITask>((vTaskEntry) => ToITask.toTaskSaveInputData(
+        .map<ITask>((vTaskEntry) => TaskInputConverter.toTaskSaveInputData(
               vTask: vTaskEntry.value,
               // 対象インデックスのタスクなら引数のパラメータを、
               // そうでない場合は空のパラメータをあたはめる
@@ -175,7 +176,7 @@ class TasksController {
       final List<IWeeklyTask> iTaskList = taskState
           .mapValues<IWeeklyTask>(
             (VTaskType vTask) =>
-                ToITask.toIWeeklyTask(vTask: vTask as VWeeklyTask),
+                TaskInputConverter.toIWeeklyTask(vTask: vTask as VWeeklyTask),
           )
           .toList();
       // 編集不可の仮データを省く
@@ -192,14 +193,14 @@ class TasksController {
       // 空のパラメータを当てはめて、そのまま InputData に変換する
       final TaskList<ITask> updatingITaskList = taskState
           .mapValues<ITask>(
-            (vTask) => ToITask.toTaskSaveInputData(
+            (vTask) => TaskInputConverter.toTaskSaveInputData(
               vTask: vTask,
               parameter: TaskControlParameter(),
             ),
           )
           .toListAs(TaskList<ITask>.fromIterable);
       await _saveTaskChangesUseCase.execute(
-        taskListInputData: updatingITaskList,
+        taskListInputData: TaskInputData(updatingITaskList),
       );
     }
   }

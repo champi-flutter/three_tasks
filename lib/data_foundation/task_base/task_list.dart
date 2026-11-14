@@ -4,7 +4,6 @@ import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/enum/task_recurrence.dart';
 
 sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
-
   /// タスクの種別
   TaskRec get rec;
 
@@ -13,11 +12,10 @@ sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
   TaskListBase.fromIterable(super.length, super.iterable)
       : super.fromIterable();
 
+  /// 同じ値の新しい参照を生成するコンストラクタ
   @protected
-  TaskListBase.copy(super.list) : super.copy();
-
-  @override
-  TaskListBase<Task> get deepCopy;
+  TaskListBase.callDeepCopy(super.entryList, super.copyBuilder)
+      : super.callDeepCopy();
 
   /// タスクリストの先頭のタスク
   ///
@@ -29,7 +27,6 @@ sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
 ///
 /// 要素数を 3 つに固定する。
 class TaskList<Task extends TaskBase> extends TaskListBase<Task> {
-
   /// タスクの種別
   @override
   final TaskRec rec;
@@ -38,7 +35,8 @@ class TaskList<Task extends TaskBase> extends TaskListBase<Task> {
     Task task1,
     Task task2,
     Task task3,
-  ) : rec = task1.rec, super.fill(
+  )   : rec = task1.rec,
+        super.fill(
           3,
           (i) => switch (i) {
             0 => task1,
@@ -55,7 +53,7 @@ class TaskList<Task extends TaskBase> extends TaskListBase<Task> {
           iterable.length == 3,
           "[TaskList.fromIterable] 要素数が不適当です",
         ),
-  rec = iterable.first.rec,
+        rec = iterable.first.rec,
         super.fromIterable(
           3,
           iterable,
@@ -67,19 +65,22 @@ class TaskList<Task extends TaskBase> extends TaskListBase<Task> {
         "[TaskList] single にアクセスされました。",
       );
 
-  /// [deepCopy] の実装のための内部的なコンストラクタ
-  TaskList._copy(super.list) : rec = list.first.value.rec, super.copy();
+  /// 同じ値の新しい参照を生成するコンストラクタ
+  TaskList.callDeepCopy(super.entryList, super.copyBuilder)
+      : rec = entryList.first.value.rec,
+        super.callDeepCopy();
 
-  /// 同じ情報を持つ別の新しい [TaskList]  のインスタンスを生成する
   @override
-  TaskList<Task> get deepCopy => TaskList._copy(toEntryList());
+  TaskList<Task> deepCopy({
+    required Task Function(Task task) copyBuilder,
+  }) =>
+      TaskList.callDeepCopy(toEntryList(), copyBuilder);
 }
 
 /// 週タスクのリスト
 ///
 /// 週タスクのみ、要素数を 3 つに固定しない。
 class WeeklyTaskList<Task extends WeeklyTaskBase> extends TaskListBase<Task> {
-
   /// タスクの種別
   @override
   final TaskRec rec = TaskRec.week;
@@ -98,10 +99,13 @@ class WeeklyTaskList<Task extends WeeklyTaskBase> extends TaskListBase<Task> {
           iterable,
         );
 
-  /// [deepCopy] の実装のための内部的なコンストラクタ
-  WeeklyTaskList._copy(super.list) : super.copy();
+  /// 同じ値の新しい参照を生成するコンストラクタ
+  WeeklyTaskList.callDeepCopy(super.entryList, super.copyBuilder)
+      : super.callDeepCopy();
 
-  /// 同じ情報を持つ別の新しい [WeeklyTaskList]  のインスタンスを生成する
   @override
-  WeeklyTaskList<Task> get deepCopy => WeeklyTaskList._copy(toEntryList());
+  WeeklyTaskList<Task> deepCopy({
+    required Task Function(Task task) copyBuilder,
+  }) =>
+      WeeklyTaskList.callDeepCopy(toEntryList(), copyBuilder);
 }

@@ -13,10 +13,14 @@ class LabelList<Label extends LabelBase> extends FixedList<Label> {
         );
 
   @protected
-  LabelList._copy(super.list) : super.copy();
+  LabelList.callDeepCopy(super.entryList, super.copyBuilder)
+      : super.callDeepCopy();
 
   @override
-  LabelList<Label> get deepCopy => LabelList<Label>._copy(toEntryList());
+  LabelList<Label> deepCopy({
+    required Label Function(Label value) copyBuilder,
+  }) =>
+      LabelList.callDeepCopy(toEntryList(), copyBuilder);
 
   /// 指定タイトル（[title]）と合致するラベルのID
   ///

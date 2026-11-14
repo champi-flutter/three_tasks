@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/presentation/controller/dto/converter/to_i_label.dart';
+import 'package:three_tasks/presentation/controller/dto/converter/label_input_converter.dart';
 import 'package:three_tasks/presentation/controller/dto/label_control_parameter/label_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/v_to_e_task.dart';
@@ -91,7 +91,7 @@ class LabelsController with NotificationFromViewModel {
       _editController.notifySaved();
       final VLabel targetVLabel = vLabelEntry.value;
       // inputData に変換する
-      final ILabel inputData = ToILabel.toILabel(
+      final ILabel inputData = LabelInputConverter.toILabel(
         vLabel: targetVLabel,
         parameter: parameter,
       );
@@ -114,7 +114,7 @@ class LabelsController with NotificationFromViewModel {
       _editController.notifyEdited();
       final VLabel targetVLabel = vLabelEntry.value;
       // inputData に変換する
-      final ILabel inputData = ToILabel.toILabel(
+      final ILabel inputData = LabelInputConverter.toILabel(
         vLabel: targetVLabel,
         parameter: parameter,
       );

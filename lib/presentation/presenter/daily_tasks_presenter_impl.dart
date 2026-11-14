@@ -5,6 +5,8 @@ import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_sta
 import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
+import 'package:three_tasks/use_case/output_data/daily_tasks_output_data/daily_tasks_output_data.dart';
+import 'package:three_tasks/use_case/output_data/o_task/o_task.dart';
 
 /// データ更新反映ポートの具象クラス
 class DailyTasksPresenterImpl
@@ -27,13 +29,13 @@ class DailyTasksPresenterImpl
   /// 更新反映フローを実装
   @override
   Future<void> present(
-    Map<Date, TaskList<EDailyTask>> newDataMap,
+    DailyTasksOutputData newDataMap,
   )
   // 折りたたみ用
   async {
     try {
       // VTask に変換する
-      final Map<Date, TaskList<VDailyTask>> resultMap = newDataMap.map(
+      final Map<Date, TaskList<VDailyTask>> resultMap = newDataMap.get().map(
         (key, taskList) => MapEntry(key, _convertToVList(taskList)),
       );
       // ViewModel の update を呼び出す
@@ -44,8 +46,8 @@ class DailyTasksPresenterImpl
   }
 
   /// データの型をエンティティから View State へ変換するプライベートメソッド
-  TaskList<VDailyTask> _convertToVList(TaskList<EDailyTask> eTaskList) =>
+  TaskList<VDailyTask> _convertToVList(TaskList<ODailyTask> eTaskList) =>
       eTaskList
-          .mapValues<VDailyTask>(EToVTask.toVDailyTask)
+          .mapValues<VDailyTask>(OToVTask.toVDailyTask)
           .toListAs<TaskList<VDailyTask>>(TaskList<VDailyTask>.fromIterable);
 }

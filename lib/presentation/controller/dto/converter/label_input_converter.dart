@@ -2,7 +2,10 @@ import 'package:three_tasks/presentation/controller/dto/label_control_parameter/
 import 'package:three_tasks/presentation/view_state/v_label/v_label.dart';
 import 'package:three_tasks/use_case/input_data/i_label/i_label.dart';
 
-class ToILabel {
+class LabelInputConverter {
+
+  LabelInputConverter._();
+
   static ILabel toILabel({
     required VLabel vLabel,
     required LabelControlParameter parameter,

@@ -1,11 +1,11 @@
-import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
+import 'package:three_tasks/use_case/output_data/o_task/o_task.dart';
 
 /// [VTask] への変換器
-class EToVTask {
+class OToVTask {
   static VDailyTask toVDailyTask(
-    EDailyTask dailyTask,
+      ODailyTask dailyTask,
   ) =>
       VDailyTask(
         id: dailyTask.id,
@@ -18,7 +18,7 @@ class EToVTask {
       );
 
   static VWeeklyTask toVWeeklyTask(
-    EWeeklyTask weeklyTask,
+      OWeeklyTask weeklyTask,
   ) =>
       VWeeklyTask(
         id: weeklyTask.id,
@@ -28,7 +28,7 @@ class EToVTask {
         week: weeklyTask.week,
         review: weeklyTask.review,
         isFetched: weeklyTask.isFetched,
-        canReplace: weeklyTask.isPlaceHolder2,
+        canReplace: weeklyTask.canReplace,
       );
 
   static VMonthlyTask toVMonthlyTask(EMonthlyTask monthlyTask) => VMonthlyTask(
@@ -52,6 +52,3 @@ class EToVTask {
       );
 }
 
-// extension VTaskCaster on List<VTask>{
-//   List<P> pass<P extends VTask>()=>cast<P>();
-// }

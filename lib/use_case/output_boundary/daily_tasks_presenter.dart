@@ -1,10 +1,8 @@
 
-import 'package:custom_core_types/custom_core_types.dart';
-import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/domain/entity/e_task/e_task.dart';
+import 'package:three_tasks/use_case/output_data/daily_tasks_output_data/daily_tasks_output_data.dart';
 
 /// 日単位タスクの監視を反映させるポート
 abstract class DailyTasksPresenter {
   /// 更新を反映させる
-  Future<void> present(Map<Date, TaskList<EDailyTask>> newDataMap);
+  Future<void> present(DailyTasksOutputData newDataMap);
 }
