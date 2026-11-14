@@ -46,8 +46,8 @@ class DailyTasksPresenterImpl
   }
 
   /// データの型をエンティティから View State へ変換するプライベートメソッド
-  TaskList<VDailyTask> _convertToVList(TaskList<ODailyTask> eTaskList) =>
-      eTaskList
+  TaskList<VDailyTask> _convertToVList(TaskList<ODailyTask> oTaskList) =>
+      oTaskList
           .mapValues<VDailyTask>(OToVTask.toVDailyTask)
           .toListAs<TaskList<VDailyTask>>(TaskList<VDailyTask>.fromIterable);
 }

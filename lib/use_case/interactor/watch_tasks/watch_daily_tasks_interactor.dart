@@ -4,6 +4,9 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
+import 'package:three_tasks/use_case/output_data/daily_tasks_output_data/daily_tasks_output_data.dart';
+import 'package:three_tasks/use_case/output_data/o_task/converter/task_output_converter.dart';
+import 'package:three_tasks/use_case/output_data/o_task/o_task.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/daily_tasks_stream_handler.dart';
 
@@ -125,17 +128,25 @@ class WatchDailyTasksInteractor
   Future<void> _onData(Map<Date, TaskList<EDailyTask>> newDataMap) =>
       _loadingService.loadAsync(() async {
         try {
+          final Map<Date, TaskList<ODailyTask>> outputTaskList = newDataMap.map(
+        (key, eTaskList) => MapEntry(key, _convertToOTaskList(eTaskList)),
+        );
           // 変換後のデータを反映させる
-          await _publishDailyTasks(newDataMap);
-        } catch (e) {
-          notifyError(content: "$e", specifiesLayer: true);
+          await _publishDailyTasks(outputTaskList);
+        } catch (e, st) {
+          notifyError(content: "$e\n$st", specifiesLayer: true);
         }
       });
 
+  TaskList<ODailyTask> _convertToOTaskList(TaskList<EDailyTask> eTaskList) {
+    return eTaskList.mapValues<ODailyTask>(TaskOutputConverter.toODailyTask)
+          .toListAs<TaskList<ODailyTask>>(TaskList<ODailyTask>.fromIterable);
+  }
+
   /// データを反映させるプライベートメソッド
   Future<void> _publishDailyTasks(
-      Map<Date, TaskList<EDailyTask>> newDataMap) async {
-    await _dailyTasksPresenter.handleDailyTasksUpdating(newDataMap);
+      Map<Date, TaskList<ODailyTask>> newDataMap) async {
+    await _dailyTasksPresenter.present(DailyTasksOutputData(newDataMap));
   }
 
   /// todo このクラスの dispose
