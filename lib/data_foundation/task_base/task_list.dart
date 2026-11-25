@@ -1,7 +1,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:flutter/foundation.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
   /// タスクの種別
@@ -13,7 +13,6 @@ sealed class TaskListBase<Task extends TaskBase> extends FixedList<Task> {
       : super.fromIterable();
 
   /// 同じ値の新しい参照を生成するコンストラクタ
-  @protected
   TaskListBase.callDeepCopy(super.entryList, super.copyBuilder)
       : super.callDeepCopy();
 
@@ -107,5 +106,5 @@ class WeeklyTaskList<Task extends WeeklyTaskBase> extends TaskListBase<Task> {
   WeeklyTaskList<Task> deepCopy({
     required Task Function(Task task) copyBuilder,
   }) =>
-      WeeklyTaskList.callDeepCopy(toEntryList(), copyBuilder);
+      WeeklyTaskList.callDeepCopy(toEntryList(), copyBuilder,);
 }

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'monthly_tasks_state_handler.dart';
+part of 'monthly_tasks_view_state_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -10,30 +10,31 @@ part of 'monthly_tasks_state_handler.dart';
 // ignore_for_file: type=lint, type=warning
 /// 月単位タスク View Model
 
-@ProviderFor(MonthlyTasksStateHandler)
-const monthlyTasksStateHandlerProvider = MonthlyTasksStateHandlerProvider._();
+@ProviderFor(MonthlyTasksViewStateNotifier)
+const monthlyTasksViewStateProvider = MonthlyTasksViewStateNotifierProvider._();
 
 /// 月単位タスク View Model
-final class MonthlyTasksStateHandlerProvider extends $NotifierProvider<
-    MonthlyTasksStateHandler, LazyMapViewState<Month, TaskList<VMonthlyTask>>> {
+final class MonthlyTasksViewStateNotifierProvider extends $NotifierProvider<
+    MonthlyTasksViewStateNotifier,
+    LazyMapViewState<Month, TaskList<VMonthlyTask>>> {
   /// 月単位タスク View Model
-  const MonthlyTasksStateHandlerProvider._()
+  const MonthlyTasksViewStateNotifierProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'monthlyTasksStateHandlerProvider',
+          name: r'monthlyTasksViewStateProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$monthlyTasksStateHandlerHash();
+  String debugGetCreateSourceHash() => _$monthlyTasksViewStateNotifierHash();
 
   @$internal
   @override
-  MonthlyTasksStateHandler create() => MonthlyTasksStateHandler();
+  MonthlyTasksViewStateNotifier create() => MonthlyTasksViewStateNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(
@@ -47,12 +48,12 @@ final class MonthlyTasksStateHandlerProvider extends $NotifierProvider<
   }
 }
 
-String _$monthlyTasksStateHandlerHash() =>
-    r'efe50e5486f1e197d371b744db9573ce6378c8a5';
+String _$monthlyTasksViewStateNotifierHash() =>
+    r'09094c3a88252bc4197667a9cf5297872429c184';
 
 /// 月単位タスク View Model
 
-abstract class _$MonthlyTasksStateHandler
+abstract class _$MonthlyTasksViewStateNotifier
     extends $Notifier<LazyMapViewState<Month, TaskList<VMonthlyTask>>> {
   LazyMapViewState<Month, TaskList<VMonthlyTask>> build();
   @$mustCallSuper

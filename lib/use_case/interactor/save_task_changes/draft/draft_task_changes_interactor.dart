@@ -5,6 +5,7 @@ import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/draft_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_data/i_task/converter/i_to_e_task.dart';
 import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/task_input_data.dart';
 import 'package:three_tasks/use_case/output_boundary/daily_tasks_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/monthly_tasks_presenter.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
@@ -54,13 +55,13 @@ class DraftTaskChangesInteractor
   /// 変更の反映の完了まで `await` する。
   @override
   Future<Result<void, Exception>> execute({
-    required TaskList<ITask> draftInputData,
+    required TaskInputData draftInputData,
   }) =>
       _loadingService.loadAsync<Result<void, Exception>>(
         () async {
           try {
             // InputData をエンティティに変換する
-            final TaskList<ETask> draft = draftInputData
+            final TaskList<ETask> draft = draftInputData.toOriginal()
                 .mapValues<ETask>(IToETask.toETask)
                 .toListAs(TaskList<ETask>.fromIterable);
             // データの反映を Presenter に依頼する
@@ -115,7 +116,7 @@ class DraftTaskChangesInteractor
 
     // 流れてきたデータの単位に対応した Presenter を呼び出す
     if (eDailyTasksMap.isNotEmpty) {
-      await _dailyTasksPresenter.handleDailyTasksUpdating(eDailyTasksMap);
+      await _dailyTasksPresenter.present(eDailyTasksMap);
     }
     if (eWeeklyTasksMap.isNotEmpty) {
       await _weeklyTasksPresenter.handleWeeklyTasksUpdating(eWeeklyTasksMap);

@@ -1,6 +1,6 @@
 
 
-import 'package:three_tasks/data_foundation/review_base/review.dart';
+import 'package:three_tasks/data_foundation/value_object/review.dart';
 import 'package:three_tasks/infrastructure/drivers/db/database.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_task/q_task.dart';
 

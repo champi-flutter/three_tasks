@@ -4,7 +4,11 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
+import 'package:three_tasks/use_case/output_data/o_task/converter/task_output_converter.dart';
+import 'package:three_tasks/use_case/output_data/o_task/o_task.dart';
+import 'package:three_tasks/use_case/output_data/tasks_output_data/weekly_task_output_data.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
+import 'package:three_tasks/use_case/stream_data/s_task/s_task.dart';
 import 'package:three_tasks/use_case/stream_handler_interface/weekly_tasks_stream_handler.dart';
 
 /// 日単位タスクの監視フローを実装するクラス
@@ -104,7 +108,7 @@ class WatchWeeklyTasksInteractor
   ///   2. 変換後のデータを反映させる
   ///
   Future<void> _onData(
-    Map<UniqueWeek, WeeklyTaskList<EWeeklyTask>> newDataMap,
+    Map<UniqueWeek, WeeklyTaskList<SWeeklyTask>> newDataMap,
   ) =>
       _loadingService.loadAsync(() async {
         try {
@@ -118,15 +122,39 @@ class WatchWeeklyTasksInteractor
 
   /// データを反映させるプライベートメソッド
   Future<void> _publishWeeklyTasks(
-    Map<UniqueWeek, WeeklyTaskList<EWeeklyTask>> newDataMap,
+    Map<UniqueWeek, WeeklyTaskList<SWeeklyTask>> newDataMap,
   )
   // 折りたたみ用
   async {
     try {
-      await _presenter.handleWeeklyTasksUpdating(newDataMap);
+      final Map<UniqueWeek, WeeklyTaskList<OWeeklyTask>> outputTaskList =
+          newDataMap.map(
+        (key, sTaskList) => MapEntry(key, _convertToOTaskList(sTaskList)),
+      );
+      await _presenter.present(WeeklyTaskOutputData(outputTaskList));
     } catch (e, st) {
       throw Exception("データ反映時...\n$e\n$st");
     }
+  }
+
+  WeeklyTaskList<OWeeklyTask> _convertToOTaskList(
+    WeeklyTaskList<SWeeklyTask> sTaskList,
+  ) {
+    return sTaskList.mapValues<OWeeklyTask>((sWeeklyTask) {
+      // エンティティに変換する
+      final EWeeklyTask eWeeklyTask = EWeeklyTask(
+        id: sWeeklyTask.id,
+        title: sWeeklyTask.title,
+        isChecked: sWeeklyTask.isChecked,
+        labelId: sWeeklyTask.labelId,
+        review: sWeeklyTask.review,
+        week: sWeeklyTask.week,
+      );
+      // OutputData に変換する
+      return TaskOutputConverter.toOWeeklyTask(eWeeklyTask);
+    }).toListAs<WeeklyTaskList<OWeeklyTask>>(
+        WeeklyTaskList<OWeeklyTask>.fromIterable,
+    );
   }
 
   /// todo このクラスの dispose

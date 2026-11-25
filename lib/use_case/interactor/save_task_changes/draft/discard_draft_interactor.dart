@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/draft/discard_draft_use_case.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 

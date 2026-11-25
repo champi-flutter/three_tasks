@@ -20,7 +20,7 @@ class SettingsController {
   /// 設定値変更保存フローの呼び出し口
   final SaveSettingChangesUseCase _saveSettingChangesUseCase;
 
-  Future<void> initViewModel() async {}
+  Future<void> initState() async {}
 
   /// 指定ページの設定値を制御する
   Future<void> controlPageSettings({

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'daily_tasks_state_handler.dart';
+part of 'daily_tasks_view_state_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,28 @@ part of 'daily_tasks_state_handler.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(DailyTasksStateHandler)
-const dailyTasksStateHandlerProvider = DailyTasksStateHandlerProvider._();
+@ProviderFor(DailyTasksViewStateNotifier)
+const dailyTasksViewStateProvider = DailyTasksViewStateNotifierProvider._();
 
-final class DailyTasksStateHandlerProvider extends $NotifierProvider<
-    DailyTasksStateHandler, LazyMapViewState<Date, TaskList<VDailyTask>>> {
-  const DailyTasksStateHandlerProvider._()
+final class DailyTasksViewStateNotifierProvider extends $NotifierProvider<
+    DailyTasksViewStateNotifier, LazyMapViewState<Date, TaskList<VDailyTask>>> {
+  const DailyTasksViewStateNotifierProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'dailyTasksStateHandlerProvider',
+          name: r'dailyTasksViewStateProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$dailyTasksStateHandlerHash();
+  String debugGetCreateSourceHash() => _$dailyTasksViewStateNotifierHash();
 
   @$internal
   @override
-  DailyTasksStateHandler create() => DailyTasksStateHandler();
+  DailyTasksViewStateNotifier create() => DailyTasksViewStateNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(
@@ -44,10 +44,10 @@ final class DailyTasksStateHandlerProvider extends $NotifierProvider<
   }
 }
 
-String _$dailyTasksStateHandlerHash() =>
-    r'a8134204a110047992407632df0400635e6298bc';
+String _$dailyTasksViewStateNotifierHash() =>
+    r'be9ffbc4b96699f54adef71cdc7d4efeccd21854';
 
-abstract class _$DailyTasksStateHandler
+abstract class _$DailyTasksViewStateNotifier
     extends $Notifier<LazyMapViewState<Date, TaskList<VDailyTask>>> {
   LazyMapViewState<Date, TaskList<VDailyTask>> build();
   @$mustCallSuper

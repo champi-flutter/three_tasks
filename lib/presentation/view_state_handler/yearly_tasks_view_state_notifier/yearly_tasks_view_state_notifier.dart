@@ -5,16 +5,18 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
+import 'package:three_tasks/presentation/presenter/yearly_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_yearly_tasks_use_case.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/notify_tasks_access/notify_tasks_access_input_data.dart';
 
-part 'yearly_tasks_state_handler.g.dart';
+part 'yearly_tasks_view_state_notifier.g.dart';
 
 /// 年単位タスク View Model
 @riverpod
-class YearlyTasksStateHandler extends _$YearlyTasksStateHandler implements YearlyTasksStateNotifier{
+class YearlyTasksViewStateNotifier extends _$YearlyTasksViewStateNotifier implements YearlyTasksPresenterImpl{
   // todo 初期化
   @override
   LazyMapViewState<int, TaskList<VYearlyTask>> build() {
@@ -44,7 +46,9 @@ class YearlyTasksStateHandler extends _$YearlyTasksStateHandler implements Yearl
       ref.read(notifyYearlyTasksAccessUseCaseProvider);
 
   /// アクセスを通知する
-  void _onAccess(int year)=>_notifyYearlyTasksAccessUseCase.execute(year);
+  void _onAccess(int year)=>_notifyYearlyTasksAccessUseCase.execute(
+    NotifyYearlyTasksAccessInputData(year: year),
+  );
 
   /// 監視フローを開始する
   void _startWatching(int targetYear) {
@@ -56,7 +60,7 @@ class YearlyTasksStateHandler extends _$YearlyTasksStateHandler implements Yearl
   }
 
 
-  /// [state] 更新メソッド
+  /// View State 更新メソッド
   ///
   /// キャッシュは追加されるたびに、LFU 方式で evict される。
   @override

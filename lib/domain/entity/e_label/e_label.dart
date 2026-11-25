@@ -1,4 +1,5 @@
 import 'package:three_tasks/data_foundation/label_base/label_base.dart';
+import 'package:three_tasks/data_foundation/value_object/task_id_list.dart';
 
 /// ラベルのエンティティ
 ///
@@ -11,16 +12,16 @@ class ELabel with LabelBase {
   String title;
 
   /// 登録されている日単位タスクの ID のリスト
-  final List<int> dailyIdList;
+  TaskIdList dailyIdList;
 
   /// 登録されている週単位タスクの ID のリスト
-  final List<int> weeklyIdList;
+  TaskIdList weeklyIdList;
 
   /// 登録されている月単位タスクの ID のリスト
-  final List<int> monthlyIdList;
+  TaskIdList monthlyIdList;
 
   /// 登録されている年単位タスクの ID のリスト
-  final List<int> yearlyIdList;
+  TaskIdList yearlyIdList;
 
   ELabel({
     required this.labelId,
@@ -32,8 +33,7 @@ class ELabel with LabelBase {
   });
 
   /// [ELabel] のパラメータを更新する
-  void update({
-    String? newTitle,
+  void addTaskId({
     int? newDailyId,
     int? newWeeklyId,
     int? newMonthlyId,
@@ -41,46 +41,100 @@ class ELabel with LabelBase {
   })
   // 折りたたみ用
   {
-    // タイトルの更新
-    if (newTitle != null) {
-      title = newTitle;
-    }
-
     // 各単位ごとのタスクIDの追加（重複している場合は ArgumentError）
     if (newDailyId != null) {
-      if (dailyIdList.contains(newDailyId)) {
-        throw ArgumentError(
-          "[ELabel.update] Daily task ID $newDailyId is already registered in this label.",
-        );
-      }
-      dailyIdList.add(newDailyId);
+      dailyIdList = _updateTaskIdList(
+        targetIdList: dailyIdList,
+        newId: newDailyId,
+      );
     }
 
     if (newWeeklyId != null) {
-      if (weeklyIdList.contains(newWeeklyId)) {
-        throw ArgumentError(
-          "[ELabel.update] Weekly task ID $newWeeklyId is already registered in this label.",
-        );
-      }
-      weeklyIdList.add(newWeeklyId);
+      weeklyIdList = _updateTaskIdList(
+        targetIdList: weeklyIdList,
+        newId: newWeeklyId,
+      );
     }
 
     if (newMonthlyId != null) {
-      if (monthlyIdList.contains(newMonthlyId)) {
-        throw ArgumentError(
-          "[ELabel.update] Monthly task ID $newMonthlyId is already registered in this label.",
-        );
-      }
-      monthlyIdList.add(newMonthlyId);
+      monthlyIdList = _updateTaskIdList(
+        targetIdList: monthlyIdList,
+        newId: newMonthlyId,
+      );
     }
 
     if (newYearlyId != null) {
-      if (yearlyIdList.contains(newYearlyId)) {
-        throw ArgumentError(
-          "[ELabel.update] Yearly task ID $newYearlyId is already registered in this label.",
-        );
-      }
-      yearlyIdList.add(newYearlyId);
+      yearlyIdList = _updateTaskIdList(
+        targetIdList: yearlyIdList,
+        newId: newYearlyId,
+      );
     }
+  }
+
+  /// [ELabel] のパラメータを更新する
+  void removeTaskId({
+    int? removedDailyId,
+    int? removedWeeklyId,
+    int? removedMonthlyId,
+    int? removedYearlyId,
+  })
+  // 折りたたみ用
+  {
+    // 各単位ごとのタスクIDの追加（重複している場合は ArgumentError）
+    if (removedDailyId != null) {
+      dailyIdList = _updateTaskIdList(
+        targetIdList: dailyIdList,
+        removedId: removedDailyId,
+      );
+    }
+
+    if (removedWeeklyId != null) {
+      weeklyIdList = _updateTaskIdList(
+        targetIdList: weeklyIdList,
+        removedId: removedWeeklyId,
+      );
+    }
+
+    if (removedMonthlyId != null) {
+      monthlyIdList = _updateTaskIdList(
+        targetIdList: monthlyIdList,
+        removedId: removedMonthlyId,
+      );
+    }
+
+    if (removedYearlyId != null) {
+      yearlyIdList = _updateTaskIdList(
+        targetIdList: yearlyIdList,
+        removedId: removedYearlyId,
+      );
+    }
+  }
+
+  /// [ELabel] のパラメータを更新する
+  void updateTitle(String newTitle) {
+    title = newTitle;
+  }
+
+  /// タスクIDリスト更新ロジック
+  static TaskIdList _updateTaskIdList({
+    required TaskIdList targetIdList,
+    int? newId,
+    int? removedId,
+  })
+  // 折りたたみ用
+  {
+    if (targetIdList.contains(newId)) {
+      throw ArgumentError(
+        "[ELabel.update] task ID: $newId is already registered in this label.",
+      );
+    }
+    final List<int> mutable = targetIdList.toMutable();
+    if (newId != null) {
+      mutable.add(newId);
+    }
+    if (removedId != null) {
+      mutable.remove(newId);
+    }
+    return TaskIdList(mutable);
   }
 }

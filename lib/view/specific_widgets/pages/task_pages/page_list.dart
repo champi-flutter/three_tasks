@@ -6,10 +6,10 @@ import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/application_config.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
-import 'package:three_tasks/presentation/view_state_handler/daily_tasks_state_handler/daily_tasks_state_handler.dart';
-import 'package:three_tasks/presentation/view_state_handler/monthly_tasks_state_handler/monthly_tasks_state_handler.dart';
-import 'package:three_tasks/presentation/view_state_handler/weekly_tasks_state_handler/weekly_tasks_state_handler.dart';
-import 'package:three_tasks/presentation/view_state_handler/yearly_tasks_view_model/yearly_tasks_state_handler.dart';
+import 'package:three_tasks/presentation/view_state_handler/daily_tasks_state_handler/daily_tasks_view_state_notifier.dart';
+import 'package:three_tasks/presentation/view_state_handler/monthly_tasks_state_handler/monthly_tasks_view_state_notifier.dart';
+import 'package:three_tasks/presentation/view_state_handler/weekly_tasks_state_handler/weekly_tasks_view_state_notifier.dart';
+import 'package:three_tasks/presentation/view_state_handler/yearly_tasks_view_model/yearly_tasks_view_state_notifier.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/task_page_base.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_months_page.dart';
 import 'package:three_tasks/view/specific_widgets/pages/task_pages/this_weeks_page.dart';
@@ -66,11 +66,11 @@ TaskList<VTask> getTaskStateOnCurrentPage(
 {
   switch (pageIndex) {
     case 0:
-      return ref.read(dailyTasksStateHandlerProvider.notifier).getCurrentStateAt(
+      return ref.read(dailyTasksViewStateProvider.notifier).getCurrentStateAt(
             today,
           );
     case 1:
-      return ref.read(dailyTasksStateHandlerProvider.notifier).getCurrentStateAt(
+      return ref.read(dailyTasksViewStateProvider.notifier).getCurrentStateAt(
             tomorrow,
           );
     case 2:
@@ -102,9 +102,9 @@ LazyViewState<TaskList<VTask>> watchTaskStateOnCurrentPage(
 {
   switch (pageIndex) {
     case 0:
-      return ref.watch(dailyTasksStateHandlerProvider.select((state)=>state[today]));
+      return ref.watch(dailyTasksViewStateProvider.select((state)=>state[today]));
     case 1:
-      return ref.watch(dailyTasksStateHandlerProvider.select((state)=>state[tomorrow]));
+      return ref.watch(dailyTasksViewStateProvider.select((state)=>state[tomorrow]));
     case 2:
       return ref.watch(weeklyTasksStateHandlerProvider.select((state)=>state[today]));
     case 3:
@@ -128,7 +128,7 @@ LazyViewState<TaskList<VTask>> watchPreviousTaskStateOnCurrentPage(
 {
   switch (pageIndex) {
     case 0:
-      return ref.watch(dailyTasksStateHandlerProvider.select((state)=>state[today.nDaysAgo(1)]));
+      return ref.watch(dailyTasksViewStateProvider.select((state)=>state[today.nDaysAgo(1)]));
     case 1:
       throw ArgumentError(
         "[watchPreviousTaskStateOnCurrentPage] tomorrows_page での呼び出し",

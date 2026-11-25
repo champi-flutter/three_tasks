@@ -16,10 +16,10 @@ T _$identity<T>(T value) => value;
 mixin _$CLabel {
   String get title;
   int get labelId;
-  List<int> get dailyIdList;
-  List<int> get weeklyIdList;
-  List<int> get monthlyIdList;
-  List<int> get yearlyIdList;
+  TaskIdList get dailyIdList;
+  TaskIdList get weeklyIdList;
+  TaskIdList get monthlyIdList;
+  TaskIdList get yearlyIdList;
 
   /// Create a copy of CLabel
   /// with the given fields replaced by the non-null parameter values.
@@ -35,25 +35,19 @@ mixin _$CLabel {
             other is CLabel &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
-            const DeepCollectionEquality()
-                .equals(other.dailyIdList, dailyIdList) &&
-            const DeepCollectionEquality()
-                .equals(other.weeklyIdList, weeklyIdList) &&
-            const DeepCollectionEquality()
-                .equals(other.monthlyIdList, monthlyIdList) &&
-            const DeepCollectionEquality()
-                .equals(other.yearlyIdList, yearlyIdList));
+            (identical(other.dailyIdList, dailyIdList) ||
+                other.dailyIdList == dailyIdList) &&
+            (identical(other.weeklyIdList, weeklyIdList) ||
+                other.weeklyIdList == weeklyIdList) &&
+            (identical(other.monthlyIdList, monthlyIdList) ||
+                other.monthlyIdList == monthlyIdList) &&
+            (identical(other.yearlyIdList, yearlyIdList) ||
+                other.yearlyIdList == yearlyIdList));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      labelId,
-      const DeepCollectionEquality().hash(dailyIdList),
-      const DeepCollectionEquality().hash(weeklyIdList),
-      const DeepCollectionEquality().hash(monthlyIdList),
-      const DeepCollectionEquality().hash(yearlyIdList));
+  int get hashCode => Object.hash(runtimeType, title, labelId, dailyIdList,
+      weeklyIdList, monthlyIdList, yearlyIdList);
 
   @override
   String toString() {
@@ -69,10 +63,10 @@ abstract mixin class $CLabelCopyWith<$Res> {
   $Res call(
       {String title,
       int labelId,
-      List<int> dailyIdList,
-      List<int> weeklyIdList,
-      List<int> monthlyIdList,
-      List<int> yearlyIdList});
+      TaskIdList dailyIdList,
+      TaskIdList weeklyIdList,
+      TaskIdList monthlyIdList,
+      TaskIdList yearlyIdList});
 }
 
 /// @nodoc
@@ -106,19 +100,19 @@ class _$CLabelCopyWithImpl<$Res> implements $CLabelCopyWith<$Res> {
       dailyIdList: null == dailyIdList
           ? _self.dailyIdList
           : dailyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
       weeklyIdList: null == weeklyIdList
           ? _self.weeklyIdList
           : weeklyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
       monthlyIdList: null == monthlyIdList
           ? _self.monthlyIdList
           : monthlyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
       yearlyIdList: null == yearlyIdList
           ? _self.yearlyIdList
           : yearlyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
     ));
   }
 }
@@ -219,10 +213,10 @@ extension CLabelPatterns on CLabel {
     TResult Function(
             String title,
             int labelId,
-            List<int> dailyIdList,
-            List<int> weeklyIdList,
-            List<int> monthlyIdList,
-            List<int> yearlyIdList)?
+            TaskIdList dailyIdList,
+            TaskIdList weeklyIdList,
+            TaskIdList monthlyIdList,
+            TaskIdList yearlyIdList)?
         $default, {
     required TResult orElse(),
   }) {
@@ -254,10 +248,10 @@ extension CLabelPatterns on CLabel {
     TResult Function(
             String title,
             int labelId,
-            List<int> dailyIdList,
-            List<int> weeklyIdList,
-            List<int> monthlyIdList,
-            List<int> yearlyIdList)
+            TaskIdList dailyIdList,
+            TaskIdList weeklyIdList,
+            TaskIdList monthlyIdList,
+            TaskIdList yearlyIdList)
         $default,
   ) {
     final _that = this;
@@ -287,10 +281,10 @@ extension CLabelPatterns on CLabel {
     TResult? Function(
             String title,
             int labelId,
-            List<int> dailyIdList,
-            List<int> weeklyIdList,
-            List<int> monthlyIdList,
-            List<int> yearlyIdList)?
+            TaskIdList dailyIdList,
+            TaskIdList weeklyIdList,
+            TaskIdList monthlyIdList,
+            TaskIdList yearlyIdList)?
         $default,
   ) {
     final _that = this;
@@ -310,51 +304,24 @@ class _CLabel extends CLabel {
   const _CLabel(
       {required this.title,
       required this.labelId,
-      required final List<int> dailyIdList,
-      required final List<int> weeklyIdList,
-      required final List<int> monthlyIdList,
-      required final List<int> yearlyIdList})
-      : _dailyIdList = dailyIdList,
-        _weeklyIdList = weeklyIdList,
-        _monthlyIdList = monthlyIdList,
-        _yearlyIdList = yearlyIdList,
-        super._();
+      required this.dailyIdList,
+      required this.weeklyIdList,
+      required this.monthlyIdList,
+      required this.yearlyIdList})
+      : super._();
 
   @override
   final String title;
   @override
   final int labelId;
-  final List<int> _dailyIdList;
   @override
-  List<int> get dailyIdList {
-    if (_dailyIdList is EqualUnmodifiableListView) return _dailyIdList;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_dailyIdList);
-  }
-
-  final List<int> _weeklyIdList;
+  final TaskIdList dailyIdList;
   @override
-  List<int> get weeklyIdList {
-    if (_weeklyIdList is EqualUnmodifiableListView) return _weeklyIdList;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_weeklyIdList);
-  }
-
-  final List<int> _monthlyIdList;
+  final TaskIdList weeklyIdList;
   @override
-  List<int> get monthlyIdList {
-    if (_monthlyIdList is EqualUnmodifiableListView) return _monthlyIdList;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_monthlyIdList);
-  }
-
-  final List<int> _yearlyIdList;
+  final TaskIdList monthlyIdList;
   @override
-  List<int> get yearlyIdList {
-    if (_yearlyIdList is EqualUnmodifiableListView) return _yearlyIdList;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_yearlyIdList);
-  }
+  final TaskIdList yearlyIdList;
 
   /// Create a copy of CLabel
   /// with the given fields replaced by the non-null parameter values.
@@ -371,25 +338,19 @@ class _CLabel extends CLabel {
             other is _CLabel &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.labelId, labelId) || other.labelId == labelId) &&
-            const DeepCollectionEquality()
-                .equals(other._dailyIdList, _dailyIdList) &&
-            const DeepCollectionEquality()
-                .equals(other._weeklyIdList, _weeklyIdList) &&
-            const DeepCollectionEquality()
-                .equals(other._monthlyIdList, _monthlyIdList) &&
-            const DeepCollectionEquality()
-                .equals(other._yearlyIdList, _yearlyIdList));
+            (identical(other.dailyIdList, dailyIdList) ||
+                other.dailyIdList == dailyIdList) &&
+            (identical(other.weeklyIdList, weeklyIdList) ||
+                other.weeklyIdList == weeklyIdList) &&
+            (identical(other.monthlyIdList, monthlyIdList) ||
+                other.monthlyIdList == monthlyIdList) &&
+            (identical(other.yearlyIdList, yearlyIdList) ||
+                other.yearlyIdList == yearlyIdList));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      title,
-      labelId,
-      const DeepCollectionEquality().hash(_dailyIdList),
-      const DeepCollectionEquality().hash(_weeklyIdList),
-      const DeepCollectionEquality().hash(_monthlyIdList),
-      const DeepCollectionEquality().hash(_yearlyIdList));
+  int get hashCode => Object.hash(runtimeType, title, labelId, dailyIdList,
+      weeklyIdList, monthlyIdList, yearlyIdList);
 
   @override
   String toString() {
@@ -406,10 +367,10 @@ abstract mixin class _$CLabelCopyWith<$Res> implements $CLabelCopyWith<$Res> {
   $Res call(
       {String title,
       int labelId,
-      List<int> dailyIdList,
-      List<int> weeklyIdList,
-      List<int> monthlyIdList,
-      List<int> yearlyIdList});
+      TaskIdList dailyIdList,
+      TaskIdList weeklyIdList,
+      TaskIdList monthlyIdList,
+      TaskIdList yearlyIdList});
 }
 
 /// @nodoc
@@ -441,21 +402,21 @@ class __$CLabelCopyWithImpl<$Res> implements _$CLabelCopyWith<$Res> {
           : labelId // ignore: cast_nullable_to_non_nullable
               as int,
       dailyIdList: null == dailyIdList
-          ? _self._dailyIdList
+          ? _self.dailyIdList
           : dailyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
       weeklyIdList: null == weeklyIdList
-          ? _self._weeklyIdList
+          ? _self.weeklyIdList
           : weeklyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
       monthlyIdList: null == monthlyIdList
-          ? _self._monthlyIdList
+          ? _self.monthlyIdList
           : monthlyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
       yearlyIdList: null == yearlyIdList
-          ? _self._yearlyIdList
+          ? _self.yearlyIdList
           : yearlyIdList // ignore: cast_nullable_to_non_nullable
-              as List<int>,
+              as TaskIdList,
     ));
   }
 }

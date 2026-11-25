@@ -1,5 +1,6 @@
 
 import 'package:data_converter/data_converter.dart';
+import 'package:three_tasks/data_foundation/value_object/task_id_list.dart';
 import 'package:three_tasks/infrastructure/drivers/db/database.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 
@@ -9,10 +10,10 @@ class TableToQLabel {
     return QLabel(
       title: rawData.label,
       labelId: rawData.labeledId,
-      dailyId32Blob: Int32Blob.fromUint8List(rawData.dailyIdList),
-      weeklyId32Blob: Int32Blob.fromUint8List(rawData.weeklyIdList),
-      monthlyId32Blob: Int32Blob.fromUint8List(rawData.monthlyIdList),
-      yearlyId32Blob: Int32Blob.fromUint8List(rawData.yearlyIdList),
+      dailyId32Blob: TaskIdBlob.fromUint8List(rawData.dailyIdList),
+      weeklyId32Blob: TaskIdBlob.fromUint8List(rawData.weeklyIdList),
+      monthlyId32Blob: TaskIdBlob.fromUint8List(rawData.monthlyIdList),
+      yearlyId32Blob: TaskIdBlob.fromUint8List(rawData.yearlyIdList),
     );
   }
 

@@ -28,7 +28,9 @@ class OToVTask {
         week: weeklyTask.week,
         review: weeklyTask.review,
         isFetched: weeklyTask.isFetched,
-        canReplace: weeklyTask.canReplace,
+        isPlaceholder2: weeklyTask.isPlaceholder2,
+        shouldIdentify: weeklyTask.shouldIdentify,
+        willRemainPlaceholder2: weeklyTask.willRemainPlaceholder2,
       );
 
   static VMonthlyTask toVMonthlyTask(EMonthlyTask monthlyTask) => VMonthlyTask(

@@ -9,10 +9,10 @@ class QToTableLabel {
     return Label(
       labeledId: qLabel.labelId,
       label: qLabel.title,
-      dailyIdList: qLabel.dailyId32Blob.data,
-      weeklyIdList: qLabel.weeklyId32Blob.data,
-      monthlyIdList: qLabel.monthlyId32Blob.data,
-      yearlyIdList: qLabel.yearlyId32Blob.data,
+      dailyIdList: qLabel.dailyId32Blob.getAsUint8List(),
+      weeklyIdList: qLabel.weeklyId32Blob.getAsUint8List(),
+      monthlyIdList: qLabel.monthlyId32Blob.getAsUint8List(),
+      yearlyIdList: qLabel.yearlyId32Blob.getAsUint8List(),
     );
   }
 }

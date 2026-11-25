@@ -18,3 +18,17 @@ class TaskInputData extends FixedListSnapshot<ITask, TaskList<ITask>>{
   @override
   TaskList<ITask> toOriginal() => TaskList.callDeepCopy(entryList, _buildITaskCopy);
 }
+
+/// 週タスクリストの InputData
+class WeeklyTaskInputData extends FixedListSnapshot<IWeeklyTask, TaskList<IWeeklyTask>>{
+
+  WeeklyTaskInputData(TaskList<IWeeklyTask> inputTaskList): super(inputTaskList,
+    elementBuilder: _buildITaskCopy, // ITask は不変
+  );
+
+  /// コピー生成関数
+  static IWeeklyTask _buildITaskCopy(IWeeklyTask iTask) => iTask;
+
+  @override
+  TaskList<IWeeklyTask> toOriginal() => TaskList.callDeepCopy(entryList, _buildITaskCopy);
+}

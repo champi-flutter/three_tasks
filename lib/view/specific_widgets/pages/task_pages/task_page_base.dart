@@ -1,6 +1,6 @@
 
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 import 'package:three_tasks/view/wrapper/screens_wrapper.dart';
 
 /// [ScreensWrapper] で管理するタスクのページの基底クラス

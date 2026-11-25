@@ -1,56 +1,38 @@
 import 'package:custom_core_types/custom_core_types.dart';
-import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/domain/entity/e_task/e_task.dart';
-import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
 import 'package:three_tasks/presentation/view_state/v_task/converter/to_v_task.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/weekly_tasks_presenter.dart';
+import 'package:three_tasks/use_case/output_data/o_task/o_task.dart';
+import 'package:three_tasks/use_case/output_data/tasks_output_data/weekly_task_output_data.dart';
 
 /// データ更新反映ポートの具象クラス
-class WeeklyTasksPresenterImpl
-    with NotificationFromViewModel
-    implements WeeklyTasksPresenter {
-  // todo コンストラクタ
-  WeeklyTasksPresenterImpl({
-    required WeeklyTasksStateNotifier weeklyTasksStateNotifier,
-    required NotificationService notificationService,
-  })  : _state = weeklyTasksStateNotifier,
-        notificationService = notificationService;
-
-  /// 週単位タスク ViewState の更新呼び出し口
-  final WeeklyTasksStateNotifier _state;
-
-  /// 通知機能の呼び出し口
-  @override
-  final NotificationService notificationService;
+abstract mixin class WeeklyTasksPresenterImpl implements WeeklyTasksPresenter {
 
   /// 更新反映フローを実装
   @override
-  Future<void> handleWeeklyTasksUpdating(
-    Map<UniqueWeek, WeeklyTaskList<EWeeklyTask>> newDataMap,
+  Future<void> present(
+    WeeklyTaskOutputData newDataMap,
   )
   // 折りたたみ用
   async {
-    try {
-      // エンティティ を VTask に変換する
-      final Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> result =
-          newDataMap.map(
-        (key, value) => MapEntry(
-          key,
-          value
-              .mapValues(EToVTask.toVWeeklyTask)
-              .toListAs(WeeklyTaskList.fromIterable),
-        ),
-      );
-      // VM を更新する
-      _state.update(result);
-    } catch (e, st) {
-      notifyError(content: "[WeeklyTasksPresenter] $e\n$st");
-    }
+    // エンティティ を VTask に変換する
+    final Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> result =
+    newDataMap.read().map(
+          (key, taskList) => MapEntry(
+        key,
+        _convertToVList(taskList),
+      ),
+    );
+    update(result);
   }
 
   /// データの型をエンティティから View State へ変換するプライベートメソッド
-  List<VWeeklyTask> _convertToVList(List<EWeeklyTask> eTaskList) =>
-      eTaskList.map<VWeeklyTask>(EToVTask.toVWeeklyTask).toList();
+  WeeklyTaskList<VWeeklyTask> _convertToVList(WeeklyTaskList<OWeeklyTask> oTaskList) =>
+      oTaskList
+          .mapValues<VWeeklyTask>(OToVTask.toVWeeklyTask)
+          .toListAs<WeeklyTaskList<VWeeklyTask>>(WeeklyTaskList<VWeeklyTask>.fromIterable);
+
+  /// View State 更新メソッド
+  void update(Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> newData);
 }

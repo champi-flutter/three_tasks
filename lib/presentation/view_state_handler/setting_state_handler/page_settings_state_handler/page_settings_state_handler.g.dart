@@ -15,7 +15,7 @@ const pageSettingsStateHandlerProvider = PageSettingsStateHandlerProvider._();
 
 /// 各ページの設定
 final class PageSettingsStateHandlerProvider extends $NotifierProvider<
-    PageSettingsStateHandler, LazyViewState<VSettingsMap>> {
+    PageSettingsStateHandler, OnetimeLazyViewState<VSettingsMap>> {
   /// 各ページの設定
   const PageSettingsStateHandlerProvider._()
       : super(
@@ -36,31 +36,33 @@ final class PageSettingsStateHandlerProvider extends $NotifierProvider<
   PageSettingsStateHandler create() => PageSettingsStateHandler();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(LazyViewState<VSettingsMap> value) {
+  Override overrideWithValue(OnetimeLazyViewState<VSettingsMap> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<LazyViewState<VSettingsMap>>(value),
+      providerOverride:
+          $SyncValueProvider<OnetimeLazyViewState<VSettingsMap>>(value),
     );
   }
 }
 
 String _$pageSettingsStateHandlerHash() =>
-    r'0c4012f1b7748907d13114fe273674788501c977';
+    r'd58035733a3cf1fe1889e04a56946ac164f07b68';
 
 /// 各ページの設定
 
 abstract class _$PageSettingsStateHandler
-    extends $Notifier<LazyViewState<VSettingsMap>> {
-  LazyViewState<VSettingsMap> build();
+    extends $Notifier<OnetimeLazyViewState<VSettingsMap>> {
+  OnetimeLazyViewState<VSettingsMap> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref
-        as $Ref<LazyViewState<VSettingsMap>, LazyViewState<VSettingsMap>>;
+    final ref = this.ref as $Ref<OnetimeLazyViewState<VSettingsMap>,
+        OnetimeLazyViewState<VSettingsMap>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<LazyViewState<VSettingsMap>, LazyViewState<VSettingsMap>>,
-        LazyViewState<VSettingsMap>,
+        AnyNotifier<OnetimeLazyViewState<VSettingsMap>,
+            OnetimeLazyViewState<VSettingsMap>>,
+        OnetimeLazyViewState<VSettingsMap>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

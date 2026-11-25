@@ -1,6 +1,6 @@
 
 
-import 'package:data_converter/data_converter.dart';
+import 'package:three_tasks/data_foundation/value_object/task_id_list.dart';
 import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/infrastructure/gateway/dto/q_label/q_label.dart';
 
@@ -19,8 +19,8 @@ class EToQLabel {
   }
 }
 
-extension LoadTaskIdListInQLabel on List<int>{
-  Int32Blob _toQList(){
-    return Int32Blob.fromIntList(this);
+extension LoadTaskIdListInQLabel on TaskIdList{
+  TaskIdBlob _toQList(){
+    return TaskIdBlob.fromIntList(this.toMutable());
   }
 }

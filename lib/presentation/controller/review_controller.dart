@@ -1,9 +1,7 @@
-
-
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 import 'package:three_tasks/presentation/controller/dto/converter/task_input_converter.dart';
 import 'package:three_tasks/presentation/controller/dto/review_control_parameter/review_control_parameter.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
@@ -16,7 +14,6 @@ import 'package:three_tasks/use_case/input_data/task_input_data/task_input_data.
 
 /// レビュー操作クラス
 class ReviewController {
-
   // todo コンストラクタ
   ReviewController({
     required SaveTaskChangesUseCase saveTaskChangesUseCase,
@@ -52,26 +49,26 @@ class ReviewController {
     required int position,
     required ReviewControlParameter parameter,
   })
-  // 折りたたみ用
-  =>
+      // 折りたたみ用
+      =>
       willAutoSave
           ? _saveAt(
-        position,
-        state: taskState,
-        parameter: parameter,
-      )
+              position,
+              state: taskState,
+              parameter: parameter,
+            )
           : _draftAt(
-        position,
-        state: taskState,
-        parameter: parameter,
-      );
+              position,
+              state: taskState,
+              parameter: parameter,
+            );
 
   /// [TaskList] 中の指定 [position] のレビューの変更を保存する
   Future<void> _saveAt(
-      int position, {
-        required TaskList<VTask> state,
-        required ReviewControlParameter parameter,
-      })
+    int position, {
+    required TaskList<VTask> state,
+    required ReviewControlParameter parameter,
+  })
   // 折りたたみ用
   async {
     // 編集未保存フラグをおろす
@@ -87,8 +84,9 @@ class ReviewController {
         vTask: vTaskEntry.value,
         // 対象インデックスのタスクなら引数のパラメータを、
         // そうでない場合は空のパラメータをあたはめる
-        parameter:
-        (vTaskEntry.index == position) ? parameter : ReviewControlParameter(),
+        parameter: (vTaskEntry.index == position)
+            ? parameter
+            : ReviewControlParameter(),
       );
 
       // 週タスクの場合
@@ -105,7 +103,7 @@ class ReviewController {
     // 週タスク以外の場合
     if (tempTaskList.length == 3) {
       final TaskList<ITask> updatingITaskList =
-      TaskList<ITask>.fromIterable(tempTaskList);
+          TaskList<ITask>.fromIterable(tempTaskList);
       // SaveTaskChangesUseCase を起動する
       await _saveTaskChangesUseCase.execute(
         taskListInputData: TaskInputData(updatingITaskList),
@@ -129,22 +127,22 @@ class ReviewController {
       }
 
       // tempWeeklyList を WeeklyTaskList<IWeeklyTask> に適用する
-      final WeeklyTaskList<IWeeklyTask> updatingITaskList =
-      WeeklyTaskList<IWeeklyTask>.fromIterable(combinedList);
+      final TaskList<IWeeklyTask> updatingITaskList =
+          TaskList<IWeeklyTask>.fromIterable(combinedList);
 
       // SaveTaskChangesUseCase を起動する
       await _saveWeeklyTaskChangesUseCase.execute(
-        taskListInputData: updatingITaskList,
+        taskListInputData: WeeklyTaskInputData(updatingITaskList),
       );
     }
   }
 
   /// [TaskList] 中の指定 [position] のレビューの変更を下書きとして保留する
   Future<void> _draftAt(
-      int position, {
-        required TaskList<VTask> state,
-        required ReviewControlParameter parameter,
-      })
+    int position, {
+    required TaskList<VTask> state,
+    required ReviewControlParameter parameter,
+  })
   // 折りたたみ用
   async {
     // 編集未保存フラグを立てる
@@ -152,13 +150,13 @@ class ReviewController {
     // state をInputData に変換する（下書きは週タスクも TaskList で渡す）
     final TaskList<ITask> newDraft = state
         .map<ITask>((vTaskEntry) => TaskInputConverter.toTaskReviewInputData(
-      vTask: vTaskEntry.value,
-      // 対象インデックスのタスクなら引数のパラメータを、
-      // そうでない場合は空のパラメータをあたはめる
-      parameter: (vTaskEntry.index == position)
-          ? parameter
-          : ReviewControlParameter(),
-    ))
+              vTask: vTaskEntry.value,
+              // 対象インデックスのタスクなら引数のパラメータを、
+              // そうでない場合は空のパラメータをあたはめる
+              parameter: (vTaskEntry.index == position)
+                  ? parameter
+                  : ReviewControlParameter(),
+            ))
         .toListAs(TaskList<ITask>.fromIterable);
 
     // DraftTaskChangesUseCase を起動する
@@ -166,42 +164,40 @@ class ReviewController {
   }
 
   /// 現時点でのレビューの View State でタスク変更保存フローを呼び出す
-  Future<void> saveCurrent<VTaskType extends VTask>({
-    required TaskList<VTaskType> taskState,
+  Future<void> saveCurrent({
+    required TaskList<VTask> taskState,
   })
   // 折りたたみ用
   async {
     // 編集未保存フラグをおろす
     _editController.notifySaved();
+
     // 週タスクの場合
-    if (VTaskType is VWeeklyTask) {
-      // InputData に変換する（まだ可変長リスト）
-      final List<IWeeklyTask> iTaskList = taskState
+    if (taskState.rec == TaskRec.week) {
+      // 空のパラメータを当てはめて、そのまま InputData の固定長リストに変換する
+      final TaskList<IWeeklyTask> updatingITaskList = taskState
           .mapValues<IWeeklyTask>(
-            (VTaskType vTask) =>
-                TaskInputConverter.toIWeeklyTask(vTask: vTask as VWeeklyTask),
+            (vTask) => TaskInputConverter.toIWeeklyTaskWithoutChange(
+          vTask: vTask as VWeeklyTask,
+        ),
       )
-          .toList();
-      // 編集不可の仮データを省く
-      iTaskList.removeWhere((iTask) => iTask.cannotReplace);
-      // 固定長リストに変換する
-      final WeeklyTaskList<IWeeklyTask> updatingITaskList =
-      WeeklyTaskList<IWeeklyTask>.fromIterable(iTaskList);
+          .toListAs(TaskList<IWeeklyTask>.fromIterable);
+
       await _saveWeeklyTaskChangesUseCase.execute(
-        taskListInputData: updatingITaskList,
+        taskListInputData: WeeklyTaskInputData(updatingITaskList),
       );
     }
     // 週タスク以外の場合
     else {
-      // 空のパラメータを当てはめて、そのまま InputData に変換する
+      // 空のパラメータを当てはめて、そのまま InputData の固定長リストに変換する
       final TaskList<ITask> updatingITaskList = taskState
           .mapValues<ITask>(
-            (vTask) => TaskInputConverter.toTaskReviewInputData(
+            (vTask) => TaskInputConverter.toITaskWithoutChange(
           vTask: vTask,
-          parameter: ReviewControlParameter(),
         ),
       )
           .toListAs(TaskList<ITask>.fromIterable);
+
       await _saveTaskChangesUseCase.execute(
         taskListInputData: TaskInputData(updatingITaskList),
       );
@@ -209,7 +205,7 @@ class ReviewController {
   }
 
   /// 下書きを破棄する
-  Future<void> discardDraft({required TaskRec taskRec}) async{
+  Future<void> discardDraft({required TaskRec taskRec}) async {
     // 編集未保存フラグをおろす
     _editController.notifyDiscarded();
     await _discardDraftUseCase.execute(taskRec: taskRec);

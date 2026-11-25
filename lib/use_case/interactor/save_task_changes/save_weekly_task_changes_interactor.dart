@@ -5,6 +5,8 @@ import 'package:three_tasks/domain/entity/e_task/e_task.dart';
 import 'package:three_tasks/use_case/input_boundary/save_task_changes/save_weekly_task_changes_use_case.dart';
 import 'package:three_tasks/use_case/input_data/i_task/converter/i_to_e_task.dart';
 import 'package:three_tasks/use_case/input_data/i_task/i_task.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/task_input_data.dart';
+import 'package:three_tasks/use_case/interactor/converter/weekly_task_list_type_converter.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 /// 週単位タスク変更保存フローを実装するクラス
@@ -40,19 +42,25 @@ class SaveWeeklyTaskChangesInteractor
   /// 変更を受けるタスク（[targetVTask]）を指定する。
   @override
   Future<void> execute({
-    required WeeklyTaskList<IWeeklyTask>  taskListInputData,
+    required WeeklyTaskInputData taskListInputData,
   }) =>
       _loadingService.loadAsync(
         () async {
           try {
-            // InputData をエンティティに変換する
-            final WeeklyTaskList<EWeeklyTask> updatingETaskList = taskListInputData
+            // 2026/11/25 修正: placeholder2 除去ロジックを外部化
+            final TaskList<EWeeklyTask> eTaskList = taskListInputData
+                .toOriginal()
                 .mapValues<EWeeklyTask>(IToETask.toEWeeklyTask)
-                .toListAs(WeeklyTaskList<EWeeklyTask>.fromIterable);
+                .toListAs(TaskList<EWeeklyTask>.fromIterable);
+
+            // 固定長に変換する
+            final WeeklyTaskList<EWeeklyTask> appliedETaskList =
+                WeeklyTaskListTypeConverter.removePlaceholder2(eTaskList);
+
             // リポジトリにデータの保存を依頼する
             final Result<void, Exception> result =
                 await _repository.saveWeeklyTaskChanges(
-                  updatingETaskList: updatingETaskList,
+              updatingETaskList: appliedETaskList,
             );
             // 保存が成功した場合に、キャッシュを更新する
             switch (result) {

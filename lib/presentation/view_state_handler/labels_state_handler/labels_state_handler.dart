@@ -19,15 +19,14 @@ part 'labels_state_handler.g.dart';
 ///
 /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 @riverpod
-class LabelsStateHandler extends _$LabelsStateHandler implements LabelsStateNotifier{
+class LabelsStateHandler extends _$LabelsStateHandler
+    implements LabelsStateNotifier {
   // todo 初期化
   @override
-  LazyViewState<LabelList<VLabel>> build() {
-    _initViewModel();
-
+  OnetimeLazyViewState<LabelList<VLabel>> build() {
     final LabelList<VLabel> placeholder = LabelList.fromIterable([]);
 
-    return LazyViewState.placeholder(placeholder);
+    return OnetimeLazyViewState.placeholder(placeholder, initState: _initState);
   }
 
   /// Token（[build] の引数）を指定して、[FetchLabelUseCase] を参照する getter
@@ -35,13 +34,13 @@ class LabelsStateHandler extends _$LabelsStateHandler implements LabelsStateNoti
       ref.read(fetchLabelUseCaseProvider);
 
   /// この VM の新しいインスタンスが生成された時の初期化
-  Future<void> _initViewModel() async {
+  Future<void> _initState() async {
     await _fetchLabelUseCase.execute();
   }
 
   /// [state] の更新
   @override
   void update(LabelList<VLabel> newState) {
-    state = LazyViewState.data(newState);
+    state = OnetimeLazyViewState.data(newState);
   }
 }

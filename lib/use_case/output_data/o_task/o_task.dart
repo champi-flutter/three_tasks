@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:three_tasks/data_foundation/review_base/review.dart';
+import 'package:three_tasks/data_foundation/value_object/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 part 'o_task.freezed.dart';
 
@@ -26,8 +26,6 @@ sealed class OTask extends TaskBase {
 
   /// データ受信済みかどうか
   bool get isFetched;
-
-
 }
 
 /// 日単位タスクの OutputData
@@ -59,7 +57,9 @@ abstract class OWeeklyTask with WeeklyTaskBase, _$OWeeklyTask implements OTask {
     required int labelId,
     required Review review,
     required bool isFetched,
-    required bool canReplace,
+    required bool isPlaceholder2,
+    required bool shouldIdentify,
+    required bool willRemainPlaceholder2,
   }) = _OWeeklyTask;
 
   /// **編集可能な** 週単位タスクの仮データを生成するファクトリ
@@ -78,7 +78,9 @@ abstract class OWeeklyTask with WeeklyTaskBase, _$OWeeklyTask implements OTask {
     labelId: -1,
     review: Review(result: null, next: null),
     isFetched: false,
-    canReplace: true,
+    isPlaceholder2: true,
+    shouldIdentify: false,
+    willRemainPlaceholder2: true,
   );
 }
 

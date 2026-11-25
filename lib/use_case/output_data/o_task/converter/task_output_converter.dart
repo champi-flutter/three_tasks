@@ -36,7 +36,9 @@ class TaskOutputConverter {
         week: weeklyTask.week,
         review: weeklyTask.review,
         isFetched: weeklyTask.isFetched,
-        canReplace: weeklyTask.isPlaceHolder2,
+        isPlaceholder2: weeklyTask.isPlaceholder2,
+        shouldIdentify: weeklyTask.shouldIdentify,
+        willRemainPlaceholder2: weeklyTask.willRemainPlaceholder2,
       );
 
   static OMonthlyTask toOMonthlyTask(EMonthlyTask monthlyTask) => OMonthlyTask(

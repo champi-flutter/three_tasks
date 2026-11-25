@@ -1,6 +1,7 @@
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:three_tasks/data_foundation/label_base/label_base.dart';
+import 'package:three_tasks/data_foundation/value_object/task_id_list.dart';
 
 part 'c_label.freezed.dart';
 
@@ -15,9 +16,9 @@ abstract class CLabel with LabelBase, _$CLabel {
   const factory CLabel({
     required String title,
     required int labelId,
-    required List<int> dailyIdList,
-    required List<int> weeklyIdList,
-    required List<int> monthlyIdList,
-    required List<int> yearlyIdList,
+    required TaskIdList dailyIdList,
+    required TaskIdList weeklyIdList,
+    required TaskIdList monthlyIdList,
+    required TaskIdList yearlyIdList,
   }) = _CLabel;
 }

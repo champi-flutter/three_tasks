@@ -1,4 +1,6 @@
 
+import 'package:three_tasks/data_foundation/value_object/task_id_list.dart';
+
 abstract mixin class LabelBase {
   /// ラベルタイトル
   String get title;
@@ -7,16 +9,16 @@ abstract mixin class LabelBase {
   int get labelId;
 
   /// 日単位タスクの登録リスト
-  List<int> get dailyIdList;
+  TaskIdList get dailyIdList;
 
   /// 週単位タスクの登録リスト
-  List<int> get weeklyIdList;
+  TaskIdList get weeklyIdList;
 
   /// 月単位タスクの登録リスト
-  List<int> get monthlyIdList;
+  TaskIdList get monthlyIdList;
 
   /// 年単位タスクの登録リスト
-  List<int> get yearlyIdList;
+  TaskIdList get yearlyIdList;
 }
 
 /// ラベルのリストを走査する拡張メソッド

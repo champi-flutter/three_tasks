@@ -5,10 +5,11 @@ import 'package:data_converter/data_converter.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/label_base/label_list.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
+import 'package:three_tasks/data_foundation/value_object/task_id_list.dart';
 import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/daily_tasks_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/labels_cache_handler.dart';
 import 'package:three_tasks/infrastructure/gateway/driver_interface/cache_handler_interface/monthly_tasks_cache_handler.dart';
@@ -101,23 +102,23 @@ class DataRepositoryImpl
               final weeklyIdListData = qLabel.weeklyId32Blob.toIntList();
               final monthlyIdListData = qLabel.monthlyId32Blob.toIntList();
               final yearlyIdListData = qLabel.yearlyId32Blob.toIntList();
-              // CLabel は不変なので、リストデータはそのまま渡す
+              // リストデータを immutable のリストクラスに格納して渡す
               final CLabel cLabel = CLabel(
                 title: qLabel.title,
                 labelId: qLabel.labelId,
-                dailyIdList: dailyIdListData,
-                weeklyIdList: weeklyIdListData,
-                monthlyIdList: monthlyIdListData,
-                yearlyIdList: yearlyIdListData,
+                dailyIdList: TaskIdList(dailyIdListData),
+                weeklyIdList: TaskIdList(weeklyIdListData),
+                monthlyIdList: TaskIdList(monthlyIdListData),
+                yearlyIdList: TaskIdList(yearlyIdListData),
               );
-              // ELabel は可変なので、リストデータはコピーして渡す
+              // リストデータを immutable のリストクラスに格納して渡す
               final ELabel eLabel = ELabel(
                 title: qLabel.title,
                 labelId: qLabel.labelId,
-                dailyIdList: [...dailyIdListData],
-                weeklyIdList: [...weeklyIdListData],
-                monthlyIdList: [...monthlyIdListData],
-                yearlyIdList: [...yearlyIdListData],
+                dailyIdList: TaskIdList(dailyIdListData),
+                weeklyIdList: TaskIdList(weeklyIdListData),
+                monthlyIdList: TaskIdList(monthlyIdListData),
+                yearlyIdList: TaskIdList(yearlyIdListData),
               );
               newCLabelList.add(cLabel);
               newELabelList.add(eLabel);
@@ -775,7 +776,7 @@ class DataRepositoryImpl
     // データソースに保存する
     final Result<void, Exception> result = await _dataSource.saveTaskChanges(
       // TaskList から普通の List に変換してから渡す
-      newTaskList: newTaskList.toValueList(),
+      newTaskList: newTaskList.toValueList(growable: false),
     );
     // 保存が成功した場合に、キャッシュを更新する
     switch (result) {
@@ -847,10 +848,12 @@ class DataRepositoryImpl
   // 折りたたみ用
   async {
     // 引数に渡されたリストが変更しないように、コピーを用意する
-    final WeeklyTaskList<EWeeklyTask> returningList = eTaskList.deepCopy;
+    final WeeklyTaskList<EWeeklyTask> returningList = eTaskList.deepCopy(
+        copyBuilder: (EWeeklyTask task) => task.copy(),
+    );
     // 値が入れられた placeholder2 を抽出する
     final List<ListEntry<EWeeklyTask>> valuedPlaceholders =
-        returningList.where((eTask) => eTask.value.isPlaceHolder2).toList();
+        returningList.where((eTask) => eTask.value.isPlaceholder2).toList();
     // placeholder2 に値が入れられていなかった場合は、早期リターン
     if (valuedPlaceholders.isEmpty) {
       return Success(returningList);
@@ -874,7 +877,7 @@ class DataRepositoryImpl
           // ListEntry<EWeeklyTask> の value を変更する
           returningList.setAt(
             index,
-            originalETask.replacePlaceholder2(createdId),
+            originalETask.identifyPlaceholder2As(createdId),
           );
         }
         return Success(returningList);
@@ -1131,34 +1134,34 @@ class DataRepositoryImpl
           EDailyTask(id: final int firstTaskId) => CLabel(
               title: title,
               labelId: newId,
-              dailyIdList: [firstTaskId],
-              weeklyIdList: [],
-              monthlyIdList: [],
-              yearlyIdList: [],
+              dailyIdList: TaskIdList([firstTaskId]),
+              weeklyIdList: TaskIdList([]),
+              monthlyIdList: TaskIdList([]),
+              yearlyIdList: TaskIdList([]),
             ),
           EWeeklyTask(id: final int firstTaskId) => CLabel(
               title: title,
               labelId: newId,
-              dailyIdList: [],
-              weeklyIdList: [firstTaskId],
-              monthlyIdList: [],
-              yearlyIdList: [],
+              dailyIdList: TaskIdList([]),
+              weeklyIdList:  TaskIdList([firstTaskId]),
+              monthlyIdList: TaskIdList([]),
+              yearlyIdList: TaskIdList([]),
             ),
           EMonthlyTask(id: final int firstTaskId) => CLabel(
               title: title,
               labelId: newId,
-              dailyIdList: [],
-              weeklyIdList: [],
-              monthlyIdList: [firstTaskId],
-              yearlyIdList: [],
+              dailyIdList: TaskIdList([]),
+              weeklyIdList: TaskIdList([]),
+              monthlyIdList:  TaskIdList([firstTaskId]),
+              yearlyIdList: TaskIdList([]),
             ),
           EYearlyTask(id: final int firstTaskId) => CLabel(
               title: title,
               labelId: newId,
-              dailyIdList: [],
-              weeklyIdList: [],
-              monthlyIdList: [],
-              yearlyIdList: [firstTaskId],
+              dailyIdList: TaskIdList([]),
+              weeklyIdList: TaskIdList([]),
+              monthlyIdList: TaskIdList([]),
+              yearlyIdList:  TaskIdList([firstTaskId]),
             ),
           // endregion
         };

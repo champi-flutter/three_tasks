@@ -6,14 +6,16 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
 import 'package:three_tasks/presentation/extended_foundation/weekly_lazy_map.dart';
 import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
+import 'package:three_tasks/presentation/presenter/weekly_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_weekly_tasks_use_case.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/notify_tasks_access/notify_tasks_access_input_data.dart';
 
-part 'weekly_tasks_state_handler.g.dart';
+part 'weekly_tasks_view_state_notifier.g.dart';
 
 @riverpod
-class WeeklyTasksStateHandler extends _$WeeklyTasksStateHandler implements WeeklyTasksStateNotifier{
+class WeeklyTasksViewStateNotifier extends _$WeeklyTasksViewStateNotifier with WeeklyTasksPresenterImpl {
   // todo 初期化
   @override
   WeeklyLazyMap build() {
@@ -43,7 +45,7 @@ class WeeklyTasksStateHandler extends _$WeeklyTasksStateHandler implements Weekl
 
   /// アクセスを通知する
   void _onAccess(UniqueWeek week) => _notifyWeeklyTasksAccessUseCase.execute(
-        week,
+        NotifyWeeklyTasksAccessInputData(week: week),
       );
 
   /// 監視フローを開始する
@@ -55,7 +57,7 @@ class WeeklyTasksStateHandler extends _$WeeklyTasksStateHandler implements Weekl
     _watchWeeklyTasksUseCase.initAt(targetDate);
   }
 
-  /// [state] （`List<VWeeklyTask>`）更新メソッド
+  /// View State 更新メソッド
   @override
   void update(Map<UniqueWeek, WeeklyTaskList<VWeeklyTask>> newData) {
     final Map<UniqueWeek, LazyViewState<WeeklyTaskList<VWeeklyTask>>>

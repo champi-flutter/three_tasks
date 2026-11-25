@@ -413,19 +413,19 @@ class MyDatabase extends _$MyDatabase implements DataSource {
         (record) => switch (firstTask) {
           QDailyTask(id: final int firstTaskId) => record(
               label: title,
-              dailyIdList: Value([firstTaskId].toInt32Blob()),
+              dailyIdList: _initAndValidateTaskIdBlob(firstTaskId),
             ),
           QWeeklyTask(id: final int firstTaskId) => record(
               label: title,
-              weeklyIdList: Value([firstTaskId].toInt32Blob()),
+              weeklyIdList: _initAndValidateTaskIdBlob(firstTaskId),
             ),
           QMonthlyTask(id: final int firstTaskId) => record(
               label: title,
-              monthlyIdList: Value([firstTaskId].toInt32Blob()),
+              monthlyIdList: _initAndValidateTaskIdBlob(firstTaskId),
             ),
           QYearlyTask(id: final int firstTaskId) => record(
               label: title,
-              yearlyIdList: Value([firstTaskId].toInt32Blob()),
+              yearlyIdList: _initAndValidateTaskIdBlob(firstTaskId),
             ),
         },
       );
@@ -433,6 +433,11 @@ class MyDatabase extends _$MyDatabase implements DataSource {
     } catch (e, st) {
       return Failure(Exception("$e\n$st"), methodName: "createNewLabel");
     }
+  }
+
+  Value<Uint8List> _initAndValidateTaskIdBlob(int firstTaskId) {
+    final Uint8List uint8list = Uint8List.fromList([firstTaskId].toInt32List());
+    return Value(uint8list);
   }
 
   /// ラベルテーブルの情報を更新する

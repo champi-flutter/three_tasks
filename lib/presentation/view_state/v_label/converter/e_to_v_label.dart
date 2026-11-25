@@ -8,9 +8,9 @@ class EToVLabel {
   static VLabel toVLabel(ELabel eLabel)=> VLabel(
     title: eLabel.title,
     labelId: eLabel.labelId,
-    dailyIdList: [...eLabel.dailyIdList],
-    weeklyIdList: [...eLabel.weeklyIdList],
-    monthlyIdList: [...eLabel.monthlyIdList],
-    yearlyIdList: [...eLabel.yearlyIdList],
+    dailyIdList: eLabel.dailyIdList,
+    weeklyIdList: eLabel.weeklyIdList,
+    monthlyIdList: eLabel.monthlyIdList,
+    yearlyIdList: eLabel.yearlyIdList,
   );
 }

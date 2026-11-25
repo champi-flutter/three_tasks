@@ -1,10 +1,8 @@
-import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:three_tasks/data_foundation/review_base/review.dart';
+import 'package:three_tasks/data_foundation/value_object/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
-import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 part 'v_task.freezed.dart';
 
@@ -29,8 +27,6 @@ sealed class VTask extends TaskBase {
 
   /// データ受信済みかどうか
   bool get isFetched;
-
-
 }
 
 /// 日単位のタスククラス
@@ -73,19 +69,25 @@ abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
     required int labelId,
     required Review review,
     required bool isFetched,
-    required bool canReplace,
+    required bool isPlaceholder2,
+    required bool shouldIdentify,
+    required bool willRemainPlaceholder2,
   }) = _VWeeklyTask;
 
   /// 週単位タスクの仮データを生成するファクトリ
   factory VWeeklyTask.placeholder(Date targetDate) => VWeeklyTask(
-      title: "",
-      week: UniqueWeek.fromDate(currentDate: targetDate, firstDate: targetDate),
-      id: -1,
-      isChecked: false,
-      labelId: -1,
-      review: Review(result: null, next: null),
-      isFetched: true,
-      canReplace: false);
+        title: "",
+        week:
+            UniqueWeek.fromDate(currentDate: targetDate, firstDate: targetDate),
+        id: -1,
+        isChecked: false,
+        labelId: -1,
+        review: Review(result: null, next: null),
+        isFetched: true,
+        isPlaceholder2: false,
+        shouldIdentify: false,
+        willRemainPlaceholder2: false,
+      );
 
   /// **編集可能な** 週単位タスクの仮データを生成するファクトリ
   ///
@@ -101,17 +103,13 @@ abstract class VWeeklyTask with WeeklyTaskBase, _$VWeeklyTask implements VTask {
         id: -2,
         isChecked: false,
         labelId: -1,
-    review: Review(result: null, next: null),
+        review: Review(result: null, next: null),
         isFetched: false,
-        canReplace: true,
+        isPlaceholder2: true,
+        shouldIdentify: false,
+        willRemainPlaceholder2: true,
       );
 }
-
-// class W{
-//   final List<WeeklyTaskList<VWeeklyTask>> weekUnitList;
-//
-//   List<VWeeklyTask> get view => [for(WeeklyTaskList<VWeeklyTask> sublist in weekUnitList)...sublist.];
-// }
 
 /// 月単位のタスククラス
 @freezed
@@ -137,7 +135,7 @@ abstract class VMonthlyTask
         id: -1,
         isChecked: false,
         labelId: -1,
-    review: Review(result: null, next: null),
+        review: Review(result: null, next: null),
         isFetched: true,
       );
 }
@@ -164,7 +162,7 @@ abstract class VYearlyTask with YearlyTaskBase, _$VYearlyTask implements VTask {
         id: -1,
         isChecked: false,
         labelId: -1,
-    review: Review(result: null, next: null),
+        review: Review(result: null, next: null),
         isFetched: true,
       );
 }

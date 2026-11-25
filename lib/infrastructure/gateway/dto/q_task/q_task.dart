@@ -2,7 +2,7 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:data_converter/data_converter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:three_tasks/data_foundation/review_base/review.dart';
+import 'package:three_tasks/data_foundation/value_object/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 
 part 'q_task.freezed.dart';

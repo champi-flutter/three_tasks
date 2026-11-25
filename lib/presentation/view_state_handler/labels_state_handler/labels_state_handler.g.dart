@@ -25,7 +25,7 @@ const labelsStateHandlerProvider = LabelsStateHandlerProvider._();
 ///
 /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 final class LabelsStateHandlerProvider extends $NotifierProvider<
-    LabelsStateHandler, LazyViewState<LabelList<VLabel>>> {
+    LabelsStateHandler, OnetimeLazyViewState<LabelList<VLabel>>> {
   /// 「ラベル化したタスク」の表示を管理するクラス
   ///
   /// `ref.watch`で監視する際は、[Token] を用いて、呼び出し元のインスタンスにつき1つの
@@ -51,17 +51,17 @@ final class LabelsStateHandlerProvider extends $NotifierProvider<
   LabelsStateHandler create() => LabelsStateHandler();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(LazyViewState<LabelList<VLabel>> value) {
+  Override overrideWithValue(OnetimeLazyViewState<LabelList<VLabel>> value) {
     return $ProviderOverride(
       origin: this,
       providerOverride:
-          $SyncValueProvider<LazyViewState<LabelList<VLabel>>>(value),
+          $SyncValueProvider<OnetimeLazyViewState<LabelList<VLabel>>>(value),
     );
   }
 }
 
 String _$labelsStateHandlerHash() =>
-    r'eed14f14361cad991d499f4b06d2af53551fb330';
+    r'e50252fc246834c5aef201d7dd99ef7c52a64ceb';
 
 /// 「ラベル化したタスク」の表示を管理するクラス
 ///
@@ -71,18 +71,18 @@ String _$labelsStateHandlerHash() =>
 /// Fetch が完了するまで、[VLabel.placeholder] が返される。
 
 abstract class _$LabelsStateHandler
-    extends $Notifier<LazyViewState<LabelList<VLabel>>> {
-  LazyViewState<LabelList<VLabel>> build();
+    extends $Notifier<OnetimeLazyViewState<LabelList<VLabel>>> {
+  OnetimeLazyViewState<LabelList<VLabel>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<LazyViewState<LabelList<VLabel>>,
-        LazyViewState<LabelList<VLabel>>>;
+    final ref = this.ref as $Ref<OnetimeLazyViewState<LabelList<VLabel>>,
+        OnetimeLazyViewState<LabelList<VLabel>>>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<LazyViewState<LabelList<VLabel>>,
-            LazyViewState<LabelList<VLabel>>>,
-        LazyViewState<LabelList<VLabel>>,
+        AnyNotifier<OnetimeLazyViewState<LabelList<VLabel>>,
+            OnetimeLazyViewState<LabelList<VLabel>>>,
+        OnetimeLazyViewState<LabelList<VLabel>>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

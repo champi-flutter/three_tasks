@@ -16,10 +16,10 @@ T _$identity<T>(T value) => value;
 mixin _$QLabel {
   String get title;
   int get labelId;
-  Int32Blob get dailyId32Blob;
-  Int32Blob get weeklyId32Blob;
-  Int32Blob get monthlyId32Blob;
-  Int32Blob get yearlyId32Blob;
+  TaskIdBlob get dailyId32Blob;
+  TaskIdBlob get weeklyId32Blob;
+  TaskIdBlob get monthlyId32Blob;
+  TaskIdBlob get yearlyId32Blob;
 
   /// Create a copy of QLabel
   /// with the given fields replaced by the non-null parameter values.
@@ -63,10 +63,10 @@ abstract mixin class $QLabelCopyWith<$Res> {
   $Res call(
       {String title,
       int labelId,
-      Int32Blob dailyId32Blob,
-      Int32Blob weeklyId32Blob,
-      Int32Blob monthlyId32Blob,
-      Int32Blob yearlyId32Blob});
+      TaskIdBlob dailyId32Blob,
+      TaskIdBlob weeklyId32Blob,
+      TaskIdBlob monthlyId32Blob,
+      TaskIdBlob yearlyId32Blob});
 }
 
 /// @nodoc
@@ -100,19 +100,19 @@ class _$QLabelCopyWithImpl<$Res> implements $QLabelCopyWith<$Res> {
       dailyId32Blob: null == dailyId32Blob
           ? _self.dailyId32Blob
           : dailyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
       weeklyId32Blob: null == weeklyId32Blob
           ? _self.weeklyId32Blob
           : weeklyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
       monthlyId32Blob: null == monthlyId32Blob
           ? _self.monthlyId32Blob
           : monthlyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
       yearlyId32Blob: null == yearlyId32Blob
           ? _self.yearlyId32Blob
           : yearlyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
     ));
   }
 }
@@ -213,10 +213,10 @@ extension QLabelPatterns on QLabel {
     TResult Function(
             String title,
             int labelId,
-            Int32Blob dailyId32Blob,
-            Int32Blob weeklyId32Blob,
-            Int32Blob monthlyId32Blob,
-            Int32Blob yearlyId32Blob)?
+            TaskIdBlob dailyId32Blob,
+            TaskIdBlob weeklyId32Blob,
+            TaskIdBlob monthlyId32Blob,
+            TaskIdBlob yearlyId32Blob)?
         $default, {
     required TResult orElse(),
   }) {
@@ -248,10 +248,10 @@ extension QLabelPatterns on QLabel {
     TResult Function(
             String title,
             int labelId,
-            Int32Blob dailyId32Blob,
-            Int32Blob weeklyId32Blob,
-            Int32Blob monthlyId32Blob,
-            Int32Blob yearlyId32Blob)
+            TaskIdBlob dailyId32Blob,
+            TaskIdBlob weeklyId32Blob,
+            TaskIdBlob monthlyId32Blob,
+            TaskIdBlob yearlyId32Blob)
         $default,
   ) {
     final _that = this;
@@ -281,10 +281,10 @@ extension QLabelPatterns on QLabel {
     TResult? Function(
             String title,
             int labelId,
-            Int32Blob dailyId32Blob,
-            Int32Blob weeklyId32Blob,
-            Int32Blob monthlyId32Blob,
-            Int32Blob yearlyId32Blob)?
+            TaskIdBlob dailyId32Blob,
+            TaskIdBlob weeklyId32Blob,
+            TaskIdBlob monthlyId32Blob,
+            TaskIdBlob yearlyId32Blob)?
         $default,
   ) {
     final _that = this;
@@ -315,13 +315,13 @@ class _QLabel extends QLabel {
   @override
   final int labelId;
   @override
-  final Int32Blob dailyId32Blob;
+  final TaskIdBlob dailyId32Blob;
   @override
-  final Int32Blob weeklyId32Blob;
+  final TaskIdBlob weeklyId32Blob;
   @override
-  final Int32Blob monthlyId32Blob;
+  final TaskIdBlob monthlyId32Blob;
   @override
-  final Int32Blob yearlyId32Blob;
+  final TaskIdBlob yearlyId32Blob;
 
   /// Create a copy of QLabel
   /// with the given fields replaced by the non-null parameter values.
@@ -367,10 +367,10 @@ abstract mixin class _$QLabelCopyWith<$Res> implements $QLabelCopyWith<$Res> {
   $Res call(
       {String title,
       int labelId,
-      Int32Blob dailyId32Blob,
-      Int32Blob weeklyId32Blob,
-      Int32Blob monthlyId32Blob,
-      Int32Blob yearlyId32Blob});
+      TaskIdBlob dailyId32Blob,
+      TaskIdBlob weeklyId32Blob,
+      TaskIdBlob monthlyId32Blob,
+      TaskIdBlob yearlyId32Blob});
 }
 
 /// @nodoc
@@ -404,19 +404,19 @@ class __$QLabelCopyWithImpl<$Res> implements _$QLabelCopyWith<$Res> {
       dailyId32Blob: null == dailyId32Blob
           ? _self.dailyId32Blob
           : dailyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
       weeklyId32Blob: null == weeklyId32Blob
           ? _self.weeklyId32Blob
           : weeklyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
       monthlyId32Blob: null == monthlyId32Blob
           ? _self.monthlyId32Blob
           : monthlyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
       yearlyId32Blob: null == yearlyId32Blob
           ? _self.yearlyId32Blob
           : yearlyId32Blob // ignore: cast_nullable_to_non_nullable
-              as Int32Blob,
+              as TaskIdBlob,
     ));
   }
 }

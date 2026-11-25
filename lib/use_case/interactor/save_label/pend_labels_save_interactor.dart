@@ -16,10 +16,10 @@ class PendLabelsSaveInteractor implements PendLabelsSaveUseCase {
     final ELabel eLabel = ELabel(
       labelId: iLabel.labelId,
       title: iLabel.title,
-      dailyIdList: [...iLabel.dailyIdList],
-      weeklyIdList: [...iLabel.weeklyIdList],
-      monthlyIdList: [...iLabel.monthlyIdList],
-      yearlyIdList: [...iLabel.yearlyIdList],
+      dailyIdList: iLabel.dailyIdList,
+      weeklyIdList: iLabel.weeklyIdList,
+      monthlyIdList: iLabel.monthlyIdList,
+      yearlyIdList: iLabel.yearlyIdList,
     );
     // ラベル下書き保管所に保管する
     await _draftRepository.draftWith(eLabel);

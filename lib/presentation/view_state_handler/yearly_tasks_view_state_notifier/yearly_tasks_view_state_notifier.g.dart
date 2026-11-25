@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'yearly_tasks_state_handler.dart';
+part of 'yearly_tasks_view_state_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -10,30 +10,31 @@ part of 'yearly_tasks_state_handler.dart';
 // ignore_for_file: type=lint, type=warning
 /// 年単位タスク View Model
 
-@ProviderFor(YearlyTasksStateHandler)
-const yearlyTasksStateHandlerProvider = YearlyTasksStateHandlerProvider._();
+@ProviderFor(YearlyTasksViewStateNotifier)
+const yearlyTasksViewStateProvider = YearlyTasksViewStateNotifierProvider._();
 
 /// 年単位タスク View Model
-final class YearlyTasksStateHandlerProvider extends $NotifierProvider<
-    YearlyTasksStateHandler, LazyMapViewState<int, TaskList<VYearlyTask>>> {
+final class YearlyTasksViewStateNotifierProvider extends $NotifierProvider<
+    YearlyTasksViewStateNotifier,
+    LazyMapViewState<int, TaskList<VYearlyTask>>> {
   /// 年単位タスク View Model
-  const YearlyTasksStateHandlerProvider._()
+  const YearlyTasksViewStateNotifierProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'yearlyTasksStateHandlerProvider',
+          name: r'yearlyTasksViewStateProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$yearlyTasksStateHandlerHash();
+  String debugGetCreateSourceHash() => _$yearlyTasksViewStateNotifierHash();
 
   @$internal
   @override
-  YearlyTasksStateHandler create() => YearlyTasksStateHandler();
+  YearlyTasksViewStateNotifier create() => YearlyTasksViewStateNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(
@@ -47,12 +48,12 @@ final class YearlyTasksStateHandlerProvider extends $NotifierProvider<
   }
 }
 
-String _$yearlyTasksStateHandlerHash() =>
-    r'24c2ad49afaded523c62cad46b2407a7d6cd2187';
+String _$yearlyTasksViewStateNotifierHash() =>
+    r'a38f1e5ddacd6372b568209dbec4cb63ed40dee3';
 
 /// 年単位タスク View Model
 
-abstract class _$YearlyTasksStateHandler
+abstract class _$YearlyTasksViewStateNotifier
     extends $Notifier<LazyMapViewState<int, TaskList<VYearlyTask>>> {
   LazyMapViewState<int, TaskList<VYearlyTask>> build();
   @$mustCallSuper

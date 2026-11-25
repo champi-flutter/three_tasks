@@ -8,22 +8,8 @@ import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/output_boundary/monthly_tasks_presenter.dart';
 
 /// データ更新反映ポートの具象クラス
-class MonthlyTasksPresenterImpl
-    with NotificationFromViewModel
+abstract mixin class MonthlyTasksPresenterImpl
     implements MonthlyTasksPresenter {
-  // todo コンストラクタ
-  MonthlyTasksPresenterImpl({
-    required MonthlyTasksStateNotifier monthlyTasksStateNotifier,
-    required NotificationService notificationService,
-  })  : _state = monthlyTasksStateNotifier,
-        notificationService = notificationService;
-
-  /// 月単位タスク ViewState の更新呼び出し口
-  final MonthlyTasksStateNotifier _state;
-
-  /// 通知機能の呼び出し口
-  @override
-  final NotificationService notificationService;
 
   /// 更新反映フローを実装
   @override
@@ -32,16 +18,11 @@ class MonthlyTasksPresenterImpl
       )
   // 折りたたみ用
   async {
-    try {
-      // VTask に変換する
-      final Map<Month, TaskList<VMonthlyTask>> resultMap = newDataMap.map(
-            (key, taskList) => MapEntry(key, _convertToVList(taskList)),
-      );
-      // ViewModel の update を呼び出す
-      _state.update(resultMap);
-    } catch (e, st) {
-      notifyError(content: "[MonthlyTasksPresenter] $e\n$st");
-    }
+    // VTask に変換する
+    final Map<Month, TaskList<VMonthlyTask>> resultMap = newDataMap.map(
+          (key, taskList) => MapEntry(key, _convertToVList(taskList)),
+    );
+    update(resultMap);
   }
 
   /// データの型をエンティティから View State へ変換するプライベートメソッド
@@ -49,4 +30,10 @@ class MonthlyTasksPresenterImpl
       eTaskList
           .mapValues<VMonthlyTask>(EToVTask.toVMonthlyTask)
           .toListAs<TaskList<VMonthlyTask>>(TaskList<VMonthlyTask>.fromIterable);
+
+
+  /// View State 更新メソッド
+  ///
+  /// キャッシュは追加されるたびに、LFU 方式で evict される。
+  void update(Map<Month, TaskList<VMonthlyTask>> newData);
 }

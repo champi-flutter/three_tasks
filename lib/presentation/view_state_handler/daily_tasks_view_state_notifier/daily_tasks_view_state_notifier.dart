@@ -3,17 +3,18 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
-import 'package:three_tasks/presentation/notifier/tasks_state_notifier/tasks_state_notifier.dart';
+import 'package:three_tasks/presentation/presenter/daily_tasks_presenter_impl.dart';
 import 'package:three_tasks/presentation/view_state/v_task/v_task.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
 import 'package:three_tasks/use_case/input_boundary/watch_tasks/watch_daily_tasks_use_case.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/notify_tasks_access/notify_tasks_access_input_data.dart';
 
-part 'daily_tasks_state_handler.g.dart';
+part 'daily_tasks_view_state_notifier.g.dart';
 
 @riverpod
-class DailyTasksStateHandler extends _$DailyTasksStateHandler
-    implements DailyTasksStateNotifier {
+class DailyTasksViewStateNotifier extends _$DailyTasksViewStateNotifier
+    with DailyTasksPresenterImpl {
   // todo 初期化
   @override
   LazyMapViewState<Date, TaskList<VDailyTask>> build() {
@@ -43,7 +44,9 @@ class DailyTasksStateHandler extends _$DailyTasksStateHandler
       ref.read(notifyDailyTasksAccessUseCaseProvider);
 
   /// アクセスを通知する
-  void _onAccess(Date date) => _notifyDailyTasksAccessUseCase.execute(date);
+  void _onAccess(Date date) => _notifyDailyTasksAccessUseCase.execute(
+        NotifyDailyTasksAccessInputData(date: date),
+      );
 
   /// 監視フローを開始する
   void _startWatching(Date targetDate) {
@@ -53,8 +56,6 @@ class DailyTasksStateHandler extends _$DailyTasksStateHandler
     }
     _watchDailyTasksUseCase.initAt(targetDate);
   }
-
-  // void _notifyAccess(Date date)=>;
 
   /// [state] 更新メソッド
   ///

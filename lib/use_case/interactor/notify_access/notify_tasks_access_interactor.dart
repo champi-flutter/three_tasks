@@ -1,5 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:three_tasks/use_case/input_boundary/notify_access/notify_tasks_access_use_case.dart';
+import 'package:three_tasks/use_case/input_data/task_input_data/notify_tasks_access/notify_tasks_access_input_data.dart';
 import 'package:three_tasks/use_case/repository_interface/data_repository.dart';
 
 
@@ -13,8 +14,8 @@ class NotifyDailyTasksAccessInteractor
   final DataRepository _repository;
 
   @override
-  void execute(Date date) {
-    _repository.notifyDailyTaskAccess(date: date);
+  void execute(NotifyDailyTasksAccessInputData inputData) {
+    _repository.notifyDailyTaskAccess(date: inputData.date);
   }
 }
 
@@ -28,8 +29,8 @@ class NotifyWeeklyTasksAccessInteractor
   final DataRepository _repository;
 
   @override
-  void execute(UniqueWeek week) {
-    _repository.notifyWeeklyTaskAccess(week: week);
+  void execute(NotifyWeeklyTasksAccessInputData inputData) {
+    _repository.notifyWeeklyTaskAccess(week: inputData.week);
   }
 }
 
@@ -43,8 +44,8 @@ class NotifyMonthlyTasksAccessInteractor
   final DataRepository _repository;
 
   @override
-  void execute(Month month) {
-    _repository.notifyMonthlyTaskAccess(month: month);
+  void execute(NotifyMonthlyTasksAccessInputData inputData) {
+    _repository.notifyMonthlyTaskAccess(month: inputData.month);
   }
 }
 
@@ -58,7 +59,7 @@ class NotifyYearlyTasksAccessInteractor
   final DataRepository _repository;
 
   @override
-  void execute(int year) {
-    _repository.notifyYearlyTaskAccess(year: year);
+  void execute(NotifyYearlyTasksAccessInputData inputData) {
+    _repository.notifyYearlyTaskAccess(year: inputData.year);
   }
 }

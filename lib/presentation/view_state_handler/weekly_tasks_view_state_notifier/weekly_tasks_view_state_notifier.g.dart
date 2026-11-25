@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'weekly_tasks_state_handler.dart';
+part of 'weekly_tasks_view_state_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -9,28 +9,28 @@ part of 'weekly_tasks_state_handler.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
-@ProviderFor(WeeklyTasksStateHandler)
-const weeklyTasksStateHandlerProvider = WeeklyTasksStateHandlerProvider._();
+@ProviderFor(WeeklyTasksViewStateNotifier)
+const weeklyTasksViewStateProvider = WeeklyTasksViewStateNotifierProvider._();
 
-final class WeeklyTasksStateHandlerProvider
-    extends $NotifierProvider<WeeklyTasksStateHandler, WeeklyLazyMap> {
-  const WeeklyTasksStateHandlerProvider._()
+final class WeeklyTasksViewStateNotifierProvider
+    extends $NotifierProvider<WeeklyTasksViewStateNotifier, WeeklyLazyMap> {
+  const WeeklyTasksViewStateNotifierProvider._()
       : super(
           from: null,
           argument: null,
           retry: null,
-          name: r'weeklyTasksStateHandlerProvider',
+          name: r'weeklyTasksViewStateProvider',
           isAutoDispose: true,
           dependencies: null,
           $allTransitiveDependencies: null,
         );
 
   @override
-  String debugGetCreateSourceHash() => _$weeklyTasksStateHandlerHash();
+  String debugGetCreateSourceHash() => _$weeklyTasksViewStateNotifierHash();
 
   @$internal
   @override
-  WeeklyTasksStateHandler create() => WeeklyTasksStateHandler();
+  WeeklyTasksViewStateNotifier create() => WeeklyTasksViewStateNotifier();
 
   /// {@macro riverpod.override_with_value}
   Override overrideWithValue(WeeklyLazyMap value) {
@@ -41,10 +41,10 @@ final class WeeklyTasksStateHandlerProvider
   }
 }
 
-String _$weeklyTasksStateHandlerHash() =>
-    r'2c463d86e3e7392534f2631f3590c14623bd1e7d';
+String _$weeklyTasksViewStateNotifierHash() =>
+    r'522fc508a5712867327bdc6d31d558edde27a5e3';
 
-abstract class _$WeeklyTasksStateHandler extends $Notifier<WeeklyLazyMap> {
+abstract class _$WeeklyTasksViewStateNotifier extends $Notifier<WeeklyLazyMap> {
   WeeklyLazyMap build();
   @$mustCallSuper
   @override

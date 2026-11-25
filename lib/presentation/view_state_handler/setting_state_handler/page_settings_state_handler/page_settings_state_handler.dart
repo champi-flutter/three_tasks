@@ -1,4 +1,3 @@
-import 'package:custom_core_types/custom_core_types.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/di/use_case_providers/use_case_providers.dart';
@@ -14,19 +13,20 @@ part 'page_settings_state_handler.g.dart';
 class PageSettingsStateHandler extends _$PageSettingsStateHandler
     implements PageSettingsStateNotifier {
   @override
-  LazyViewState<VSettingsMap> build() {
-    _initViewModel();
-
+  OnetimeLazyViewState<VSettingsMap> build() {
     final placeholder = VSettingsMap.initFromPageList(
       numberOfPages: pageConfig.numberOfPages,
     );
-    return LazyViewState.placeholder(placeholder);
+    return OnetimeLazyViewState.placeholder(
+      placeholder,
+      initState: _initState,
+    );
   }
 
   FetchSettingsUseCase get _fetchSettingsUseCase =>
       ref.read(fetchSettingsUseCaseProvider);
 
-  Future<void> _initViewModel() async {
+  Future<void> _initState() async {
     await _fetchSettingsUseCase.execute(validLength: pageConfig.numberOfPages);
   }
 
@@ -38,7 +38,7 @@ class PageSettingsStateHandler extends _$PageSettingsStateHandler
     if (updatingMap[newSetting.controlledIndex] != newSetting) {
       updatingMap[newSetting.controlledIndex] = newSetting;
 
-      state = LazyViewState.data(updatingMap);
+      state = OnetimeLazyViewState.data(updatingMap);
     }
   }
 
@@ -46,7 +46,7 @@ class PageSettingsStateHandler extends _$PageSettingsStateHandler
   @override
   void updateAll(VSettingsMap newMapState) {
     if (state.data.hasChanges(newMapState)) {
-      state = LazyViewState.data(newMapState);
+      state = OnetimeLazyViewState.data(newMapState);
     }
   }
 }

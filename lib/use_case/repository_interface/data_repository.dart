@@ -4,7 +4,7 @@ import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/domain/entity/e_label/e_label.dart';
 import 'package:three_tasks/domain/entity/e_setting/e_page_setting.dart';
 import 'package:three_tasks/domain/entity/e_task/e_task.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 /// データ層へのアクセスポート
 abstract class DataRepository {

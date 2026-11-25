@@ -1,8 +1,8 @@
 
 
 import 'package:custom_core_types/custom_core_types.dart';
-import 'package:three_tasks/data_foundation/review_base/review.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/review.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 /// タスク共通のデータ構造
 abstract class TaskBase {

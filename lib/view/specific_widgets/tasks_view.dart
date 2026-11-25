@@ -7,6 +7,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_wrapper/riverpod_wrapper.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
 import 'package:three_tasks/di/presentation_providers/controller_providers.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 import 'package:three_tasks/presentation/controller/dto/label_control_parameter/label_control_parameter.dart';
 import 'package:three_tasks/presentation/controller/dto/task_control_parameter/task_control_parameter.dart';
 
@@ -54,26 +55,36 @@ class TasksView extends ConsumerWidget {
           String? newTitle,
           bool? newChecked,
           int? newLabelId,
-        })
-            // 折りたたみ用
-            =>
-            ref.read(tasksControllerProvider(scopeToken)).controlTask(
-                willAutoSave: willAutoSave,
-                taskState: taskState,
-                position: position,
-                parameter: TaskControlParameter(
-                  newTitle: newTitle,
-                  newChecked: newChecked,
-                  newLabelId: newLabelId,
-                ));
+          Date? newStartOfWeeklyTask,
+        }) {
+          // 週タスクのみ専用のパラメータクラス（汎用パラメータクラスを継承）を使う
+          final TaskControlParameter parameter = (taskState.rec != TaskRec.week)
+              ? TaskControlParameter(
+            newTitle: newTitle,
+            newChecked: newChecked,
+            newLabelId: newLabelId,
+          )
+              : WeeklyTaskControlParameter(
+            newTitle: newTitle,
+            newChecked: newChecked,
+            newLabelId: newLabelId,
+            newStart: newStartOfWeeklyTask,
+          );
+          return ref.read(tasksControllerProvider(scopeToken)).controlTask(
+            willAutoSave: willAutoSave,
+            taskState: taskState,
+            position: position,
+            parameter: parameter,
+          );
+        };
 
         // ラベルにタスク情報が加わるときのコールバック
         final onAddTaskInLabel = ({
           required ListEntry<VLabel> vLabelEntry,
           required VTask vTask,
         })
-            // 折りたたみ用
-            async {
+        // 折りたたみ用
+        async {
           // タスク ID がどのタスクの ID か
           final LabelControlParameter parameter = switch (vTask) {
             VDailyTask() => LabelControlParameter(newDailyId: vTask.id),
@@ -83,13 +94,14 @@ class TasksView extends ConsumerWidget {
           };
           await ref.read(labelsControllerProvider(scopeToken)).controlLabel(
             willAutoSave: willAutoSave,
-                vLabelEntry: vLabelEntry,
-                parameter: parameter,
-              );
+            vLabelEntry: vLabelEntry,
+            parameter: parameter,
+          );
         };
 
         // ラベル適用時のコールバック
-        final onSetLabel = (BuildContext context) => showLabelApplyingDialog(
+        final onSetLabel = (BuildContext context) =>
+            showLabelApplyingDialog(
               context,
               taskState: taskState,
               targetPosition: position,
@@ -110,8 +122,13 @@ class TasksView extends ConsumerWidget {
             );
 
         // ラベル解除時のコールバック
-        final onUnlabel =
-            (BuildContext context) => onControlTask(newLabelId: -1);
+        // todo 確認ダイアログは必要か（2026/11/16）＞＞
+        final onUnlabel = () => onControlTask(newLabelId: -1);
+
+        // 週タスクの開始日変更時のコールバック
+        final onChangeStartOfWeeklyTask = (Date date) => onControlTask(
+          newStartOfWeeklyTask: date,
+        );
 
         switch (tasksViewStyle) {
           case TasksViewStyle.checkbox:
@@ -165,7 +182,7 @@ class _TaskField extends HookConsumerWidget {
 
   /// 自動保存オン時の、各タスクの入力値の自動保存ロジック
   final Future<void> Function({
-    String? newTitle,
+  String? newTitle,
   }) onTextEdited;
 
   /// このスコープの [Token]
@@ -196,7 +213,7 @@ class _TaskField extends HookConsumerWidget {
 
     // TextEditingController と FocusNode の管理元
     final TextFocusController textFocusController =
-        useTextFocusController(onUnfocused: _onUnfocused);
+    useTextFocusController(onUnfocused: _onUnfocused);
 
     // 入力欄本体
     return TextField(
@@ -239,16 +256,16 @@ class _CheckableTaskField extends HookConsumerWidget {
 
   /// 各タスク編集時のコールバック
   final Future<void> Function({
-    String? newTitle,
-    bool? newChecked,
-    int? newLabelId,
+  String? newTitle,
+  bool? newChecked,
+  int? newLabelId,
   }) onControlTask;
 
   /// ラベル適用時のコールバック
   final Future<void> Function(BuildContext context) onSetLabel;
 
   /// ラベル解除時のコールバック
-  final Future<void> Function(BuildContext context) onUnlabel;
+  final Future<void> Function() onUnlabel;
 
   /// このスコープの [Token]
   final Token scopeToken;
@@ -266,9 +283,10 @@ class _CheckableTaskField extends HookConsumerWidget {
       title: _TaskField(
         taskEntry: taskEntry,
         scopeToken: scopeToken,
-        onTextEdited: ({String? newTitle}) => onControlTask(
-          newTitle: newTitle,
-        ),
+        onTextEdited: ({String? newTitle}) =>
+            onControlTask(
+              newTitle: newTitle,
+            ),
       ),
       value: isChecked,
       // チェックボックスが leading （左）側
@@ -305,16 +323,16 @@ class _IconTaskField extends ConsumerWidget {
 
   /// 各タスク編集時のコールバック
   final Future<void> Function({
-    String? newTitle,
-    bool? newChecked,
-    int? newLabelId,
+  String? newTitle,
+  bool? newChecked,
+  int? newLabelId,
   }) onControlTask;
 
   /// ラベル適用時のコールバック
   final Future<void> Function(BuildContext context) onSetLabel;
 
   /// ラベル解除時のコールバック
-  final Future<void> Function(BuildContext context) onUnlabel;
+  final Future<void> Function() onUnlabel;
 
   /// このスコープの [Token]
   final Token scopeToken;
@@ -331,9 +349,10 @@ class _IconTaskField extends ConsumerWidget {
       leading: const Icon(Icons.task),
       title: _TaskField(
         taskEntry: taskEntry,
-        onTextEdited: ({String? newTitle}) => onControlTask(
-          newTitle: newTitle,
-        ),
+        onTextEdited: ({String? newTitle}) =>
+            onControlTask(
+              newTitle: newTitle,
+            ),
         scopeToken: scopeToken,
       ),
       trailing: _LabelIconTrailing(
@@ -360,7 +379,7 @@ class _LabelIconTrailing extends StatelessWidget {
   final Future<void> Function(BuildContext context) onSetLabel;
 
   /// ラベル解除時のコールバック
-  final Future<void> Function(BuildContext context) onUnlabel;
+  final Future<void> Function() onUnlabel;
 
   @override
   Widget build(BuildContext context) {
@@ -369,8 +388,8 @@ class _LabelIconTrailing extends StatelessWidget {
       icon: isLabeled
           ? Icon(Icons.bookmark)
           : Icon(
-              Icons.bookmark_add_outlined,
-            ),
+        Icons.bookmark_add_outlined,
+      ),
       // ラベルマークをタップ
       onPressed: () async {
         // マークがついていない状態で押した場合
@@ -405,7 +424,7 @@ class _LabelIconTrailing extends StatelessWidget {
           }
           // 「ラベルを削除する」を選択した場合
           else if (willUnlabel) {
-            await onUnlabel(context);
+            await onUnlabel();
           }
           // 「ラベルを変更する」を選択した場合
           else {

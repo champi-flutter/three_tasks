@@ -1,4 +1,4 @@
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 class TaskInfoOfReview {
   final TaskRec taskRec;

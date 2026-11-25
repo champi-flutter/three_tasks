@@ -432,7 +432,9 @@ mixin _$OWeeklyTask {
   int get labelId;
   Review get review;
   bool get isFetched;
-  bool get canReplace;
+  bool get isPlaceholder2;
+  bool get shouldIdentify;
+  bool get willRemainPlaceholder2;
 
   /// Create a copy of OWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -455,17 +457,31 @@ mixin _$OWeeklyTask {
             (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched) &&
-            (identical(other.canReplace, canReplace) ||
-                other.canReplace == canReplace));
+            (identical(other.isPlaceholder2, isPlaceholder2) ||
+                other.isPlaceholder2 == isPlaceholder2) &&
+            (identical(other.shouldIdentify, shouldIdentify) ||
+                other.shouldIdentify == shouldIdentify) &&
+            (identical(other.willRemainPlaceholder2, willRemainPlaceholder2) ||
+                other.willRemainPlaceholder2 == willRemainPlaceholder2));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, title, week, id, isChecked,
-      labelId, review, isFetched, canReplace);
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      week,
+      id,
+      isChecked,
+      labelId,
+      review,
+      isFetched,
+      isPlaceholder2,
+      shouldIdentify,
+      willRemainPlaceholder2);
 
   @override
   String toString() {
-    return 'OWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched, canReplace: $canReplace)';
+    return 'OWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched, isPlaceholder2: $isPlaceholder2, shouldIdentify: $shouldIdentify, willRemainPlaceholder2: $willRemainPlaceholder2)';
   }
 }
 
@@ -483,7 +499,9 @@ abstract mixin class $OWeeklyTaskCopyWith<$Res> {
       int labelId,
       Review review,
       bool isFetched,
-      bool canReplace});
+      bool isPlaceholder2,
+      bool shouldIdentify,
+      bool willRemainPlaceholder2});
 }
 
 /// @nodoc
@@ -505,7 +523,9 @@ class _$OWeeklyTaskCopyWithImpl<$Res> implements $OWeeklyTaskCopyWith<$Res> {
     Object? labelId = null,
     Object? review = null,
     Object? isFetched = null,
-    Object? canReplace = null,
+    Object? isPlaceholder2 = null,
+    Object? shouldIdentify = null,
+    Object? willRemainPlaceholder2 = null,
   }) {
     return _then(_self.copyWith(
       title: null == title
@@ -536,9 +556,17 @@ class _$OWeeklyTaskCopyWithImpl<$Res> implements $OWeeklyTaskCopyWith<$Res> {
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
               as bool,
-      canReplace: null == canReplace
-          ? _self.canReplace
-          : canReplace // ignore: cast_nullable_to_non_nullable
+      isPlaceholder2: null == isPlaceholder2
+          ? _self.isPlaceholder2
+          : isPlaceholder2 // ignore: cast_nullable_to_non_nullable
+              as bool,
+      shouldIdentify: null == shouldIdentify
+          ? _self.shouldIdentify
+          : shouldIdentify // ignore: cast_nullable_to_non_nullable
+              as bool,
+      willRemainPlaceholder2: null == willRemainPlaceholder2
+          ? _self.willRemainPlaceholder2
+          : willRemainPlaceholder2 // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -637,16 +665,34 @@ extension OWeeklyTaskPatterns on OWeeklyTask {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String title, UniqueWeek week, int id, bool isChecked,
-            int labelId, Review review, bool isFetched, bool canReplace)?
+    TResult Function(
+            String title,
+            UniqueWeek week,
+            int id,
+            bool isChecked,
+            int labelId,
+            Review review,
+            bool isFetched,
+            bool isPlaceholder2,
+            bool shouldIdentify,
+            bool willRemainPlaceholder2)?
         $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _OWeeklyTask() when $default != null:
-        return $default(_that.title, _that.week, _that.id, _that.isChecked,
-            _that.labelId, _that.review, _that.isFetched, _that.canReplace);
+        return $default(
+            _that.title,
+            _that.week,
+            _that.id,
+            _that.isChecked,
+            _that.labelId,
+            _that.review,
+            _that.isFetched,
+            _that.isPlaceholder2,
+            _that.shouldIdentify,
+            _that.willRemainPlaceholder2);
       case _:
         return orElse();
     }
@@ -667,15 +713,33 @@ extension OWeeklyTaskPatterns on OWeeklyTask {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String title, UniqueWeek week, int id, bool isChecked,
-            int labelId, Review review, bool isFetched, bool canReplace)
+    TResult Function(
+            String title,
+            UniqueWeek week,
+            int id,
+            bool isChecked,
+            int labelId,
+            Review review,
+            bool isFetched,
+            bool isPlaceholder2,
+            bool shouldIdentify,
+            bool willRemainPlaceholder2)
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _OWeeklyTask():
-        return $default(_that.title, _that.week, _that.id, _that.isChecked,
-            _that.labelId, _that.review, _that.isFetched, _that.canReplace);
+        return $default(
+            _that.title,
+            _that.week,
+            _that.id,
+            _that.isChecked,
+            _that.labelId,
+            _that.review,
+            _that.isFetched,
+            _that.isPlaceholder2,
+            _that.shouldIdentify,
+            _that.willRemainPlaceholder2);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -695,15 +759,33 @@ extension OWeeklyTaskPatterns on OWeeklyTask {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String title, UniqueWeek week, int id, bool isChecked,
-            int labelId, Review review, bool isFetched, bool canReplace)?
+    TResult? Function(
+            String title,
+            UniqueWeek week,
+            int id,
+            bool isChecked,
+            int labelId,
+            Review review,
+            bool isFetched,
+            bool isPlaceholder2,
+            bool shouldIdentify,
+            bool willRemainPlaceholder2)?
         $default,
   ) {
     final _that = this;
     switch (_that) {
       case _OWeeklyTask() when $default != null:
-        return $default(_that.title, _that.week, _that.id, _that.isChecked,
-            _that.labelId, _that.review, _that.isFetched, _that.canReplace);
+        return $default(
+            _that.title,
+            _that.week,
+            _that.id,
+            _that.isChecked,
+            _that.labelId,
+            _that.review,
+            _that.isFetched,
+            _that.isPlaceholder2,
+            _that.shouldIdentify,
+            _that.willRemainPlaceholder2);
       case _:
         return null;
     }
@@ -721,7 +803,9 @@ class _OWeeklyTask extends OWeeklyTask {
       required this.labelId,
       required this.review,
       required this.isFetched,
-      required this.canReplace})
+      required this.isPlaceholder2,
+      required this.shouldIdentify,
+      required this.willRemainPlaceholder2})
       : super._();
 
   @override
@@ -739,7 +823,11 @@ class _OWeeklyTask extends OWeeklyTask {
   @override
   final bool isFetched;
   @override
-  final bool canReplace;
+  final bool isPlaceholder2;
+  @override
+  final bool shouldIdentify;
+  @override
+  final bool willRemainPlaceholder2;
 
   /// Create a copy of OWeeklyTask
   /// with the given fields replaced by the non-null parameter values.
@@ -763,17 +851,31 @@ class _OWeeklyTask extends OWeeklyTask {
             (identical(other.review, review) || other.review == review) &&
             (identical(other.isFetched, isFetched) ||
                 other.isFetched == isFetched) &&
-            (identical(other.canReplace, canReplace) ||
-                other.canReplace == canReplace));
+            (identical(other.isPlaceholder2, isPlaceholder2) ||
+                other.isPlaceholder2 == isPlaceholder2) &&
+            (identical(other.shouldIdentify, shouldIdentify) ||
+                other.shouldIdentify == shouldIdentify) &&
+            (identical(other.willRemainPlaceholder2, willRemainPlaceholder2) ||
+                other.willRemainPlaceholder2 == willRemainPlaceholder2));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, title, week, id, isChecked,
-      labelId, review, isFetched, canReplace);
+  int get hashCode => Object.hash(
+      runtimeType,
+      title,
+      week,
+      id,
+      isChecked,
+      labelId,
+      review,
+      isFetched,
+      isPlaceholder2,
+      shouldIdentify,
+      willRemainPlaceholder2);
 
   @override
   String toString() {
-    return 'OWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched, canReplace: $canReplace)';
+    return 'OWeeklyTask(title: $title, week: $week, id: $id, isChecked: $isChecked, labelId: $labelId, review: $review, isFetched: $isFetched, isPlaceholder2: $isPlaceholder2, shouldIdentify: $shouldIdentify, willRemainPlaceholder2: $willRemainPlaceholder2)';
   }
 }
 
@@ -793,7 +895,9 @@ abstract mixin class _$OWeeklyTaskCopyWith<$Res>
       int labelId,
       Review review,
       bool isFetched,
-      bool canReplace});
+      bool isPlaceholder2,
+      bool shouldIdentify,
+      bool willRemainPlaceholder2});
 }
 
 /// @nodoc
@@ -815,7 +919,9 @@ class __$OWeeklyTaskCopyWithImpl<$Res> implements _$OWeeklyTaskCopyWith<$Res> {
     Object? labelId = null,
     Object? review = null,
     Object? isFetched = null,
-    Object? canReplace = null,
+    Object? isPlaceholder2 = null,
+    Object? shouldIdentify = null,
+    Object? willRemainPlaceholder2 = null,
   }) {
     return _then(_OWeeklyTask(
       title: null == title
@@ -846,9 +952,17 @@ class __$OWeeklyTaskCopyWithImpl<$Res> implements _$OWeeklyTaskCopyWith<$Res> {
           ? _self.isFetched
           : isFetched // ignore: cast_nullable_to_non_nullable
               as bool,
-      canReplace: null == canReplace
-          ? _self.canReplace
-          : canReplace // ignore: cast_nullable_to_non_nullable
+      isPlaceholder2: null == isPlaceholder2
+          ? _self.isPlaceholder2
+          : isPlaceholder2 // ignore: cast_nullable_to_non_nullable
+              as bool,
+      shouldIdentify: null == shouldIdentify
+          ? _self.shouldIdentify
+          : shouldIdentify // ignore: cast_nullable_to_non_nullable
+              as bool,
+      willRemainPlaceholder2: null == willRemainPlaceholder2
+          ? _self.willRemainPlaceholder2
+          : willRemainPlaceholder2 // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }

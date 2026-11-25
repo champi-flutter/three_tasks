@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
 import 'package:custom_core_types/custom_core_types.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:three_tasks/data_foundation/review_base/review.dart';
+import 'package:three_tasks/data_foundation/value_object/review.dart';
 import 'package:three_tasks/data_foundation/task_base/task_base.dart';
 import 'package:three_tasks/data_foundation/task_base/task_list.dart';
-import 'package:three_tasks/enum/task_recurrence.dart';
+import 'package:three_tasks/data_foundation/value_object/task_recurrence.dart';
 
 part 'i_task.freezed.dart';
 
@@ -53,23 +53,6 @@ abstract class IWeeklyTask with WeeklyTaskBase, _$IWeeklyTask implements ITask {
     required int labelId,
     required Review review,
   }) = _IWeeklyTask;
-
-  /// **編集可能な** 週単位タスクの仮データかどうか
-  bool get isPlaceHolder2 => id == -2;
-
-  /// placeholder2 の初期値から変更されたかどうか
-  bool get _isPlaceholder2Changed =>
-      !(title == "" && isChecked == false && labelId == -1);
-
-  /// 編集可能な仮データかどうか
-  bool get canReplace {
-    return isPlaceHolder2 && !_isPlaceholder2Changed;
-  }
-
-  /// 編集不可な仮データかどうか
-  bool get cannotReplace {
-    return _isPlaceholder2Changed && isPlaceHolder2;
-  }
 }
 
 /// 月単位タスクの InputData
@@ -103,8 +86,3 @@ abstract class IYearlyTask with YearlyTaskBase, _$IYearlyTask implements ITask {
     required Review review,
   }) = _IYearlyTask;
 }
-//
-// extension ITaskListExtension on List<ITask> {
-//   /// データ未受信状態かどうか
-//   bool get isDisabled => any((task) => !task.isFetched);
-// }

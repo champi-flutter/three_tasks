@@ -1,6 +1,6 @@
 import 'package:custom_core_types/custom_core_types.dart';
 
-/// タスク制御用 DTO
+/// タスク変更制御パラメータ
 class TaskControlParameter {
   const TaskControlParameter({
     this.newTitle,
@@ -20,6 +20,7 @@ class TaskControlParameter {
   final int? newLabelId;
 }
 
+/// 週タスク変更制御パラメータ
 class WeeklyTaskControlParameter extends TaskControlParameter {
   WeeklyTaskControlParameter({
     super.newTitle,

@@ -51,7 +51,7 @@ final class DailyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$dailyTasksPresenterHash() =>
-    r'7028e676e366fbfa9e64ab057652e9e0559475e5';
+    r'a52f36a4858f437cf352ee258cf3cb2764c97ba8';
 
 @ProviderFor(weeklyTasksPresenter)
 const weeklyTasksPresenterProvider = WeeklyTasksPresenterProvider._();
@@ -95,7 +95,7 @@ final class WeeklyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$weeklyTasksPresenterHash() =>
-    r'35fa7670a9997d50920d3ad16ffb531b36fa65fb';
+    r'2a208b87336cde1795e8c8ec9c727b4a6c9d442c';
 
 @ProviderFor(monthlyTasksPresenter)
 const monthlyTasksPresenterProvider = MonthlyTasksPresenterProvider._();
@@ -139,7 +139,7 @@ final class MonthlyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$monthlyTasksPresenterHash() =>
-    r'688011c171cf4831d17d16347c8dd417b8111c1b';
+    r'5dffadc3750f9b6308572bd410ffc9924672e4d3';
 
 @ProviderFor(yearlyTasksPresenter)
 const yearlyTasksPresenterProvider = YearlyTasksPresenterProvider._();
@@ -183,7 +183,7 @@ final class YearlyTasksPresenterProvider extends $FunctionalProvider<
 }
 
 String _$yearlyTasksPresenterHash() =>
-    r'c5479b1920e73f3cd974bf9bb8aa560749a7480f';
+    r'69753c5ceb5dd493b59bf80083142457c8fed1a7';
 
 @ProviderFor(labelsPresenter)
 const labelsPresenterProvider = LabelsPresenterProvider._();

@@ -262,7 +262,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "3a0a38fcb2ce3b22f2ca977f4e4deb27ca9e48c7"
+      resolved-ref: e580b15cd46c1ebbcaae81f028440233fbb92cc9
       url: "https://github.com/champi-flutter/custom_core_types.git"
     source: git
     version: "1.2.3+17"
@@ -320,10 +320,10 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: a7ef58feb86670e51d3a04438aaf92af8242b3e1
+      resolved-ref: cce89c7d92adda5bae04838af408f0c29c9fcefb
       url: "https://github.com/champi-flutter/data_converter.git"
     source: git
-    version: "1.0.3+4"
+    version: "1.0.4+5"
   drift:
     dependency: "direct main"
     description:
@@ -852,7 +852,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "81afea5dcd9bd3bf994c9296c8823f531fe9f567"
+      resolved-ref: "835befbe8ae68327264096c138661b2a9431c40a"
       url: "https://github.com/champi-flutter/riverpod_wrapper.git"
     source: git
     version: "1.3.4+14"

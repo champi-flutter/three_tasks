@@ -251,11 +251,13 @@ class WeeklyLazyMap {
     return null;
   }
 
-  /// 指定 [UniqueWeek] のを更新して、複製した [WeeklyLazyMap] の新しい枠を返すメソッド
+  /// 指定 [UniqueWeek] の値を更新して、複製した [WeeklyLazyMap] の新しい枠を返すメソッド
   ///
   /// 受信データを当てはめたコピーを返す
   WeeklyLazyMap copyReception(
-          UniqueWeek key, WeeklyTaskList<VWeeklyTask> value) =>
+    UniqueWeek key,
+    WeeklyTaskList<VWeeklyTask> value,
+  ) =>
       copyWith(key, LazyViewState.data(value));
 
   /// [copyWith] の override

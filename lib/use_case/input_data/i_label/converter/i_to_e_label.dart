@@ -6,10 +6,10 @@ class IToELabel {
     return ELabel(
       labelId: iLabel.labelId,
       title: iLabel.title,
-      dailyIdList: [...iLabel.dailyIdList],
-      weeklyIdList: [...iLabel.weeklyIdList],
-      monthlyIdList: [...iLabel.monthlyIdList],
-      yearlyIdList: [...iLabel.yearlyIdList],
+      dailyIdList: iLabel.dailyIdList,
+      weeklyIdList: iLabel.weeklyIdList,
+      monthlyIdList: iLabel.monthlyIdList,
+      yearlyIdList: iLabel.yearlyIdList,
     );
   }
 }
